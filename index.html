@@ -253,6 +253,23 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="white">
+<meta name="apple-mobile-web-app-title" content="Gemini AI">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1624/1624453.png">
+
+<script>
+  // Service Worker Kaydı
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('PWA Hazır!'))
+        .catch(err => console.log('Hata:', err));
+    });
+  }
+</script>
+    
 <script>
     const GEM_KEY = "AIzaSyDvT9CT1yhYTvuQ0kOe8EmgkTZF4RWgMNA";
     const GEM_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEM_KEY}`;
