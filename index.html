@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gemini Pro Dashboard v7</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4880FF;
+            --bg: #FFFFFF;
+            --text: #1a1a1a;
+            --chat-size: 13px;
+            --chat-weight: 600;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+
+        /* HEADER */
+        .header {
+            position: fixed; top: 0; width: 100%; height: 75px;
+            background: white; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 15px; border-bottom: 1px solid #f0f0f0; z-index: 1001;
+        }
+        .header-left, .header-right { display: flex; gap: 10px; flex: 1; }
+        .header-right { justify-content: flex-end; }
+        .header-center { text-align: center; flex: 1.5; }
+
+        .time-text { font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 1.3rem; color: #111; display: block; }
+        .date-text { font-size: 0.65rem; color: #aaa; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* BUTONLAR */
+        .btn-icon {
+            width: 42px; height: 42px; border-radius: 12px; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; transition: all 0.2s; background: #fff;
+            border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .btn-icon:active { transform: scale(0.92); }
+        .btn-gemini { background: #FFC107 !important; color: white !important; border: none !important; }
+        .btn-save { background: var(--primary) !important; color: white !important; border: none !important; }
+
+        /* HABER AKIŞI */
+        #newsFeed {
+            margin-top: 85px; height: calc(100vh - 85px);
+            overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px;
+        }
+        .news-card {
+            background: white; border-radius: 20px; padding: 12px; display: flex; gap: 12px;
+            border: 1px solid #f3f3f3; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+        .news-card img { width: 80px; height: 80px; border-radius: 14px; object-fit: cover; flex-shrink: 0; background: #f9f9f9; }
+        .news-title { font-size: 0.92rem; font-weight: 700; color: #222; line-height: 1.4; }
+        .news-meta { font-size: 0.65rem; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 4px; }
+
+        /* MODAL */
+        .overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px); display: none; z-index: 5000;
+            justify-content: center; align-items: flex-end;
+        }
+       /* MODAL ANA YAPI */
+/* MODAL ANA YAPI - ŞEFFAFLIK GİDERİLDİ */
+/* --- TERTEMİZ MODAL YAPISI (TIPSIZLIĞE SON) --- */
+.modal {
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important;
+    overflow: hidden !important;
+    height: auto;
+    max-height: 85vh;
+    background: #FFFFFF !important; 
+    border-radius: 30px 30px 0 0;
+    box-shadow: 0 -15px 40px rgba(0,0,0,0.15);
+    width: 100% !important; /* Genişliği tam yapıyoruz */
+}
+
+/* ÜST BAŞLIK ALANI */
+.modal-header {
+    padding: 25px 20px 15px 20px;
+    background: white;
+    text-align: center;
+    border-bottom: 1px solid #f2f2f2;
+}
+
+.modal-header h2 {
+    font-size: 1.2rem;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: #111;
+}
+
+/* ORTA ALAN - AYARLAR VE LİSTELER */
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 25px 20px;
+    background: #FFFFFF;
+}
+
+/* AYAR SATIRLARI (HİZALAMA BURADA DÜZELİYOR) */
+.set-row {
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.set-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 5px;
+}
+
+/* KONTROL KUTUSU (Geniş ve profesyonel) */
+.set-ctrl {
+    display: flex;
+    align-items: center;
+    background: #f8f9fb;
+    border: 2px solid #edf0f5;
+    border-radius: 18px;
+    height: 60px; /* Daha rahat dokunma alanı */
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+.set-ctrl:focus-within {
+    border-color: var(--primary);
+}
+
+.set-ctrl button {
+    flex: 1;
+    height: 100%;
+    border: none;
+    background: transparent;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.set-ctrl button:active {
+    background: #eef2ff;
+}
+
+.set-ctrl span {
+    flex: 2;
+    text-align: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #111;
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+}
+
+/* ALT SABİT BUTON (KAYDET / KAPAT) */
+.modal-footer {
+    padding: 15px 20px 35px 20px;
+    background: white;
+    border-top: 1px solid #f2f2f2;
+}
+
+.btn-full {
+    width: 100%;
+    height: 55px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 18px;
+    font-size: 1rem;
+    font-weight: 800;
+    box-shadow: 0 10px 20px rgba(72, 128, 255, 0.2);
+    cursor: pointer;
+}
+/* CHAT KUTUSU AYARI (MODAL BODY İÇİNDE) */
+.chat-box {
+    background: #f8faff;
+    border-radius: 20px;
+    padding: 15px;
+    margin: 15px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid #eef2ff;
+    /* Sabit yükseklik yerine içeriğe göre uzasın, body scroll olacak */
+}
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        /* CHAT */
+        .chat-box {
+            background: #f8faff; border-radius: 20px; padding: 15px; height: 260px;
+            overflow-y: auto; margin: 15px 0; display: flex; flex-direction: column; gap: 10px;
+            border: 1px solid #eef2ff;
+        }
+        .msg {
+            max-width: 85%; padding: 12px 16px; border-radius: 18px;
+            font-size: var(--chat-size); font-weight: var(--chat-weight);
+            line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word;
+        }
+        .msg.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg.ai { background: white; border: 1px solid #e0e6ed; align-self: flex-start; border-bottom-left-radius: 4px; }
+
+        /* TOAST BİLDİRİM */
+        #toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            background: white; padding: 12px 25px; border-radius: 50px; font-weight: 800; font-size: 0.85rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 2px solid var(--primary);
+            z-index: 9999; transition: 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* WEB BROWSER */
+        #webWin { position: fixed; inset: 0; background: white; z-index: 6000; display: none; flex-direction: column; }
+        .web-bar { height: 65px; border-bottom: 1px solid #eee; display: flex; align-items: center; padding: 0 15px; gap: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="toast">İşlem Başarılı</div>
+
+    <header class="header">
+        <div class="header-left">
+            <button class="btn-icon" onclick="openSettings()">⚙️</button>
+            <button class="btn-icon btn-gemini" onclick="openGeneralChat()">✨</button>
+        </div>
+        <div class="header-center">
+            <span class="time-text" id="clk">00:00</span>
+            <span class="date-text" id="dt">YÜKLENİYOR</span>
+        </div>
+        <div class="header-right">
+            <button class="btn-icon btn-save" onclick="openSavedList()">💾</button>
+            <button class="btn-icon" onclick="location.reload()">🔄</button>
+        </div>
+    </header>
+
+    <main id="newsFeed"></main>
+
+    <div class="overlay" id="ovl"><div class="modal" id="mdl"></div></div>
+
+    <div id="webWin">
+        <div class="web-bar">
+            <button class="btn-icon" onclick="closeWeb()">⬅️</button>
+            <div style="flex:1; text-align:center; font-weight:800; font-size:0.75rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="webTit">Site</div>
+            <button class="btn-icon btn-gemini" onclick="closeWeb()">✨</button>
+        </div>
+        <iframe id="ifr" style="flex:1; border:none;"></iframe>
+    </div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+    const GEM_KEY = "AIzaSyDvT9CT1yhYTvuQ0kOe8EmgkTZF4RWgMNA";
+    const GEM_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEM_KEY}`;
+    
+    const fbCfg = { apiKey: "AIzaSyAwQfifK4eaSrSjKpA776hD0RAlx_6a2_w", databaseURL: "https://piyasa-9049c-default-rtdb.firebaseio.com", projectId: "piyasa-9049c" };
+    firebase.initializeApp(fbCfg);
+    const db = firebase.database();
+
+    let sets = { size: 13, weight: 600, speed: 20, effect: 'DAKTİLO' };
+    let news = [];
+    let active = null;
+
+    // RESİM YAKALAMA VE LOGO SİSTEMİ
+    const logos = {
+        'TRT': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/TRT_Haber_logo.svg/512px-TRT_Haber_logo.svg.png',
+        'CNN': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/CNN.svg/512px-CNN.svg.png',
+        'NTV': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/NTV_Logo.svg/512px-NTV_Logo.svg.png',
+        'WEBTEKNO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Webtekno_Logo.png/512px-Webtekno_Logo.png',
+        'SDN': 'https://shiftdelete.net/wp-content/themes/sdn/assets/img/logo.png'
+    };
+
+    // GELİŞMİŞ RESİM YAKALAMA (NTV ve CNN İÇİN ÖZEL)
+    function getBestImage(item, source) {
+        // 1. Standart Enclosure kontrolü
+        if(item.enclosure?.link) return item.enclosure.link;
+        if(item.thumbnail) return item.thumbnail;
+        
+        // 2. NTV/CNN için description içindeki <img> tagını ayıkla
+        if (item.description && item.description.includes('<img')) {
+            const regex = /<img[^>]+src="([^">]+)"/g;
+            const match = regex.exec(item.description);
+            if (match && match[1]) return match[1];
+        }
+
+        // 3. Hiçbiri yoksa kaynağa özel HD logo koy
+        const logos = {
+            'TRT': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/TRT_Haber_logo.svg/512px-TRT_Haber_logo.svg.png',
+            'CNN': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/CNN.svg/512px-CNN.svg.png',
+            'NTV': 'https://upload.wikimedia.org/wikipedia/commons/b/b5/NTV_logo.png', // NTV HD Logo
+            'WEBTEKNO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Webtekno_Logo.png/512px-Webtekno_Logo.png',
+            'SDN': 'https://shiftdelete.net/wp-content/themes/sdn/assets/img/logo.png'
+        };
+        return logos[source] || 'https://via.placeholder.com/100';
+    }
+
+    // SAAT GÜNCELLEME
+    function updateTime() {
+        const n = new Date();
+        document.getElementById('clk').innerText = n.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+        document.getElementById('dt').innerText = n.toLocaleDateString('tr-TR', {day:'numeric', month:'long'}).toUpperCase();
+    }
+    setInterval(updateTime, 1000); updateTime();
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // FIREBASE VERİ ÇEKME
+    const sMap = { 'haber_trt': 'TRT', 'haber_cnn': 'CNN', 'haber_ntv': 'NTV', 'haber_webtekno': 'WEBTEKNO', 'haber_shiftdelete': 'SDN' };
+    Object.keys(sMap).forEach(key => {
+        db.ref(key + "/items").on("value", snap => {
+            if(snap.val()) {
+                const data = snap.val().slice(0, 10).map(i => ({...i, source: sMap[key]}));
+                news = news.filter(x => x.source !== sMap[key]).concat(data).sort(() => Math.random() - 0.5);
+                render();
+            }
+        });
+    });
+
+    function render() {
+        const f = document.getElementById('newsFeed'); f.innerHTML = '';
+        news.forEach((n, i) => {
+            f.innerHTML += `
+                <div class="news-card" onclick="openDetail(${i})">
+                    <img src="${getBestImage(n, n.source)}">
+                    <div style="flex:1">
+                        <div class="news-meta">${n.source}</div>
+                        <div class="news-title">${n.title}</div>
+                    </div>
+                </div>`;
+        });
+    }
+
+    // AYARLAR PANELİ
+  function openSettings() {
+    const m = document.getElementById('mdl');
+    m.innerHTML = `
+        <div class="modal-header">
+            <h2>⚙️ SİSTEM AYARLARI</h2>
+        </div>
+        <div class="modal-body">
+            <div class="set-row">
+                <label class="set-label">Yazı Boyutu</label>
+                <div class="set-ctrl">
+                    <button onclick="chSet('size',-1)">−</button>
+                    <span>${sets.size}px</span>
+                    <button onclick="chSet('size',1)">+</button>
+                </div>
+            </div>
+            <div class="set-row">
+                <label class="set-label">Yazı Kalınlığı</label>
+                <div class="set-ctrl">
+                    <button onclick="chSet('weight',-100)">−</button>
+                    <span>${sets.weight}</span>
+                    <button onclick="chSet('weight',100)">+</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-full" onclick="closeM()">AYARLARI UYGULA</button>
+        </div>
+    `;
+    document.getElementById('ovl').style.display = 'flex';
+}
+
+    function chSet(k, v) { 
+        sets[k] += v; 
+        document.documentElement.style.setProperty('--chat-'+k, sets[k] + (k=='size'?'px':''));
+        openSettings(); 
+    }
+
+    // HABER DETAY
+   function openDetail(idx) {
+    if(idx === -1) { active = {title: "Genel Sohbet", source: "GEMINI", description: "Buyur abi, seni dinliyorum."}; }
+    else if(idx === -2) { /* Kaydedilenden gelindi, active zaten seçili */ }
+    else { active = news[idx]; }
+
+    const m = document.getElementById('mdl');
+    const img = getBestImage(active, active.source);
+    
+    m.innerHTML = `
+        <div class="modal-header">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="news-meta" style="color:var(--primary); font-weight:900;">${active.source}</span>
+                <div style="display:flex; gap:8px;">
+                    ${active.link ? `<button class="btn-icon" onclick="openWeb('${active.link}')">🔗</button>` : ''}
+                    <button class="btn-icon" onclick="saveNews()">💾</button>
+                    <button class="btn-icon" style="color:#ff4444; border-color:#ffebeb;" onclick="closeM()">❌</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-body">
+            <h3 style="margin-bottom:12px; line-height:1.4; font-size:1.1rem; color:#111;">${active.title}</h3>
+            ${active.source !== "GEMINI" ? `<img src="${img}" style="width:100%; border-radius:18px; margin-bottom:15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">` : ''}
+            <p style="font-size:0.88rem; color:#555; line-height:1.6; margin-bottom:20px;">
+                ${active.description ? active.description.replace(/<[^>]*>?/gm, '').substring(0,300) + '...' : ''}
+            </p>
+            
+            <div class="chat-box" id="cBox">
+                <div class="msg ai">Bu konu hakkında ne sormak istersin abi? Senin için analiz edebilirim.</div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="uInp" placeholder="Gemini'ye sor..." 
+                       style="flex:1; padding:14px; border-radius:15px; border:2px solid #f0f0f0; outline:none; font-weight:600; background:#fcfcfc; font-size:14px;">
+                <button class="btn-icon btn-save" style="width:50px; height:50px; border-radius:15px; flex-shrink:0;" onclick="ask()">➤</button>
+            </div>
+        </div>
+    `;
+    document.getElementById('ovl').style.display = 'flex';
+}
+
+    async function ask() {
+        const inp = document.getElementById('uInp'); const box = document.getElementById('cBox');
+        if(!inp.value) return; const q = inp.value; inp.value = '';
+        box.innerHTML += `<div class="msg user">${q}</div>`;
+        const ai = document.createElement('div'); ai.className = 'msg ai'; ai.innerText = '...';
+        box.appendChild(ai); box.scrollTop = box.scrollHeight;
+        try {
+            const res = await fetch(GEM_URL, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: `Haber: ${active.title}. Soru: ${q}` }] }] })
+            });
+            const d = await res.json(); const txt = d.candidates[0].content.parts[0].text;
+            ai.innerText = '';
+            let x = 0; let itv = setInterval(() => { ai.innerText += txt[x]; x++; if(x >= txt.length){ clearInterval(itv); } box.scrollTop = box.scrollHeight; }, sets.speed);
+        } catch (e) { ai.innerText = "Bağlantı hatası!"; }
+    }
+
+    // KAYDEDİLENLER VE SİLME
+    function saveNews() {
+        let s = JSON.parse(localStorage.getItem('saved_v7') || '[]');
+        if(!s.find(x => x.title === active.title)) {
+            s.push(active); localStorage.setItem('saved_v7', JSON.stringify(s));
+            showToast("Haber Kaydedildi! 💾");
+        }
+    }
+
+    function openSavedList() {
+        const s = JSON.parse(localStorage.getItem('saved_v7') || '[]');
+        const m = document.getElementById('mdl');
+        let h = `<h2 style="text-align:center; margin-bottom:20px;">💾 KAYDEDİLENLER</h2>`;
+        if(!s.length) h += `<p style="text-align:center; color:#999; padding:20px;">Henüz kayıt yok abi.</p>`;
+        else {
+            s.forEach((n, i) => {
+                h += `<div class="news-card" style="margin-bottom:10px;">
+                    <img src="${getBestImage(n, n.source)}" style="width:50px; height:50px;">
+                    <div style="flex:1" onclick="openSavedDetail(${i})">
+                        <div class="news-title" style="font-size:0.8rem;">${n.title.substring(0,50)}...</div>
+                    </div>
+                    <button class="btn-icon" style="color:red; border:none;" onclick="deleteNews(${i})">🗑️</button>
+                </div>`;
+            });
+            h += `<button class="btn-icon" style="width:100%; margin-top:15px; color:red; font-size:0.8rem; font-weight:bold;" onclick="clearAll()">TÜMÜNÜ SİL</button>`;
+        }
+        h += `<button class="btn-icon" style="width:100%; margin-top:10px; background:var(--primary); color:white;" onclick="closeM()">KAPAT</button>`;
+        m.innerHTML = h; document.getElementById('ovl').style.display = 'flex';
+    }
+
+    function deleteNews(i) {
+        let s = JSON.parse(localStorage.getItem('saved_v7') || '[]');
+        s.splice(i, 1); localStorage.setItem('saved_v7', JSON.stringify(s));
+        showToast("Haber Silindi 🗑️"); openSavedList();
+    }
+
+    function clearAll() { if(confirm("Emin misin abi?")) { localStorage.removeItem('saved_v7'); openSavedList(); } }
+    function openSavedDetail(i) { active = JSON.parse(localStorage.getItem('saved_v7'))[i]; openDetail(-2); }
+    function openGeneralChat() { openDetail(-1); }
+    function openWeb(url) { document.getElementById('webTit').innerText = active.title; document.getElementById('ifr').src = url; document.getElementById('webWin').style.display = 'flex'; }
+    function closeWeb() { document.getElementById('webWin').style.display = 'none'; document.getElementById('ifr').src = ''; }
+    function closeM() { document.getElementById('ovl').style.display = 'none'; }
+</script>
+</body>
+</html>
