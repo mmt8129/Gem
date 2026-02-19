@@ -206,7 +206,7 @@
     margin-bottom: 10px; /* Input ile arasında az bir mesafe bırakır */
     border: none; /* Gereksiz çizgileri atıyoruz */
     /* Sabit yükseklik yerine içeriğe göre uzasın, body scroll olacak */
-padding-bottom: 50px !important; /* Mesajların bittiği yerin altında 50px boşluk bırakır */
+padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px boşluk bırakır */
 }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
@@ -215,7 +215,7 @@ padding-bottom: 50px !important; /* Mesajların bittiği yerin altında 50px bo�
             background: #f8faff; border-radius: 20px; padding: 15px; flex: 1; /* Altındaki boşluğu otomatik doldurur ve inputa yaklaşır */ 
             overflow-y: auto; margin: 15px 0; display: flex; flex-direction: column; gap: 10px;
             border: 1px solid #eef2ff; margin-bottom: 10px; /* Input ile arasında az bir mesafe bırakır */
-        padding-bottom: 50px !important; /* Mesajların bittiği yerin altında 50px boşluk bırakır */
+        padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px boşluk bırakır */
         }
         .msg {
             max-width: 92%; padding: 12px 16px; border-radius: 18px;
@@ -462,6 +462,11 @@ padding-bottom: 50px !important; /* Mesajların bittiği yerin altında 50px bo�
         if(!inp.value) return; 
         const q = inp.value; inp.value = '';
         box.innerHTML += `<div class="msg user">${q}</div>`;
+        // Hemen altına bu sihirli satırı ekle:
+document.getElementById('lastUserMsg').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+// Sonra id'yi temizleyelim ki bir sonraki mesajda karışmasın:
+document.getElementById('lastUserMsg').removeAttribute('id');
         if(active.source === "KHOJ") chatHistory.push({role: 'user', text: q});
         
         const ai = document.createElement('div'); ai.className = 'msg ai'; ai.innerHTML = '...';
