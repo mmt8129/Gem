@@ -206,6 +206,7 @@
     margin-bottom: 10px; /* Input ile arasında az bir mesafe bırakır */
     border: none; /* Gereksiz çizgileri atıyoruz */
     /* Sabit yükseklik yerine içeriğe göre uzasın, body scroll olacak */
+padding-bottom: 50px !important; /* Mesajların bittiği yerin altında 50px boşluk bırakır */
 }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
@@ -214,6 +215,7 @@
             background: #f8faff; border-radius: 20px; padding: 15px; flex: 1; /* Altındaki boşluğu otomatik doldurur ve inputa yaklaşır */ 
             overflow-y: auto; margin: 15px 0; display: flex; flex-direction: column; gap: 10px;
             border: 1px solid #eef2ff; margin-bottom: 10px; /* Input ile arasında az bir mesafe bırakır */
+        padding-bottom: 50px !important; /* Mesajların bittiği yerin altında 50px boşluk bırakır */
         }
         .msg {
             max-width: 92%; padding: 12px 16px; border-radius: 18px;
@@ -489,7 +491,7 @@
                     } else {
                         ai.innerHTML += formatted.charAt(i); i++;
                     }
-                    box.scrollTop = box.scrollHeight;
+                    box.scrollTop = box.scrollHeight + 100; // Her yazımda kutuyu biraz daha fazla aşağı iter
                     setTimeout(type, sets.speed);
                 }
             }
