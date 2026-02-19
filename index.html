@@ -523,23 +523,22 @@ padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px bo
                 localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory));
             }
 
-            ai.innerHTML = '';
+           ai.innerHTML = '';
+            let words = formatted.split(' '); // Metni kelimelere bölüyoruz
             let i = 0;
+
             function type() {
-                if (i < formatted.length) {
-                    if (formatted.substr(i, 1) === '<') {
-                        let end = formatted.indexOf('>', i) + 1;
-                        ai.innerHTML += formatted.substring(i, end); i = end;
-                    } else {
-                        ai.innerHTML += formatted.charAt(i); i++;
-                    }
-                    box.scrollTop = box.scrollHeight + 100; // Her yazımda kutuyu biraz daha fazla aşağı iter
-                box.scrollTo({
-    top: box.scrollHeight,
-    behavior: 'auto' // 'smooth' yaparsak yazı hızına yetişemez, 'auto' en iyisi
-});
-                    setTimeout(type, sets.speed);
-                                    }
+                if (i < words.length) {
+                    // Kelimeyi ekliyoruz ve yanına bir boşluk bırakıyoruz
+                    ai.innerHTML += words[i] + ' '; 
+                    i++;
+                    
+                    // Her kelimeden sonra ekranı aşağı kaydırıyoruz
+                    box.scrollTop = box.scrollHeight;
+                    
+                    // Hız ayarını "sets.speed" üzerinden alıyoruz
+                    setTimeout(type, sets.speed * 5); // Kelime olduğu için biraz çarpan ekledik
+                }
             }
             type();
         } catch (e) { ai.innerText = "Bağlantı hatası!"; }
