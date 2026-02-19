@@ -68,14 +68,12 @@
     flex-direction: column;
     padding: 0 !important;
     overflow: hidden !important;
-    height: auto;
-    max-height: 85vh;
+    height: 70vh; /* Ekranın %70'i kadar sabit yükseklik */
     background: #FFFFFF !important; 
-    border-radius: 15px 15px 0 0;
+    border-radius: 20px 20px 0 0; /* Köşe yuvarlaklığını buradan 20'ye düşürdüm */
     box-shadow: 0 -15px 40px rgba(0,0,0,0.15);
-    width: 100% !important; /* Genişliği tam yapıyoruz */
+    width: 100% !important;
 }
-
 /* ÜST BAŞLIK ALANI */
 .modal-header {
     padding: 25px 20px 15px 20px;
@@ -93,10 +91,15 @@
 
 /* ORTA ALAN - AYARLAR VE LİSTELER */
 .modal-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 25px 20px;
+    flex: 1; /* Kalan tüm boşluğu doldurur */
+    overflow-y: auto; /* İçerik taşarsa kaydırma çubuğu çıkar */
+    padding: 20px;
     background: #FFFFFF;
+    /* Kaydırma çubuğunu gizlemek ama kaydırmayı tutmak istersen: */
+    scrollbar-width: none; /* Firefox için */
+}
+.modal-body::-webkit-scrollbar {
+    display: none; /* Chrome/Safari için çubuğu gizler, temiz durur */
 }
 
 /* AYAR SATIRLARI (HİZALAMA BURADA DÜZELİYOR) */
