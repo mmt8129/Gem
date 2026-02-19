@@ -548,22 +548,20 @@ padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px bo
             let i = 0;
 
             function type() {
-                if (i < tokens.length) {
-                    ai.innerHTML += tokens[i];
-                    i++;
+    if (i < tokens.length) {
+        ai.innerHTML += tokens[i];
+        i++;
 
-                    // YILDIRIM YENİLEME: HTML'i anında render eder, renkleri çözer
-                    ai.innerHTML = ai.innerHTML; 
-                    
-                    // ODAKLANMA: Yazma bitene kadar ekranı aşağıda tutar
-                    box.scrollTop = box.scrollHeight;
+        // --- İŞTE YENİLEME YAPAN SİHİRLİ SATIR BURASI ---
+        ai.innerHTML = ai.innerHTML; 
+        // -----------------------------------------------
 
-                    setTimeout(type, sets.speed);
-                } else {
-                    // Yazma bitti, artık kullanıcı ekranı serbestçe yukarı kaydırabilir
-                    box.scrollTop = box.scrollHeight;
-                }
-            }
+        box.scrollTop = box.scrollHeight; // Her kelimede aşağı odakla
+        setTimeout(type, sets.speed);
+    } else {
+        box.scrollTop = box.scrollHeight; // Bittiğinde son kez odakla
+    }
+}
             type();
             
         } catch (e) { ai.innerText = "Bağlantı hatası!"; }
