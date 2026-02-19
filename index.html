@@ -455,13 +455,13 @@ padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px bo
     }
 
     function openDetail(idx) {
-        if(idx === -1) active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." 
+        if(idx === -1) active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." };
           // Sohbet kutusunu bul ve içeriği yükledikten hemen sonra en alta kaydır
     setTimeout(() => {
         const box = document.getElementById('cBox');
         if (box) box.scrollTop = box.scrollHeight;
     }, 50); // 50ms gecikme, içeriğin render edilmesi için yeterli                      
-                                };
+                                
         else if(idx !== -2) active = news[idx];
 
         const m = document.getElementById('mdl');
