@@ -274,41 +274,14 @@
     const GEM_KEY = "AIzaSyDvT9CT1yhYTvuQ0kOe8EmgkTZF4RWgMNA";
     const GEM_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEM_KEY}`;
     
-        // --- FIREBASE BAĞLANTISI (GÜNCELLENDİ) ---
-    const fbCfg = { 
-        apiKey: "AIzaSyAwQfifK4eaSrSjKpA776hD0RAlx_6a2_w", 
-        databaseURL: "https://khoj-smart-default-rtdb.firebaseio.com", 
-        projectId: "khoj-smart" 
-    };
-    
-    if (!firebase.apps.length) {
-        firebase.initializeApp(fbCfg);
-    }
-    const db = firebase.database();
+    const fbCfg = { apiKey: "AIzaSyAwQfifK4eaSrSjKpA776hD0RAlx_6a2_w", databaseURL: "https://piyasa-9049c-default-rtdb.firebaseio.com", projectId: "piyasa-9049c" };
+    firebase.initializeApp(fbCfg);
     const db = firebase.database();
 
     let sets = { size: 13, weight: 600, speed: 20, effect: 'DAKTİLO' };
     let news = [];
     let active = null;
-    // Ayarları Firebase'den Çek
-    db.ref("gemini_settings").on("value", (snap) => {
-        if(snap.val()) {
-            sets = snap.val();
-            document.documentElement.style.setProperty('--chat-size', sets.size + 'px');
-            document.documentElement.style.setProperty('--chat-weight', sets.weight);
-        }
-    });
 
-    // Ayar Değiştiğinde Firebase'e Gönder
-    function chSet(k, v) { 
-        sets[k] += v; 
-        document.documentElement.style.setProperty('--chat-'+k, sets[k] + (k=='size'?'px':''));
-        db.ref("gemini_settings").set(sets); // Buluta gönder
-        openSettings(); 
-    }
-    
-
-    
     // RESİM YAKALAMA VE LOGO SİSTEMİ
     const logos = {
         'TRT': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/TRT_Haber_logo.svg/512px-TRT_Haber_logo.svg.png',
@@ -465,46 +438,21 @@
 }
 
     async function ask() {
-    const inp = document.getElementById('uInp'); 
-    const box = document.getElementById('cBox');
-    if(!inp.value) return; 
-    const q = inp.value; 
-    inp.value = '';
-    
-    box.innerHTML += `<div class="msg user">${q}</div>`;
-    const ai = document.createElement('div'); 
-    ai.className = 'msg ai'; 
-    ai.innerText = '...';
-    box.appendChild(ai); 
-    box.scrollTop = box.scrollHeight;
-
-    try {
-        const res = await fetch(GEM_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            // CORS Hatalarını önlemek için isteği bu şekilde gönderiyoruz
-            body: JSON.stringify({ contents: [{ parts: [{ text: `Haber: ${active.title}. Soru: ${q}` }] }] })
-        });
-
-        if (!res.ok) throw new Error('API Hatası'); // Hata kontrolü
-
-        const d = await res.json(); 
-        const txt = d.candidates[0].content.parts[0].text;
-        ai.innerText = '';
-        
-        let x = 0; 
-        let itv = setInterval(() => { 
-            ai.innerText += txt[x]; 
-            x++; 
-            if(x >= txt.length){ clearInterval(itv); } 
-            box.scrollTop = box.scrollHeight; 
-        }, sets.speed);
-
-    } catch (e) { 
-        ai.innerText = "Hata: Gemini ile bağlantı kurulamadı. Lütfen API anahtarını kontrol et abi."; 
-        console.error("CORS veya Bağlantı Hatası:", e);
+        const inp = document.getElementById('uInp'); const box = document.getElementById('cBox');
+        if(!inp.value) return; const q = inp.value; inp.value = '';
+        box.innerHTML += `<div class="msg user">${q}</div>`;
+        const ai = document.createElement('div'); ai.className = 'msg ai'; ai.innerText = '...';
+        box.appendChild(ai); box.scrollTop = box.scrollHeight;
+        try {
+            const res = await fetch(GEM_URL, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: `Haber: ${active.title}. Soru: ${q}` }] }] })
+            });
+            const d = await res.json(); const txt = d.candidates[0].content.parts[0].text;
+            ai.innerText = '';
+            let x = 0; let itv = setInterval(() => { ai.innerText += txt[x]; x++; if(x >= txt.length){ clearInterval(itv); } box.scrollTop = box.scrollHeight; }, sets.speed);
+        } catch (e) { ai.innerText = "Bağlantı hatası!"; }
     }
-}
 
     // KAYDEDİLENLER VE SİLME
     function saveNews() {
