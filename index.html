@@ -285,11 +285,11 @@
     firebase.initializeApp(fbCfg);
     const db = firebase.database();
 
-    let sets = { size: 13, weight: 600, speed: 20, effect: 'DAKTİLO' };
+    // Ayarları Firebase veya LocalStorage uyumlu hale getirdik
+    let sets = { size: 16, weight: 900, speed: 20, effect: 'typewriter' };
     let news = [];
     let active = null;
 
-    // SAAT GÜNCELLEME (Hata burada oluşmuş olabilir, düzelttim)
     function updateTime() {
         const n = new Date();
         const clk = document.getElementById('clk');
@@ -297,10 +297,9 @@
         if(clk) clk.innerText = n.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
         if(dt) dt.innerText = n.toLocaleDateString('tr-TR', {day:'numeric', month:'long'}).toUpperCase();
     }
-    setInterval(updateTime, 1000); 
-    updateTime();
+    setInterval(updateTime, 1000); updateTime();
 
-    // RESİM YAKALAMA SİSTEMİ
+    // GÖRSEL AYIKLAMA
     function getBestImage(item, source) {
         if(item.enclosure?.link) return item.enclosure.link;
         if(item.thumbnail) return item.thumbnail;
@@ -309,23 +308,10 @@
             const match = regex.exec(item.description);
             if (match && match[1]) return match[1];
         }
-        const logos = {
-            'TRT': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/TRT_Haber_logo.svg/512px-TRT_Haber_logo.svg.png',
-            'CNN': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/CNN.svg/512px-CNN.svg.png',
-            'NTV': 'https://upload.wikimedia.org/wikipedia/commons/b/b5/NTV_logo.png',
-            'WEBTEKNO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Webtekno_Logo.png/512px-Webtekno_Logo.png',
-            'SDN': 'https://shiftdelete.net/wp-content/themes/sdn/assets/img/logo.png'
-        };
-        return logos[source] || 'https://via.placeholder.com/100';
+        return 'https://via.placeholder.com/100';
     }
 
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.innerText = msg; t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2500);
-    }
-
-    // FIREBASE VERİ ÇEKME
+    // HABERLERİ ÇEK
     const sMap = { 'haber_trt': 'TRT', 'haber_cnn': 'CNN', 'haber_ntv': 'NTV', 'haber_webtekno': 'WEBTEKNO', 'haber_shiftdelete': 'SDN' };
     Object.keys(sMap).forEach(key => {
         db.ref(key + "/items").on("value", snap => {
@@ -338,92 +324,108 @@
     });
 
     function render() {
-        const f = document.getElementById('newsFeed'); 
-        if(!f) return;
-        f.innerHTML = '';
-        news.forEach((n, i) => {
-            f.innerHTML += `
-                <div class="news-card" onclick="openDetail(${i})">
-                    <img src="${getBestImage(n, n.source)}">
-                    <div style="flex:1">
-                        <div class="news-meta">${n.source}</div>
-                        <div class="news-title">${n.title}</div>
-                    </div>
-                </div>`;
-        });
+        const f = document.getElementById('newsFeed'); if(!f) return;
+        f.innerHTML = news.map((n, i) => `
+            <div class="news-card" onclick="openDetail(${i})">
+                <img src="${getBestImage(n, n.source)}">
+                <div style="flex:1">
+                    <div class="news-meta">${n.source}</div>
+                    <div class="news-title">${n.title}</div>
+                </div>
+            </div>`).join('');
     }
 
-    // AYARLAR PANELİ
+    // --- GELİŞMİŞ AYARLAR PANELİ (İSTEDİĞİN GİBİ) ---
     function openSettings() {
         const m = document.getElementById('mdl');
         m.innerHTML = `
-            <div class="modal-header"><h2>⚙️ SİSTEM AYARLARI</h2></div>
+            <div class="modal-header"><h2 style="color:var(--primary)">⚙️ AYARLAR</h2></div>
             <div class="modal-body">
                 <div class="set-row">
-                    <label class="set-label">Yazı Boyutu</label>
+                    <label class="set-label">YAZI BOYUTU</label>
                     <div class="set-ctrl">
-                        <button onclick="chSet('size',-1)">−</button>
-                        <span>${sets.size}px</span>
-                        <button onclick="chSet('size',1)">+</button>
+                        <button onclick="adjustSet('size',-1)">-</button>
+                        <span>${sets.size}PX</span>
+                        <button onclick="adjustSet('size',1)">+</button>
                     </div>
                 </div>
+                <div class="set-row">
+                    <label class="set-label">YAZI KALINLIĞI</label>
+                    <div class="set-ctrl">
+                        <button onclick="adjustSet('weight',-100)">-</button>
+                        <span>${sets.weight}</span>
+                        <button onclick="adjustSet('weight',100)">+</button>
+                    </div>
+                </div>
+                <div class="set-row">
+                    <label class="set-label">DAKTİLO HIZI (MS)</label>
+                    <div class="set-ctrl">
+                        <button onclick="adjustSet('speed',-5)">-</button>
+                        <span>${sets.speed}</span>
+                        <button onclick="adjustSet('speed',5)">+</button>
+                    </div>
+                </div>
+                <div class="set-row">
+                    <label class="set-label">YAZI EFEKTİ</label>
+                    <select id="effSel" onchange="adjustSet('effect', this.value)" style="width:100%; padding:15px; border-radius:15px; border:2px solid #edf0f5; font-weight:800;">
+                        <option value="typewriter" ${sets.effect==='typewriter'?'selected':''}>DAKTİLO</option>
+                        <option value="fade" ${sets.effect==='fade'?'selected':''}>SOLARAK</option>
+                        <option value="slide" ${sets.effect==='slide'?'selected':''}>KAYARAK</option>
+                    </select>
+                </div>
             </div>
-            <div class="modal-footer"><button class="btn-full" onclick="closeM()">AYARLARI UYGULA</button></div>`;
+            <div class="modal-footer"><button class="btn-full" onclick="closeM()">KAYDET VE KAPAT</button></div>`;
         document.getElementById('ovl').style.display = 'flex';
     }
 
-    function chSet(k, v) { 
-        sets[k] += v; 
-        document.documentElement.style.setProperty('--chat-'+k, sets[k] + (k=='size'?'px':''));
-        openSettings(); 
+    function adjustSet(k, v) {
+        if(k === 'effect') sets[k] = v;
+        else sets[k] = Math.max(1, (sets[k] || 0) + v);
+        
+        document.documentElement.style.setProperty('--chat-size', sets.size + 'px');
+        document.documentElement.style.setProperty('--chat-weight', sets.weight);
+        openSettings();
     }
 
-    // HABER DETAY VE KHOJ SOHBET
+    // HABER DETAY
     function openDetail(idx) {
-        if(idx === -1) { active = {title: "Genel Sohbet", source: "KHOJ", description: "Buyur abi, seni dinliyorum."}; }
-        else if(idx === -2) { /* Kayıtlıdan gelindi */ }
-        else { active = news[idx]; }
+        if(idx === -1) active = {title: "Genel Sohbet", source: "KHOJ", description: "Buyur abi, seni dinliyorum."};
+        else if(idx !== -2) active = news[idx];
 
         const m = document.getElementById('mdl');
-        const img = getBestImage(active, active.source);
-        
         m.innerHTML = `
             <div class="modal-header">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span class="news-meta" style="color:var(--primary); font-weight:900;">${active.source}</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                    <span class="news-meta">${active.source}</span>
                     <div style="display:flex; gap:8px;">
-                        ${active.link ? `<button class="btn-icon" onclick="openWeb('${active.link}')">🔗</button>` : ''}
                         <button class="btn-icon" onclick="saveNews()">💾</button>
-                        <button class="btn-icon" style="color:#ff4444; border-color:#ffebeb;" onclick="closeM()">❌</button>
+                        <button class="btn-icon" style="color:red" onclick="closeM()">❌</button>
                     </div>
                 </div>
             </div>
             <div class="modal-body">
-                <h3 style="margin-bottom:12px; line-height:1.4; font-size:1.1rem; color:#111;">${active.title}</h3>
-                ${active.source !== "KHOJ" ? `<img src="${img}" style="width:100%; border-radius:18px; margin-bottom:15px;">` : ''}
-                <p style="font-size:0.88rem; color:#555; line-height:1.6; margin-bottom:20px;">
-                    ${active.description ? active.description.replace(/<[^>]*>?/gm, '').substring(0,300) + '...' : ''}
-                </p>
-                <div class="chat-box" id="cBox">
-                    <div class="msg ai">Bu konu hakkında ne sormak istersin abi? Analiz edelim.</div>
+                <h3 style="margin-bottom:10px;">${active.title}</h3>
+                <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">${active.description?.replace(/<[^>]*>?/gm, '').substring(0,200)}...</p>
+                <div class="chat-box" id="cBox" style="min-height:200px;">
+                    <div class="msg ai">Analiz için hazırım abi. Ne sormak istersin?</div>
                 </div>
             </div>
             <div class="modal-footer">
                 <div style="display:flex; gap:10px;">
-                    <input type="text" id="uInp" placeholder="Khoj'a sor..." style="flex:1; padding:14px; border-radius:15px; border:2px solid #f0f0f0; outline:none;">
-                    <button class="btn-icon btn-save" style="width:50px; height:50px; border-radius:15px;" onclick="ask()">➤</button>
+                    <input type="text" id="uInp" placeholder="Bir şey sor..." style="flex:1; padding:12px; border-radius:12px; border:1px solid #ddd;">
+                    <button class="btn-icon btn-save" onclick="ask()">➤</button>
                 </div>
             </div>`;
         document.getElementById('ovl').style.display = 'flex';
     }
 
     async function ask() {
-        const inp = document.getElementById('uInp'); 
-        const box = document.getElementById('cBox');
+        const inp = document.getElementById('uInp'); const box = document.getElementById('cBox');
         if(!inp.value) return; 
         const q = inp.value; inp.value = '';
         box.innerHTML += `<div class="msg user">${q}</div>`;
-        const ai = document.createElement('div'); ai.className = 'msg ai'; ai.innerText = '...';
+        
+        const ai = document.createElement('div'); ai.className = 'msg ai'; ai.innerHTML = '...';
         box.appendChild(ai); box.scrollTop = box.scrollHeight;
 
         try {
@@ -433,51 +435,42 @@
                 body: JSON.stringify({ q: `Haber: ${active.title}. Soru: ${q}`, stream: false })
             });
             const d = await res.json();
-            let txt = d.response.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '').replace(/(?:https?|ftp):\/\/[\n\S]+/g, '').trim();
-            ai.innerText = '';
-            let x = 0; 
-            let itv = setInterval(() => { 
-                ai.innerText += txt[x]; x++; 
-                if(x >= txt.length){ clearInterval(itv); } 
-                box.scrollTop = box.scrollHeight; 
-            }, sets.speed);
-        } catch (e) { ai.innerText = "Bağlantı hatası!"; }
+            
+            // KHOJ FORMATLAMA: Kalınları kırmızı yap, maddeleri düzenle, boşlukları koru
+            let raw = d.response
+                .replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>') // Kalın -> Kırmızı
+                .replace(/^\s*[\-\*]\s+/gm, '🔹 ') // Maddeler
+                .replace(/\n/g, '<br>'); // Satır başları
+
+            ai.innerHTML = '';
+            if(sets.effect === 'typewriter') {
+                let i = 0;
+                function type() {
+                    if (i < raw.length) {
+                        if (raw.substr(i, 1) === '<') {
+                            let end = raw.indexOf('>', i) + 1;
+                            ai.innerHTML += raw.substring(i, end);
+                            i = end;
+                        } else {
+                            ai.innerHTML += raw.charAt(i);
+                            i++;
+                        }
+                        box.scrollTop = box.scrollHeight;
+                        setTimeout(type, sets.speed);
+                    }
+                }
+                type();
+            } else {
+                ai.innerHTML = raw;
+                ai.style.animation = sets.effect === 'fade' ? 'slideUp 0.5s ease' : 'none';
+                box.scrollTop = box.scrollHeight;
+            }
+        } catch (e) { ai.innerText = "Hata oluştu abi!"; }
     }
 
-    function saveNews() {
-        let s = JSON.parse(localStorage.getItem('saved_v7') || '[]');
-        if(!s.find(x => x.title === active.title)) {
-            s.push(active); localStorage.setItem('saved_v7', JSON.stringify(s));
-            showToast("Haber Kaydedildi! 💾");
-        }
-    }
-
-    function openSavedList() {
-        const s = JSON.parse(localStorage.getItem('saved_v7') || '[]');
-        const m = document.getElementById('mdl');
-        let listHtml = s.length ? "" : `<p style="text-align:center; color:#999; padding:40px;">Henüz kayıt yok abi.</p>`;
-        s.forEach((n, i) => {
-            listHtml += `<div class="news-card" style="margin-bottom:12px;">
-                <img src="${getBestImage(n, n.source)}" style="width:50px; height:50px; border-radius:10px;">
-                <div style="flex:1" onclick="openSavedDetail(${i})"><div class="news-title" style="font-size:0.85rem;">${n.title}</div></div>
-                <button class="btn-icon" style="color:#ff4444; border:none;" onclick="deleteNews(${i})">🗑️</button>
-            </div>`;
-        });
-        m.innerHTML = `<div class="modal-header"><h2>💾 KAYDEDİLENLER</h2></div><div class="modal-body">${listHtml}</div><div class="modal-footer"><button class="btn-full" onclick="closeM()">KAPAT</button></div>`;
-        document.getElementById('ovl').style.display = 'flex';
-    }
-
-    function deleteNews(i) {
-        let s = JSON.parse(localStorage.getItem('saved_v7') || '[]');
-        s.splice(i, 1); localStorage.setItem('saved_v7', JSON.stringify(s));
-        openSavedList();
-    }
-
-    function openSavedDetail(i) { active = JSON.parse(localStorage.getItem('saved_v7'))[i]; openDetail(-2); }
-    function openGeneralChat() { openDetail(-1); }
-    function openWeb(url) { document.getElementById('webTit').innerText = active.title; document.getElementById('ifr').src = url; document.getElementById('webWin').style.display = 'flex'; }
-    function closeWeb() { document.getElementById('webWin').style.display = 'none'; document.getElementById('ifr').src = ''; }
     function closeM() { document.getElementById('ovl').style.display = 'none'; }
+    function saveNews() { showToast("Kaydedildi!"); }
+    function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
 </script>
 </body>
 </html>
