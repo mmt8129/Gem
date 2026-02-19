@@ -462,13 +462,15 @@ padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px bo
         if(!inp.value) return; 
         const q = inp.value; inp.value = '';
         box.innerHTML += `<div class="msg user">${q}</div>`;
-        // Hemen altına bu sihirli satırı ekle:
-document.getElementById('lastUserMsg').scrollIntoView({ behavior: 'smooth', block: 'start' });
+ // SİHİRLİ SATIR: Senin mesajın eklenince kutuyu ortalıyoruz
+    // Bu yöntem id gerektirmez, en son eklenen mesajı görür
+    box.scrollTo({
+        top: box.scrollHeight - 150, // Seni tam yukarı değil, biraz daha insancıl bir yere çeker
+        behavior: 'smooth'
+    });
 
-// Sonra id'yi temizleyelim ki bir sonraki mesajda karışmasın:
-document.getElementById('lastUserMsg').removeAttribute('id');
-        if(active.source === "KHOJ") chatHistory.push({role: 'user', text: q});
-        
+    if(active.source === "KHOJ") chatHistory.push({role: 'user', text: q});
+    //
         const ai = document.createElement('div'); ai.className = 'msg ai'; ai.innerHTML = '...';
         box.appendChild(ai); box.scrollTop = box.scrollHeight;
 
