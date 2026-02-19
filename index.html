@@ -454,19 +454,27 @@ padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px bo
         openDetail(-1);
     }
 
-    function openDetail(idx) {
-        if(idx === -1) active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." };
-          // Sohbet kutusunu bul ve içeriği yükledikten hemen sonra en alta kaydır
+   function openDetail(idx) {
+    // 1. Önce veriyi belirle (if/else yapısı kesintisiz olmalı)
+    if (idx === -1) {
+        active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." };
+    } else if (idx !== -2) {
+        active = news[idx];
+    }
+
+    // 2. Sonra modalı ve içeriği hazırla
+    const m = document.getElementById('mdl');
+    const img = getBestImage(active, active.source);
+
+    // 3. En sona da o "en alta kaydır" kodunu ekle (Modal açıldıktan sonra çalışması için)
     setTimeout(() => {
         const box = document.getElementById('cBox');
-        if (box) box.scrollTop = box.scrollHeight;
-    }, 50); // 50ms gecikme, içeriğin render edilmesi için yeterli                      
-                                
-        else if(idx !== -2) active = news[idx];
+        if (box) {
+            box.scrollTop = box.scrollHeight;
+        }
+    }, 100); // Süreyi biraz artırdım ki modal tam açılsın
 
-        const m = document.getElementById('mdl');
-        const img = getBestImage(active, active.source);
-        
+    // ... Fonksiyonun geri kalan kodları buraya devam edecek (m.style.display = 'flex' vb.)
         m.innerHTML = `
             <div class="modal-header">
                 <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
