@@ -289,7 +289,6 @@
     if (!firebase.apps.length) firebase.initializeApp(fbCfg);
     const db = firebase.database();
 
-    // Ayarlar ve Genel Sohbet Hafızası
     let sets = JSON.parse(localStorage.getItem('khoj_sets')) || { size: 16, weight: 900, speed: 20, effect: 'typewriter' };
     let chatHistory = JSON.parse(localStorage.getItem('khoj_ai_history')) || [];
     let news = [];
@@ -305,7 +304,7 @@
     }
     setInterval(updateTime, 1000); 
     updateTime();
-    applySets(); // Ayarları yükle
+    applySets();
 
     // --- 3. HABER SİSTEMİ ---
     const sMap = { 'haber_trt': 'TRT', 'haber_cnn': 'CNN', 'haber_ntv': 'NTV', 'haber_webtekno': 'WEBTEKNO', 'haber_shiftdelete': 'SDN' };
@@ -338,73 +337,68 @@
             </div>`).join('');
     }
 
-    // --- 4. AYARLAR PANELİ ---
+    // --- 4. AYARLAR ---
     function openSettings() {
         const m = document.getElementById('mdl');
         m.innerHTML = `
-            <div class="modal-header"><h2 style="color:var(--primary); text-align:center; width:100%;">AYARLAR</h2></div>
+            <div class="modal-header"><h2>AYARLAR</h2></div>
             <div class="modal-body">
-                <div class="set-row">
-                    <label class="set-label">YAZI BOYUTU</label>
-                    <div class="set-ctrl">
-                        <button onclick="adjustSet('size',-1)">-</button>
-                        <span>${sets.size}PX</span>
-                        <button onclick="adjustSet('size',1)">+</button>
-                    </div>
-                </div>
-                <div class="set-row">
-                    <label class="set-label">YAZI KALINLIĞI</label>
-                    <div class="set-ctrl">
-                        <button onclick="adjustSet('weight',-100)">-</button>
-                        <span>${sets.weight}</span>
-                        <button onclick="adjustSet('weight',100)">+</button>
-                    </div>
-                </div>
-                <div class="set-row">
-                    <label class="set-label">DAKTİLO HIZI (MS)</label>
-                    <div class="set-ctrl">
-                        <button onclick="adjustSet('speed',-5)">-</button>
-                        <span>${sets.speed}</span>
-                        <button onclick="adjustSet('speed',5)">+</button>
-                    </div>
-                </div>
-                <div class="set-row">
-                    <label class="set-label">YAZI EFEKTİ</label>
-                    <select id="effSel" onchange="adjustSet('effect', this.value)" style="width:100%; padding:15px; border-radius:15px; border:2px solid #3b82f6; font-weight:900;">
-                        <option value="typewriter" ${sets.effect==='typewriter'?'selected':''}>DAKTİLO</option>
-                        <option value="fade" ${sets.effect==='fade'?'selected':''}>SOLARAK</option>
-                        <option value="slide" ${sets.effect==='slide'?'selected':''}>KAYARAK</option>
-                    </select>
-                </div>
-                <button class="btn-full" style="background:#ef4444; margin-top:15px;" onclick="clearHistory()">SOHBET GEÇMİŞİNİ SİL</button>
+                <div class="set-row"><label>YAZI BOYUTU</label><div class="set-ctrl"><button onclick="adjustSet('size',-1)">-</button><span>${sets.size}PX</span><button onclick="adjustSet('size',1)">+</button></div></div>
+                <div class="set-row"><label>YAZI KALINLIĞI</label><div class="set-ctrl"><button onclick="adjustSet('weight',-100)">-</button><span>${sets.weight}</span><button onclick="adjustSet('weight',100)">+</button></div></div>
+                <div class="set-row"><label>DAKTİLO HIZI</label><div class="set-ctrl"><button onclick="adjustSet('speed',-5)">-</button><span>${sets.speed}</span><button onclick="adjustSet('speed',5)">+</button></div></div>
+                <button class="btn-full" style="background:#ef4444; margin-top:10px;" onclick="clearHistory()">SOHBETİ SIFIRLA</button>
             </div>
-            <div class="modal-footer"><button class="btn-full" onclick="closeM()">KAYDET VE KAPAT</button></div>`;
+            <div class="modal-footer"><button class="btn-full" onclick="closeM()">KAYDET</button></div>`;
         document.getElementById('ovl').style.display = 'flex';
     }
 
-    function adjustSet(k, v) {
-        if(k === 'effect') sets[k] = v;
-        else sets[k] = Math.max(1, (sets[k] || 0) + v);
-        applySets();
-        openSettings();
-    }
-
+    function adjustSet(k, v) { sets[k] = Math.max(1, (sets[k] || 0) + v); applySets(); openSettings(); }
     function applySets() {
         document.documentElement.style.setProperty('--chat-size', sets.size + 'px');
         document.documentElement.style.setProperty('--chat-weight', sets.weight);
         localStorage.setItem('khoj_sets', JSON.stringify(sets));
     }
 
-    function clearHistory() {
-        if(confirm("Tüm genel sohbet geçmişi silinsin mi abi?")) {
-            chatHistory = [];
-            localStorage.removeItem('khoj_ai_history');
-            showToast("Geçmiş Silindi!");
-            closeM();
+    // --- 5. KAYDETME SİSTEMİ ---
+    function saveNews() {
+        let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+        if(!saved.find(x => x.title === active.title)) {
+            saved.push(active);
+            localStorage.setItem('khoj_saved_news', JSON.stringify(saved));
+            showToast("Haber Kaydedildi! 💾");
+        } else {
+            showToast("Zaten Kayıtlı!");
         }
     }
 
-    // --- 5. SOHBET VE AI SİSTEMİ ---
+    function openSavedList() {
+        const saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+        const m = document.getElementById('mdl');
+        let html = saved.length ? "" : "<p style='text-align:center; padding:20px;'>Kayıtlı haber yok abi.</p>";
+        saved.forEach((n, i) => {
+            html += `<div class="news-card" style="margin-bottom:10px;">
+                <img src="${getBestImage(n, n.source)}" style="width:40px; height:40px;">
+                <div style="flex:1" onclick="openSavedDetail(${i})"><div class="news-title">${n.title}</div></div>
+                <button onclick="deleteSaved(${i})" style="background:none; border:none; color:red;">🗑️</button>
+            </div>`;
+        });
+        m.innerHTML = `<div class="modal-header"><h2>💾 KAYDEDİLENLER</h2></div><div class="modal-body">${html}</div><div class="modal-footer"><button class="btn-full" onclick="closeM()">KAPAT</button></div>`;
+        document.getElementById('ovl').style.display = 'flex';
+    }
+
+    function deleteSaved(i) {
+        let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+        saved.splice(i, 1);
+        localStorage.setItem('khoj_saved_news', JSON.stringify(saved));
+        openSavedList();
+    }
+    
+    function openSavedDetail(i) {
+        active = JSON.parse(localStorage.getItem('khoj_saved_news'))[i];
+        openDetail(-2);
+    }
+
+    // --- 6. SOHBET VE AI ---
     function openGeneralChat() {
         active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Haberden bağımsız genel sohbet modundasın." };
         openDetail(-1);
@@ -414,42 +408,44 @@
         if(idx === -1) active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." };
         else if(idx !== -2) active = news[idx];
 
-        const isGeneral = (active.source === "KHOJ");
         const m = document.getElementById('mdl');
+        const img = getBestImage(active, active.source);
         
         m.innerHTML = `
             <div class="modal-header">
                 <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
                     <span class="news-meta">${active.source}</span>
-                    <button class="btn-icon" style="color:red; border:none;" onclick="closeM()">❌</button>
+                    <div style="display:flex; gap:10px;">
+                        ${active.link ? `<button class="btn-icon" onclick="window.open('${active.link}','_blank')">🔗</button>` : ''}
+                        <button class="btn-icon" onclick="saveNews()">💾</button>
+                        <button class="btn-icon" style="color:red;" onclick="closeM()">❌</button>
+                    </div>
                 </div>
             </div>
             <div class="modal-body">
                 <h3 style="margin-bottom:10px;">${active.title}</h3>
-                <div class="chat-box" id="cBox" style="min-height:300px; display:flex; flex-direction:column; gap:10px;">
-                    ${isGeneral && chatHistory.length > 0 ? 
+                ${active.source !== "KHOJ" ? `<img src="${img}" style="width:100%; border-radius:15px; margin-bottom:10px;">` : ''}
+                <div class="chat-box" id="cBox" style="min-height:250px;">
+                    ${(active.source === "KHOJ" && chatHistory.length > 0) ? 
                         chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('') : 
-                        `<div class="msg ai">Selam abi! Sana nasıl yardımcı olabilirim?</div>`
+                        `<div class="msg ai">Seni dinliyorum abi...</div>`
                     }
                 </div>
             </div>
             <div class="modal-footer">
                 <div style="display:flex; gap:10px;">
-                    <input type="text" id="uInp" placeholder="Bir şey yaz..." style="flex:1; padding:12px; border-radius:12px; border:2px solid #eee;">
+                    <input type="text" id="uInp" placeholder="Bir şey yaz..." style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd;">
                     <button class="btn-icon btn-save" onclick="ask()">➤</button>
                 </div>
             </div>`;
         document.getElementById('ovl').style.display = 'flex';
-        const box = document.getElementById('cBox');
-        box.scrollTop = box.scrollHeight;
+        document.getElementById('cBox').scrollTop = 9999;
     }
 
     async function ask() {
         const inp = document.getElementById('uInp'); const box = document.getElementById('cBox');
         if(!inp.value) return; 
         const q = inp.value; inp.value = '';
-        
-        // Kullanıcı mesajını ekrana bas ve (genelse) hafızaya al
         box.innerHTML += `<div class="msg user">${q}</div>`;
         if(active.source === "KHOJ") chatHistory.push({role: 'user', text: q});
         
@@ -460,45 +456,35 @@
             const res = await fetch(KHOJ_URL, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${KHOJ_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ q: q, stream: false })
+                body: JSON.stringify({ q: `Haber: ${active.title}. Soru: ${q}`, stream: false })
             });
             const d = await res.json();
-            
-            // Metni zenginleştir (Kalınları kırmızı yap, satırları düzenle)
-            let formatted = d.response
-                .replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>')
-                .replace(/^\s*[\-\*]\s+/gm, '🔹 ')
-                .replace(/\n/g, '<br>');
+            let formatted = d.response.replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>').replace(/^\s*[\-\*]\s+/gm, '🔹 ').replace(/\n/g, '<br>');
 
-            // Hafızaya kaydet
             if(active.source === "KHOJ") {
                 chatHistory.push({role: 'ai', text: formatted});
                 localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory));
             }
 
             ai.innerHTML = '';
-            if(sets.effect === 'typewriter') {
-                let i = 0;
-                function type() {
-                    if (i < formatted.length) {
-                        if (formatted.substr(i, 1) === '<') {
-                            let end = formatted.indexOf('>', i) + 1;
-                            ai.innerHTML += formatted.substring(i, end); i = end;
-                        } else {
-                            ai.innerHTML += formatted.charAt(i); i++;
-                        }
-                        box.scrollTop = box.scrollHeight;
-                        setTimeout(type, sets.speed);
+            let i = 0;
+            function type() {
+                if (i < formatted.length) {
+                    if (formatted.substr(i, 1) === '<') {
+                        let end = formatted.indexOf('>', i) + 1;
+                        ai.innerHTML += formatted.substring(i, end); i = end;
+                    } else {
+                        ai.innerHTML += formatted.charAt(i); i++;
                     }
+                    box.scrollTop = box.scrollHeight;
+                    setTimeout(type, sets.speed);
                 }
-                type();
-            } else {
-                ai.innerHTML = formatted;
-                box.scrollTop = box.scrollHeight;
             }
+            type();
         } catch (e) { ai.innerText = "Bağlantı hatası!"; }
     }
 
+    function clearHistory() { chatHistory = []; localStorage.removeItem('khoj_ai_history'); closeM(); showToast("Sıfırlandı!"); }
     function closeM() { document.getElementById('ovl').style.display = 'none'; }
     function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
 </script>
