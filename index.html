@@ -277,8 +277,9 @@
 </script>
     
 <script>
+    // API VE AYARLAR
     const KHOJ_KEY = 'kk-ZeYLGGpxj0XScjEsTpgo4Aj2VjgJwtMJodqoyEsYtUI';
-const KHOJ_URL = "https://white-heart-ea96.06mmt8129.workers.dev/";
+    const KHOJ_URL = "https://white-heart-ea96.06mmt8129.workers.dev/";
     
     const fbCfg = { apiKey: "AIzaSyAwQfifK4eaSrSjKpA776hD0RAlx_6a2_w", databaseURL: "https://piyasa-9049c-default-rtdb.firebaseio.com", projectId: "piyasa-9049c" };
     firebase.initializeApp(fbCfg);
@@ -288,46 +289,35 @@ const KHOJ_URL = "https://white-heart-ea96.06mmt8129.workers.dev/";
     let news = [];
     let active = null;
 
-    // RESİM YAKALAMA VE LOGO SİSTEMİ
-    const logos = {
-        'TRT': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/TRT_Haber_logo.svg/512px-TRT_Haber_logo.svg.png',
-        'CNN': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/CNN.svg/512px-CNN.svg.png',
-        'NTV': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/NTV_Logo.svg/512px-NTV_Logo.svg.png',
-        'WEBTEKNO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Webtekno_Logo.png/512px-Webtekno_Logo.png',
-        'SDN': 'https://shiftdelete.net/wp-content/themes/sdn/assets/img/logo.png'
-    };
+    // SAAT GÜNCELLEME (Hata burada oluşmuş olabilir, düzelttim)
+    function updateTime() {
+        const n = new Date();
+        const clk = document.getElementById('clk');
+        const dt = document.getElementById('dt');
+        if(clk) clk.innerText = n.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+        if(dt) dt.innerText = n.toLocaleDateString('tr-TR', {day:'numeric', month:'long'}).toUpperCase();
+    }
+    setInterval(updateTime, 1000); 
+    updateTime();
 
-    // GELİŞMİŞ RESİM YAKALAMA (NTV ve CNN İÇİN ÖZEL)
+    // RESİM YAKALAMA SİSTEMİ
     function getBestImage(item, source) {
-        // 1. Standart Enclosure kontrolü
         if(item.enclosure?.link) return item.enclosure.link;
         if(item.thumbnail) return item.thumbnail;
-        
-        // 2. NTV/CNN için description içindeki <img> tagını ayıkla
         if (item.description && item.description.includes('<img')) {
             const regex = /<img[^>]+src="([^">]+)"/g;
             const match = regex.exec(item.description);
             if (match && match[1]) return match[1];
         }
-
-        // 3. Hiçbiri yoksa kaynağa özel HD logo koy
         const logos = {
             'TRT': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/TRT_Haber_logo.svg/512px-TRT_Haber_logo.svg.png',
             'CNN': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/CNN.svg/512px-CNN.svg.png',
-            'NTV': 'https://upload.wikimedia.org/wikipedia/commons/b/b5/NTV_logo.png', // NTV HD Logo
+            'NTV': 'https://upload.wikimedia.org/wikipedia/commons/b/b5/NTV_logo.png',
             'WEBTEKNO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Webtekno_Logo.png/512px-Webtekno_Logo.png',
             'SDN': 'https://shiftdelete.net/wp-content/themes/sdn/assets/img/logo.png'
         };
         return logos[source] || 'https://via.placeholder.com/100';
     }
-
-    // SAAT GÜNCELLEME
-    function updateTime() {
-        const n = new Date();
-        document.getElementById('clk').innerText = n.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
-        document.getElementById('dt').innerText = n.toLocaleDateString('tr-TR', {day:'numeric', month:'long'}).toUpperCase();
-    }
-    setInterval(updateTime, 1000); updateTime();
 
     function showToast(msg) {
         const t = document.getElementById('toast');
@@ -348,7 +338,9 @@ const KHOJ_URL = "https://white-heart-ea96.06mmt8129.workers.dev/";
     });
 
     function render() {
-        const f = document.getElementById('newsFeed'); f.innerHTML = '';
+        const f = document.getElementById('newsFeed'); 
+        if(!f) return;
+        f.innerHTML = '';
         news.forEach((n, i) => {
             f.innerHTML += `
                 <div class="news-card" onclick="openDetail(${i})">
@@ -362,36 +354,23 @@ const KHOJ_URL = "https://white-heart-ea96.06mmt8129.workers.dev/";
     }
 
     // AYARLAR PANELİ
-  function openSettings() {
-    const m = document.getElementById('mdl');
-    m.innerHTML = `
-        <div class="modal-header">
-            <h2>⚙️ SİSTEM AYARLARI</h2>
-        </div>
-        <div class="modal-body">
-            <div class="set-row">
-                <label class="set-label">Yazı Boyutu</label>
-                <div class="set-ctrl">
-                    <button onclick="chSet('size',-1)">−</button>
-                    <span>${sets.size}px</span>
-                    <button onclick="chSet('size',1)">+</button>
+    function openSettings() {
+        const m = document.getElementById('mdl');
+        m.innerHTML = `
+            <div class="modal-header"><h2>⚙️ SİSTEM AYARLARI</h2></div>
+            <div class="modal-body">
+                <div class="set-row">
+                    <label class="set-label">Yazı Boyutu</label>
+                    <div class="set-ctrl">
+                        <button onclick="chSet('size',-1)">−</button>
+                        <span>${sets.size}px</span>
+                        <button onclick="chSet('size',1)">+</button>
+                    </div>
                 </div>
             </div>
-            <div class="set-row">
-                <label class="set-label">Yazı Kalınlığı</label>
-                <div class="set-ctrl">
-                    <button onclick="chSet('weight',-100)">−</button>
-                    <span>${sets.weight}</span>
-                    <button onclick="chSet('weight',100)">+</button>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-full" onclick="closeM()">AYARLARI UYGULA</button>
-        </div>
-    `;
-    document.getElementById('ovl').style.display = 'flex';
-}
+            <div class="modal-footer"><button class="btn-full" onclick="closeM()">AYARLARI UYGULA</button></div>`;
+        document.getElementById('ovl').style.display = 'flex';
+    }
 
     function chSet(k, v) { 
         sets[k] += v; 
@@ -399,100 +378,72 @@ const KHOJ_URL = "https://white-heart-ea96.06mmt8129.workers.dev/";
         openSettings(); 
     }
 
-    // HABER DETAY
-   function openDetail(idx) {
-    if(idx === -1) { active = {title: "Genel Sohbet", source: "GEMINI", description: "Buyur abi, seni dinliyorum."}; }
-    else if(idx === -2) { /* Kaydedilenden gelindi, active zaten seçili */ }
-    else { active = news[idx]; }
+    // HABER DETAY VE KHOJ SOHBET
+    function openDetail(idx) {
+        if(idx === -1) { active = {title: "Genel Sohbet", source: "KHOJ", description: "Buyur abi, seni dinliyorum."}; }
+        else if(idx === -2) { /* Kayıtlıdan gelindi */ }
+        else { active = news[idx]; }
 
-    const m = document.getElementById('mdl');
-    const img = getBestImage(active, active.source);
-    
-    m.innerHTML = `
-        <div class="modal-header">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span class="news-meta" style="color:var(--primary); font-weight:900;">${active.source}</span>
-                <div style="display:flex; gap:8px;">
-                    ${active.link ? `<button class="btn-icon" onclick="openWeb('${active.link}')">🔗</button>` : ''}
-                    <button class="btn-icon" onclick="saveNews()">💾</button>
-                    <button class="btn-icon" style="color:#ff4444; border-color:#ffebeb;" onclick="closeM()">❌</button>
+        const m = document.getElementById('mdl');
+        const img = getBestImage(active, active.source);
+        
+        m.innerHTML = `
+            <div class="modal-header">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="news-meta" style="color:var(--primary); font-weight:900;">${active.source}</span>
+                    <div style="display:flex; gap:8px;">
+                        ${active.link ? `<button class="btn-icon" onclick="openWeb('${active.link}')">🔗</button>` : ''}
+                        <button class="btn-icon" onclick="saveNews()">💾</button>
+                        <button class="btn-icon" style="color:#ff4444; border-color:#ffebeb;" onclick="closeM()">❌</button>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="modal-body">
-            <h3 style="margin-bottom:12px; line-height:1.4; font-size:1.1rem; color:#111;">${active.title}</h3>
-            ${active.source !== "GEMINI" ? `<img src="${img}" style="width:100%; border-radius:18px; margin-bottom:15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">` : ''}
-            <p style="font-size:0.88rem; color:#555; line-height:1.6; margin-bottom:20px;">
-                ${active.description ? active.description.replace(/<[^>]*>?/gm, '').substring(0,300) + '...' : ''}
-            </p>
-            
-            <div class="chat-box" id="cBox">
-                <div class="msg ai">Bu konu hakkında ne sormak istersin abi? Senin için analiz edebilirim.</div>
+            <div class="modal-body">
+                <h3 style="margin-bottom:12px; line-height:1.4; font-size:1.1rem; color:#111;">${active.title}</h3>
+                ${active.source !== "KHOJ" ? `<img src="${img}" style="width:100%; border-radius:18px; margin-bottom:15px;">` : ''}
+                <p style="font-size:0.88rem; color:#555; line-height:1.6; margin-bottom:20px;">
+                    ${active.description ? active.description.replace(/<[^>]*>?/gm, '').substring(0,300) + '...' : ''}
+                </p>
+                <div class="chat-box" id="cBox">
+                    <div class="msg ai">Bu konu hakkında ne sormak istersin abi? Analiz edelim.</div>
+                </div>
             </div>
-        </div>
-
-        <div class="modal-footer">
-            <div style="display:flex; gap:10px;">
-                <input type="text" id="uInp" placeholder="Gemini'ye sor..." 
-                       style="flex:1; padding:14px; border-radius:15px; border:2px solid #f0f0f0; outline:none; font-weight:600; background:#fcfcfc; font-size:14px;">
-                <button class="btn-icon btn-save" style="width:50px; height:50px; border-radius:15px; flex-shrink:0;" onclick="ask()">➤</button>
-            </div>
-        </div>
-    `;
-    document.getElementById('ovl').style.display = 'flex';
-}
+            <div class="modal-footer">
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="uInp" placeholder="Khoj'a sor..." style="flex:1; padding:14px; border-radius:15px; border:2px solid #f0f0f0; outline:none;">
+                    <button class="btn-icon btn-save" style="width:50px; height:50px; border-radius:15px;" onclick="ask()">➤</button>
+                </div>
+            </div>`;
+        document.getElementById('ovl').style.display = 'flex';
+    }
 
     async function ask() {
-    const inp = document.getElementById('uInp'); 
-    const box = document.getElementById('cBox');
-    if(!inp.value) return; 
-    
-    const q = inp.value; 
-    inp.value = '';
-    box.innerHTML += `<div class="msg user">${q}</div>`;
-    
-    const ai = document.createElement('div'); 
-    ai.className = 'msg ai'; 
-    ai.innerText = '...';
-    box.appendChild(ai); 
-    box.scrollTop = box.scrollHeight;
-}
-    try {
-        const res = await fetch(KHOJ_URL, {
-            method: 'POST',
-            headers: { 
-                'Authorization': `Bearer ${KHOJ_KEY}`,
-                'Content-Type': 'application/json' 
-            },
-            body: JSON.stringify({ q: `Haber: ${active.title}. Soru: ${q}`, stream: false })
-        });
-        
-        const d = await res.json();
-        // Khoj'dan gelen yanıt "response" anahtarı içindedir
-        const txt = d.respo// Khoj'dan gelen yanıtı temizleyen filtre
-        let txt = d.response
-            .replace(/\(.*?\)/g, '') // Parantez içlerini siler
-            .replace(/\[.*?\]/g, '') // Köşeli parantezleri (kaynakları) siler
-            .replace(/(?:https?|ftp):\/\/[\n\S]+/g, '') // Linkleri temizler
-            .trim();nse; 
-        
-        ai.innerText = '';
-        let x = 0; 
-        let itv = setInterval(() => { 
-            ai.innerText += txt[x]; 
-            x++; 
-            if(x >= txt.length){ 
-                clearInterval(itv); 
-            } 
-            box.scrollTop = box.scrollHeight; 
-        }, sets.speed);
-        
-    } catch (e) { 
-        ai.innerText = "Bağlantı hatası! Worker veya API anahtarını kontrol et abi."; 
+        const inp = document.getElementById('uInp'); 
+        const box = document.getElementById('cBox');
+        if(!inp.value) return; 
+        const q = inp.value; inp.value = '';
+        box.innerHTML += `<div class="msg user">${q}</div>`;
+        const ai = document.createElement('div'); ai.className = 'msg ai'; ai.innerText = '...';
+        box.appendChild(ai); box.scrollTop = box.scrollHeight;
+
+        try {
+            const res = await fetch(KHOJ_URL, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${KHOJ_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ q: `Haber: ${active.title}. Soru: ${q}`, stream: false })
+            });
+            const d = await res.json();
+            let txt = d.response.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '').replace(/(?:https?|ftp):\/\/[\n\S]+/g, '').trim();
+            ai.innerText = '';
+            let x = 0; 
+            let itv = setInterval(() => { 
+                ai.innerText += txt[x]; x++; 
+                if(x >= txt.length){ clearInterval(itv); } 
+                box.scrollTop = box.scrollHeight; 
+            }, sets.speed);
+        } catch (e) { ai.innerText = "Bağlantı hatası!"; }
     }
-}
-    // KAYDEDİLENLER VE SİLME
+
     function saveNews() {
         let s = JSON.parse(localStorage.getItem('saved_v7') || '[]');
         if(!s.find(x => x.title === active.title)) {
@@ -501,50 +452,27 @@ const KHOJ_URL = "https://white-heart-ea96.06mmt8129.workers.dev/";
         }
     }
 
-   function openSavedList() {
-    const s = JSON.parse(localStorage.getItem('saved_v7') || '[]');
-    const m = document.getElementById('mdl');
-    
-    // 1. Liste içeriğini (Haberleri) oluşturuyoruz
-    let listHtml = "";
-    if(!s.length) {
-        listHtml = `<p style="text-align:center; color:#999; padding:40px;">Henüz kayıt yok abi.</p>`;
-    } else {
+    function openSavedList() {
+        const s = JSON.parse(localStorage.getItem('saved_v7') || '[]');
+        const m = document.getElementById('mdl');
+        let listHtml = s.length ? "" : `<p style="text-align:center; color:#999; padding:40px;">Henüz kayıt yok abi.</p>`;
         s.forEach((n, i) => {
-            listHtml += `
-                <div class="news-card" style="margin-bottom:12px;">
-                    <img src="${getBestImage(n, n.source)}" style="width:50px; height:50px; border-radius:10px;">
-                    <div style="flex:1" onclick="openSavedDetail(${i})">
-                        <div class="news-title" style="font-size:0.85rem;">${n.title.substring(0,60)}...</div>
-                    </div>
-                    <button class="btn-icon" style="color:#ff4444; border:none; background:none; font-size:1.2rem;" onclick="deleteNews(${i})">🗑️</button>
-                </div>`;
+            listHtml += `<div class="news-card" style="margin-bottom:12px;">
+                <img src="${getBestImage(n, n.source)}" style="width:50px; height:50px; border-radius:10px;">
+                <div style="flex:1" onclick="openSavedDetail(${i})"><div class="news-title" style="font-size:0.85rem;">${n.title}</div></div>
+                <button class="btn-icon" style="color:#ff4444; border:none;" onclick="deleteNews(${i})">🗑️</button>
+            </div>`;
         });
-        listHtml += `<button onclick="clearAll()" style="width:100%; padding:10px; color:#ff4444; background:none; border:none; font-weight:bold; font-size:0.8rem;">🗑️ TÜMÜNÜ TEMİZLE</button>`;
+        m.innerHTML = `<div class="modal-header"><h2>💾 KAYDEDİLENLER</h2></div><div class="modal-body">${listHtml}</div><div class="modal-footer"><button class="btn-full" onclick="closeM()">KAPAT</button></div>`;
+        document.getElementById('ovl').style.display = 'flex';
     }
 
-    // 2. Modalı parçalara bölerek basıyoruz (Burası görseli düzeltir)
-    m.innerHTML = `
-        <div class="modal-header">
-            <h2 style="font-size:1.1rem; font-weight:900;">💾 KAYDEDİLENLER</h2>
-        </div>
-        <div class="modal-body">
-            ${listHtml}
-        </div>
-        <div class="modal-footer">
-            <button class="btn-full" onclick="closeM()">KAPAT</button>
-        </div>
-    `;
-
-    document.getElementById('ovl').style.display = 'flex';
-}
     function deleteNews(i) {
         let s = JSON.parse(localStorage.getItem('saved_v7') || '[]');
         s.splice(i, 1); localStorage.setItem('saved_v7', JSON.stringify(s));
-        showToast("Haber Silindi 🗑️"); openSavedList();
+        openSavedList();
     }
 
-    function clearAll() { if(confirm("Emin misin abi?")) { localStorage.removeItem('saved_v7'); openSavedList(); } }
     function openSavedDetail(i) { active = JSON.parse(localStorage.getItem('saved_v7'))[i]; openDetail(-2); }
     function openGeneralChat() { openDetail(-1); }
     function openWeb(url) { document.getElementById('webTit').innerText = active.title; document.getElementById('ifr').src = url; document.getElementById('webWin').style.display = 'flex'; }
