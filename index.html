@@ -66,27 +66,30 @@
 .modal {
     display: flex;
     flex-direction: column;
-    padding: 0 !important;
-    overflow: hidden !important;
-    height: 70vh; /* Ekranın %70'i kadar sabit yükseklik */
-    background: #FFFFFF !important; 
-    border-radius: 20px 20px 0 0; /* Köşe yuvarlaklığını buradan 20'ye düşürdüm */
-    box-shadow: 0 -15px 40px rgba(0,0,0,0.15);
-    width: 100% !important;
-}
-/* ÜST BAŞLIK ALANI */
-.modal-header {
-    padding: 25px 20px 15px 20px;
-    background: white;
-    text-align: center;
-    border-bottom: 1px solid #f2f2f2;
+    height: 70vh !important; /* Pencere boyu sabit */
+    background: #FFFFFF !important;
+    border-radius: 20px 20px 0 0;
+    overflow: hidden;
 }
 
-.modal-header h2 {
-    font-size: 1.2rem;
-    font-weight: 900;
-    letter-spacing: -0.5px;
-    color: #111;
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    flex-shrink: 0; /* Başlık yukarıda sabit kalsın */
+}
+
+.modal-body {
+    flex: 1; /* Liste tüm orta alanı doldursun */
+    overflow-y: auto; /* Sadece burası kaysın */
+    padding: 20px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.modal-footer {
+    padding: 15px 20px 30px 20px;
+    border-top: 1px solid #eee;
+    background: white;
+    flex-shrink: 0; /* Buton en altta sabit kalsın */
 }
 
 /* ORTA ALAN - AYARLAR VE LİSTELER */
