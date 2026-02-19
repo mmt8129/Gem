@@ -469,27 +469,43 @@
         }
     }
 
-    function openSavedList() {
-        const s = JSON.parse(localStorage.getItem('saved_v7') || '[]');
-        const m = document.getElementById('mdl');
-        let h = `<h2 style="text-align:center; margin-bottom:20px;">💾 KAYDEDİLENLER</h2>`;
-        if(!s.length) h += `<p style="text-align:center; color:#999; padding:20px;">Henüz kayıt yok abi.</p>`;
-        else {
-            s.forEach((n, i) => {
-                h += `<div class="news-card" style="margin-bottom:10px;">
-                    <img src="${getBestImage(n, n.source)}" style="width:50px; height:50px;">
+   function openSavedList() {
+    const s = JSON.parse(localStorage.getItem('saved_v7') || '[]');
+    const m = document.getElementById('mdl');
+    
+    // 1. Liste içeriğini (Haberleri) oluşturuyoruz
+    let listHtml = "";
+    if(!s.length) {
+        listHtml = `<p style="text-align:center; color:#999; padding:40px;">Henüz kayıt yok abi.</p>`;
+    } else {
+        s.forEach((n, i) => {
+            listHtml += `
+                <div class="news-card" style="margin-bottom:12px;">
+                    <img src="${getBestImage(n, n.source)}" style="width:50px; height:50px; border-radius:10px;">
                     <div style="flex:1" onclick="openSavedDetail(${i})">
-                        <div class="news-title" style="font-size:0.8rem;">${n.title.substring(0,50)}...</div>
+                        <div class="news-title" style="font-size:0.85rem;">${n.title.substring(0,60)}...</div>
                     </div>
-                    <button class="btn-icon" style="color:red; border:none;" onclick="deleteNews(${i})">🗑️</button>
+                    <button class="btn-icon" style="color:#ff4444; border:none; background:none; font-size:1.2rem;" onclick="deleteNews(${i})">🗑️</button>
                 </div>`;
-            });
-            h += `<button class="btn-icon" style="width:100%; margin-top:15px; color:red; font-size:0.8rem; font-weight:bold;" onclick="clearAll()">TÜMÜNÜ SİL</button>`;
-        }
-        h += `<button class="btn-icon" style="width:100%; margin-top:10px; background:var(--primary); color:white;" onclick="closeM()">KAPAT</button>`;
-        m.innerHTML = h; document.getElementById('ovl').style.display = 'flex';
+        });
+        listHtml += `<button onclick="clearAll()" style="width:100%; padding:10px; color:#ff4444; background:none; border:none; font-weight:bold; font-size:0.8rem;">🗑️ TÜMÜNÜ TEMİZLE</button>`;
     }
 
+    // 2. Modalı parçalara bölerek basıyoruz (Burası görseli düzeltir)
+    m.innerHTML = `
+        <div class="modal-header">
+            <h2 style="font-size:1.1rem; font-weight:900;">💾 KAYDEDİLENLER</h2>
+        </div>
+        <div class="modal-body">
+            ${listHtml}
+        </div>
+        <div class="modal-footer">
+            <button class="btn-full" onclick="closeM()">KAPAT</button>
+        </div>
+    `;
+
+    document.getElementById('ovl').style.display = 'flex';
+}
     function deleteNews(i) {
         let s = JSON.parse(localStorage.getItem('saved_v7') || '[]');
         s.splice(i, 1); localStorage.setItem('saved_v7', JSON.stringify(s));
