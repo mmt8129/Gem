@@ -277,19 +277,25 @@
 </script>
     
 <script>
-    // API VE AYARLAR
+    // --- 1. AYARLAR VE DEĞİŞKENLER ---
     const KHOJ_KEY = 'kk-ZeYLGGpxj0XScjEsTpgo4Aj2VjgJwtMJodqoyEsYtUI';
     const KHOJ_URL = "https://white-heart-ea96.06mmt8129.workers.dev/";
     
-    const fbCfg = { apiKey: "AIzaSyAwQfifK4eaSrSjKpA776hD0RAlx_6a2_w", databaseURL: "https://piyasa-9049c-default-rtdb.firebaseio.com", projectId: "piyasa-9049c" };
-    firebase.initializeApp(fbCfg);
+    const fbCfg = { 
+        apiKey: "AIzaSyAwQfifK4eaSrSjKpA776hD0RAlx_6a2_w", 
+        databaseURL: "https://piyasa-9049c-default-rtdb.firebaseio.com", 
+        projectId: "piyasa-9049c" 
+    };
+    if (!firebase.apps.length) firebase.initializeApp(fbCfg);
     const db = firebase.database();
 
-    // Ayarları Firebase veya LocalStorage uyumlu hale getirdik
-    let sets = { size: 16, weight: 900, speed: 20, effect: 'typewriter' };
+    // Ayarlar ve Genel Sohbet Hafızası
+    let sets = JSON.parse(localStorage.getItem('khoj_sets')) || { size: 16, weight: 900, speed: 20, effect: 'typewriter' };
+    let chatHistory = JSON.parse(localStorage.getItem('khoj_ai_history')) || [];
     let news = [];
     let active = null;
 
+    // --- 2. SİSTEM BAŞLATICI ---
     function updateTime() {
         const n = new Date();
         const clk = document.getElementById('clk');
@@ -297,21 +303,11 @@
         if(clk) clk.innerText = n.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
         if(dt) dt.innerText = n.toLocaleDateString('tr-TR', {day:'numeric', month:'long'}).toUpperCase();
     }
-    setInterval(updateTime, 1000); updateTime();
+    setInterval(updateTime, 1000); 
+    updateTime();
+    applySets(); // Ayarları yükle
 
-    // GÖRSEL AYIKLAMA
-    function getBestImage(item, source) {
-        if(item.enclosure?.link) return item.enclosure.link;
-        if(item.thumbnail) return item.thumbnail;
-        if (item.description && item.description.includes('<img')) {
-            const regex = /<img[^>]+src="([^">]+)"/g;
-            const match = regex.exec(item.description);
-            if (match && match[1]) return match[1];
-        }
-        return 'https://via.placeholder.com/100';
-    }
-
-    // HABERLERİ ÇEK
+    // --- 3. HABER SİSTEMİ ---
     const sMap = { 'haber_trt': 'TRT', 'haber_cnn': 'CNN', 'haber_ntv': 'NTV', 'haber_webtekno': 'WEBTEKNO', 'haber_shiftdelete': 'SDN' };
     Object.keys(sMap).forEach(key => {
         db.ref(key + "/items").on("value", snap => {
@@ -323,8 +319,15 @@
         });
     });
 
+    function getBestImage(item, source) {
+        if(item.enclosure?.link) return item.enclosure.link;
+        if(item.thumbnail) return item.thumbnail;
+        return 'https://via.placeholder.com/100';
+    }
+
     function render() {
-        const f = document.getElementById('newsFeed'); if(!f) return;
+        const f = document.getElementById('newsFeed'); 
+        if(!f) return;
         f.innerHTML = news.map((n, i) => `
             <div class="news-card" onclick="openDetail(${i})">
                 <img src="${getBestImage(n, n.source)}">
@@ -335,11 +338,11 @@
             </div>`).join('');
     }
 
-    // --- GELİŞMİŞ AYARLAR PANELİ (İSTEDİĞİN GİBİ) ---
+    // --- 4. AYARLAR PANELİ ---
     function openSettings() {
         const m = document.getElementById('mdl');
         m.innerHTML = `
-            <div class="modal-header"><h2 style="color:var(--primary)">⚙️ AYARLAR</h2></div>
+            <div class="modal-header"><h2 style="color:var(--primary); text-align:center; width:100%;">AYARLAR</h2></div>
             <div class="modal-body">
                 <div class="set-row">
                     <label class="set-label">YAZI BOYUTU</label>
@@ -367,12 +370,13 @@
                 </div>
                 <div class="set-row">
                     <label class="set-label">YAZI EFEKTİ</label>
-                    <select id="effSel" onchange="adjustSet('effect', this.value)" style="width:100%; padding:15px; border-radius:15px; border:2px solid #edf0f5; font-weight:800;">
+                    <select id="effSel" onchange="adjustSet('effect', this.value)" style="width:100%; padding:15px; border-radius:15px; border:2px solid #3b82f6; font-weight:900;">
                         <option value="typewriter" ${sets.effect==='typewriter'?'selected':''}>DAKTİLO</option>
                         <option value="fade" ${sets.effect==='fade'?'selected':''}>SOLARAK</option>
                         <option value="slide" ${sets.effect==='slide'?'selected':''}>KAYARAK</option>
                     </select>
                 </div>
+                <button class="btn-full" style="background:#ef4444; margin-top:15px;" onclick="clearHistory()">SOHBET GEÇMİŞİNİ SİL</button>
             </div>
             <div class="modal-footer"><button class="btn-full" onclick="closeM()">KAYDET VE KAPAT</button></div>`;
         document.getElementById('ovl').style.display = 'flex';
@@ -381,49 +385,73 @@
     function adjustSet(k, v) {
         if(k === 'effect') sets[k] = v;
         else sets[k] = Math.max(1, (sets[k] || 0) + v);
-        
-        document.documentElement.style.setProperty('--chat-size', sets.size + 'px');
-        document.documentElement.style.setProperty('--chat-weight', sets.weight);
+        applySets();
         openSettings();
     }
 
-    // HABER DETAY
+    function applySets() {
+        document.documentElement.style.setProperty('--chat-size', sets.size + 'px');
+        document.documentElement.style.setProperty('--chat-weight', sets.weight);
+        localStorage.setItem('khoj_sets', JSON.stringify(sets));
+    }
+
+    function clearHistory() {
+        if(confirm("Tüm genel sohbet geçmişi silinsin mi abi?")) {
+            chatHistory = [];
+            localStorage.removeItem('khoj_ai_history');
+            showToast("Geçmiş Silindi!");
+            closeM();
+        }
+    }
+
+    // --- 5. SOHBET VE AI SİSTEMİ ---
+    function openGeneralChat() {
+        active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Haberden bağımsız genel sohbet modundasın." };
+        openDetail(-1);
+    }
+
     function openDetail(idx) {
-        if(idx === -1) active = {title: "Genel Sohbet", source: "KHOJ", description: "Buyur abi, seni dinliyorum."};
+        if(idx === -1) active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." };
         else if(idx !== -2) active = news[idx];
 
+        const isGeneral = (active.source === "KHOJ");
         const m = document.getElementById('mdl');
+        
         m.innerHTML = `
             <div class="modal-header">
                 <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
                     <span class="news-meta">${active.source}</span>
-                    <div style="display:flex; gap:8px;">
-                        <button class="btn-icon" onclick="saveNews()">💾</button>
-                        <button class="btn-icon" style="color:red" onclick="closeM()">❌</button>
-                    </div>
+                    <button class="btn-icon" style="color:red; border:none;" onclick="closeM()">❌</button>
                 </div>
             </div>
             <div class="modal-body">
                 <h3 style="margin-bottom:10px;">${active.title}</h3>
-                <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">${active.description?.replace(/<[^>]*>?/gm, '').substring(0,200)}...</p>
-                <div class="chat-box" id="cBox" style="min-height:200px;">
-                    <div class="msg ai">Analiz için hazırım abi. Ne sormak istersin?</div>
+                <div class="chat-box" id="cBox" style="min-height:300px; display:flex; flex-direction:column; gap:10px;">
+                    ${isGeneral && chatHistory.length > 0 ? 
+                        chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('') : 
+                        `<div class="msg ai">Selam abi! Sana nasıl yardımcı olabilirim?</div>`
+                    }
                 </div>
             </div>
             <div class="modal-footer">
                 <div style="display:flex; gap:10px;">
-                    <input type="text" id="uInp" placeholder="Bir şey sor..." style="flex:1; padding:12px; border-radius:12px; border:1px solid #ddd;">
+                    <input type="text" id="uInp" placeholder="Bir şey yaz..." style="flex:1; padding:12px; border-radius:12px; border:2px solid #eee;">
                     <button class="btn-icon btn-save" onclick="ask()">➤</button>
                 </div>
             </div>`;
         document.getElementById('ovl').style.display = 'flex';
+        const box = document.getElementById('cBox');
+        box.scrollTop = box.scrollHeight;
     }
 
     async function ask() {
         const inp = document.getElementById('uInp'); const box = document.getElementById('cBox');
         if(!inp.value) return; 
         const q = inp.value; inp.value = '';
+        
+        // Kullanıcı mesajını ekrana bas ve (genelse) hafızaya al
         box.innerHTML += `<div class="msg user">${q}</div>`;
+        if(active.source === "KHOJ") chatHistory.push({role: 'user', text: q});
         
         const ai = document.createElement('div'); ai.className = 'msg ai'; ai.innerHTML = '...';
         box.appendChild(ai); box.scrollTop = box.scrollHeight;
@@ -432,28 +460,32 @@
             const res = await fetch(KHOJ_URL, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${KHOJ_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ q: `Haber: ${active.title}. Soru: ${q}`, stream: false })
+                body: JSON.stringify({ q: q, stream: false })
             });
             const d = await res.json();
             
-            // KHOJ FORMATLAMA: Kalınları kırmızı yap, maddeleri düzenle, boşlukları koru
-            let raw = d.response
-                .replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>') // Kalın -> Kırmızı
-                .replace(/^\s*[\-\*]\s+/gm, '🔹 ') // Maddeler
-                .replace(/\n/g, '<br>'); // Satır başları
+            // Metni zenginleştir (Kalınları kırmızı yap, satırları düzenle)
+            let formatted = d.response
+                .replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>')
+                .replace(/^\s*[\-\*]\s+/gm, '🔹 ')
+                .replace(/\n/g, '<br>');
+
+            // Hafızaya kaydet
+            if(active.source === "KHOJ") {
+                chatHistory.push({role: 'ai', text: formatted});
+                localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory));
+            }
 
             ai.innerHTML = '';
             if(sets.effect === 'typewriter') {
                 let i = 0;
                 function type() {
-                    if (i < raw.length) {
-                        if (raw.substr(i, 1) === '<') {
-                            let end = raw.indexOf('>', i) + 1;
-                            ai.innerHTML += raw.substring(i, end);
-                            i = end;
+                    if (i < formatted.length) {
+                        if (formatted.substr(i, 1) === '<') {
+                            let end = formatted.indexOf('>', i) + 1;
+                            ai.innerHTML += formatted.substring(i, end); i = end;
                         } else {
-                            ai.innerHTML += raw.charAt(i);
-                            i++;
+                            ai.innerHTML += formatted.charAt(i); i++;
                         }
                         box.scrollTop = box.scrollHeight;
                         setTimeout(type, sets.speed);
@@ -461,15 +493,13 @@
                 }
                 type();
             } else {
-                ai.innerHTML = raw;
-                ai.style.animation = sets.effect === 'fade' ? 'slideUp 0.5s ease' : 'none';
+                ai.innerHTML = formatted;
                 box.scrollTop = box.scrollHeight;
             }
-        } catch (e) { ai.innerText = "Hata oluştu abi!"; }
+        } catch (e) { ai.innerText = "Bağlantı hatası!"; }
     }
 
     function closeM() { document.getElementById('ovl').style.display = 'none'; }
-    function saveNews() { showToast("Kaydedildi!"); }
     function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
 </script>
 </body>
