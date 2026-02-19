@@ -192,15 +192,18 @@
 }
 /* CHAT KUTUSU AYARI (MODAL BODY İÇİNDE) */
 .chat-box {
-    background: #fcfdfe;
+    background: #f8faff;
     flex: 1; /* Pencerenin geri kalan tüm boşluğunu doldursun */
     border-radius: 20px;
     padding: 15px;
+    flex: 1; /* Altındaki boşluğu otomatik doldurur ve inputa yaklaşır */
     overflow-y: auto;
     margin: 15px 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+    border: 1px solid #eef2ff;
+    margin-bottom: 10px; /* Input ile arasında az bir mesafe bırakır */
     border: none; /* Gereksiz çizgileri atıyoruz */
     /* Sabit yükseklik yerine içeriğe göre uzasın, body scroll olacak */
 }
@@ -208,14 +211,14 @@
 
         /* CHAT */
         .chat-box {
-            background: #f8faff; border-radius: 20px; padding: 15px; height: 260px;
+            background: #f8faff; border-radius: 20px; padding: 15px; flex: 1; /* Altındaki boşluğu otomatik doldurur ve inputa yaklaşır */  height: 260px;
             overflow-y: auto; margin: 15px 0; display: flex; flex-direction: column; gap: 10px;
-            border: 1px solid #eef2ff;
+            border: 1px solid #eef2ff; margin-bottom: 10px; /* Input ile arasında az bir mesafe bırakır */
         }
         .msg {
-            max-width: 85%; padding: 10px 14px; border-radius: 15px;
+            max-width: 92%; padding: 12px 16px; border-radius: 18px;
             font-size: var(--chat-size); font-weight: var(--chat-weight);
-            line-height: 1.4; word-wrap: break-word; overflow-wrap: break-word;
+            line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word;
         }
         .msg.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         .msg.ai { background: white; border: 1px solid #e0e6ed; align-self: flex-start; border-bottom-left-radius: 4px; }
