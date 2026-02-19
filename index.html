@@ -492,8 +492,12 @@ padding-bottom: 50px !important; /* Mesajların bittiği yerin altında 50px bo�
                         ai.innerHTML += formatted.charAt(i); i++;
                     }
                     box.scrollTop = box.scrollHeight + 100; // Her yazımda kutuyu biraz daha fazla aşağı iter
+                box.scrollTo({
+    top: box.scrollHeight,
+    behavior: 'auto' // 'smooth' yaparsak yazı hızına yetişemez, 'auto' en iyisi
+});
                     setTimeout(type, sets.speed);
-                }
+                                    }
             }
             type();
         } catch (e) { ai.innerText = "Bağlantı hatası!"; }
