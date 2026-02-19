@@ -352,6 +352,41 @@ padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px bo
             </div>`).join('');
     }
 
+// RESİM YAKALAMA VE LOGO SİSTEMİ
+    const logos = {
+        'TRT': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/TRT_Haber_logo.svg/512px-TRT_Haber_logo.svg.png',
+        'CNN': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/CNN.svg/512px-CNN.svg.png',
+        'NTV': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/NTV_Logo.svg/512px-NTV_Logo.svg.png',
+        'WEBTEKNO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Webtekno_Logo.png/512px-Webtekno_Logo.png',
+        'SDN': 'https://shiftdelete.net/wp-content/themes/sdn/assets/img/logo.png'
+    };
+
+    // GELİŞMİŞ RESİM YAKALAMA (NTV ve CNN İÇİN ÖZEL)
+    function getBestImage(item, source) {
+        // 1. Standart Enclosure kontrolü
+        if(item.enclosure?.link) return item.enclosure.link;
+        if(item.thumbnail) return item.thumbnail;
+        
+        // 2. NTV/CNN için description içindeki <img> tagını ayıkla
+        if (item.description && item.description.includes('<img')) {
+            const regex = /<img[^>]+src="([^">]+)"/g;
+            const match = regex.exec(item.description);
+            if (match && match[1]) return match[1];
+        }
+
+        // 3. Hiçbiri yoksa kaynağa özel HD logo koy
+        const logos = {
+            'TRT': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/TRT_Haber_logo.svg/512px-TRT_Haber_logo.svg.png',
+            'CNN': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/CNN.svg/512px-CNN.svg.png',
+            'NTV': 'https://upload.wikimedia.org/wikipedia/commons/b/b5/NTV_logo.png', // NTV HD Logo
+            'WEBTEKNO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Webtekno_Logo.png/512px-Webtekno_Logo.png',
+            'SDN': 'https://shiftdelete.net/wp-content/themes/sdn/assets/img/logo.png'
+        };
+        return logos[source] || 'https://via.placeholder.com/100';
+    }
+
+
+    
     // --- 4. AYARLAR ---
     function openSettings() {
         const m = document.getElementById('mdl');
