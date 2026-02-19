@@ -516,28 +516,29 @@ padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px bo
                 body: JSON.stringify({ q: `Haber: ${active.title}. Soru: ${q}`, stream: false })
             });
             const d = await res.json();
-            let formatted = d.response.replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>').replace(/^\s*[\-\*]\s+/gm, '🔹 ').replace(/\n/g, '<br>');
+           let formatted = d.response.replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>').replace(/^\s*[\-\*]\s+/gm, '🔹 ').replace(/\n/g, '<br>');
 
             if(active.source === "KHOJ") {
                 chatHistory.push({role: 'ai', text: formatted});
                 localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory));
             }
 
-           ai.innerHTML = '';
-            let words = formatted.split(' '); // Metni kelimelere bölüyoruz
+         ai.innerHTML = '';
+            let words = formatted.split(' ');
             let i = 0;
 
             function type() {
                 if (i < words.length) {
-                    // Kelimeyi ekliyoruz ve yanına bir boşluk bırakıyoruz
+                    // Kelimeleri ekliyoruz
                     ai.innerHTML += words[i] + ' '; 
                     i++;
                     
-                    // Her kelimeden sonra ekranı aşağı kaydırıyoruz
+                    // KRİTİK DOKUNUŞ: Tarayıcıya "burayı bir daha oku ve kodları çalıştır" diyoruz
+                    // Bu satır sayesinde <b style...> anında kırmızı bir yazıya dönüşür.
+                    ai.innerHTML = ai.innerHTML; 
+
                     box.scrollTop = box.scrollHeight;
-                    
-                    // Hız ayarını "sets.speed" üzerinden alıyoruz
-                    setTimeout(type, sets.speed * 5); // Kelime olduğu için biraz çarpan ekledik
+                    setTimeout(type, sets.speed * 5);
                 }
             }
             type();
