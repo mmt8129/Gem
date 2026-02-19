@@ -68,6 +68,8 @@
 /* MODAL ANA YAPI - ŞEFFAFLIK GİDERİLDİ */
 /* --- TERTEMİZ MODAL YAPISI (TIPSIZLIĞE SON) --- */
 .modal {
+    width: 95%; /* İnce görünümü bitiren sihirli değnek */
+    max-width: 500px; /* Çok büyük ekranlarda devasa olmasın diye sigorta */
     display: flex;
     flex-direction: column;
     height: 70vh !important; /* Pencere boyu sabit */
@@ -293,7 +295,7 @@
     if (!firebase.apps.length) firebase.initializeApp(fbCfg);
     const db = firebase.database();
 
-    let sets = JSON.parse(localStorage.getItem('khoj_sets')) || { size: 16, weight: 900, speed: 20, effect: 'typewriter' };
+    let sets = JSON.parse(localStorage.getItem('khoj_sets')) || { size: 13, weight: 600, speed: 0, effect: 'typewriter' };
     let chatHistory = JSON.parse(localStorage.getItem('khoj_ai_history')) || [];
     let news = [];
     let active = null;
