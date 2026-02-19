@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+    <link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gemini Pro Dashboard v7</title>
@@ -487,6 +491,18 @@
     function clearHistory() { chatHistory = []; localStorage.removeItem('khoj_ai_history'); closeM(); showToast("Sıfırlandı!"); }
     function closeM() { document.getElementById('ovl').style.display = 'none'; }
     function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
+
+    // --- PWA SERVICE WORKER KAYDI ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+            console.log('Service Worker Kayıtlı!', reg);
+        }).catch(err => {
+            console.log('Service Worker Hatası:', err);
+        });
+    });
+}
+
 </script>
 </body>
 </html>
