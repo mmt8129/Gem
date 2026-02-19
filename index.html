@@ -465,21 +465,46 @@
 }
 
     async function ask() {
-        const inp = document.getElementById('uInp'); const box = document.getElementById('cBox');
-        if(!inp.value) return; const q = inp.value; inp.value = '';
-        box.innerHTML += `<div class="msg user">${q}</div>`;
-        const ai = document.createElement('div'); ai.className = 'msg ai'; ai.innerText = '...';
-        box.appendChild(ai); box.scrollTop = box.scrollHeight;
-        try {
-            const res = await fetch(GEM_URL, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: `Haber: ${active.title}. Soru: ${q}` }] }] })
-            });
-            const d = await res.json(); const txt = d.candidates[0].content.parts[0].text;
-            ai.innerText = '';
-            let x = 0; let itv = setInterval(() => { ai.innerText += txt[x]; x++; if(x >= txt.length){ clearInterval(itv); } box.scrollTop = box.scrollHeight; }, sets.speed);
-        } catch (e) { ai.innerText = "Bağlantı hatası!"; }
+    const inp = document.getElementById('uInp'); 
+    const box = document.getElementById('cBox');
+    if(!inp.value) return; 
+    const q = inp.value; 
+    inp.value = '';
+    
+    box.innerHTML += `<div class="msg user">${q}</div>`;
+    const ai = document.createElement('div'); 
+    ai.className = 'msg ai'; 
+    ai.innerText = '...';
+    box.appendChild(ai); 
+    box.scrollTop = box.scrollHeight;
+
+    try {
+        const res = await fetch(GEM_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            // CORS Hatalarını önlemek için isteği bu şekilde gönderiyoruz
+            body: JSON.stringify({ contents: [{ parts: [{ text: `Haber: ${active.title}. Soru: ${q}` }] }] })
+        });
+
+        if (!res.ok) throw new Error('API Hatası'); // Hata kontrolü
+
+        const d = await res.json(); 
+        const txt = d.candidates[0].content.parts[0].text;
+        ai.innerText = '';
+        
+        let x = 0; 
+        let itv = setInterval(() => { 
+            ai.innerText += txt[x]; 
+            x++; 
+            if(x >= txt.length){ clearInterval(itv); } 
+            box.scrollTop = box.scrollHeight; 
+        }, sets.speed);
+
+    } catch (e) { 
+        ai.innerText = "Hata: Gemini ile bağlantı kurulamadı. Lütfen API anahtarını kontrol et abi."; 
+        console.error("CORS veya Bağlantı Hatası:", e);
     }
+}
 
     // KAYDEDİLENLER VE SİLME
     function saveNews() {
