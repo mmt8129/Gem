@@ -455,7 +455,13 @@ padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px bo
     }
 
     function openDetail(idx) {
-        if(idx === -1) active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." };
+        if(idx === -1) active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." 
+          // Sohbet kutusunu bul ve içeriği yükledikten hemen sonra en alta kaydır
+    setTimeout(() => {
+        const box = document.getElementById('cBox');
+        if (box) box.scrollTop = box.scrollHeight;
+    }, 50); // 50ms gecikme, içeriğin render edilmesi için yeterli                      
+                                };
         else if(idx !== -2) active = news[idx];
 
         const m = document.getElementById('mdl');
@@ -527,18 +533,27 @@ padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px bo
                 localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory));
             }
 
-         ai.innerHTML = '';
-            // Metni HTML etiketlerini bozmadan parçalara ayırır
-            let tokens = formatted.match(/(<[^>]+>|[^<>\s]+|\s+)/g) || [];
+       ai.innerHTML = '';
+            // Linkleri ve parantezleri siliyoruz
+            let cleanText = formatted.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '');
+            let tokens = cleanText.match(/(<[^>]+>|[^<>\s]+|\s+)/g) || [];
             let i = 0;
 
             function type() {
                 if (i < tokens.length) {
                     ai.innerHTML += tokens[i];
                     i++;
+
+                    // YILDIRIM YENİLEME: HTML'i anında render eder, renkleri çözer
+                    ai.innerHTML = ai.innerHTML; 
+                    
+                    // ODAKLANMA: Yazma bitene kadar ekranı aşağıda tutar
                     box.scrollTop = box.scrollHeight;
-                    // Hız ayarı (kelime bazlı olduğu için speed'i düşük tutabilirsin, örn: 5-10)
-                    setTimeout(type, sets.speed * 2);
+
+                    setTimeout(type, sets.speed);
+                } else {
+                    // Yazma bitti, artık kullanıcı ekranı serbestçe yukarı kaydırabilir
+                    box.scrollTop = box.scrollHeight;
                 }
             }
             type();
