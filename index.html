@@ -516,30 +516,33 @@ padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px bo
                 body: JSON.stringify({ q: `Haber: ${active.title}. Soru: ${q}`, stream: false })
             });
             const d = await res.json();
-           let formatted = d.response.replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>').replace(/^\s*[\-\*]\s+/gm, '🔹 ').replace(/\n/g, '<br>');
-
+           let formatted = d.response
+    .replace(/\(.*?\)/g, '') // (parantez içindekileri ve linkleri siler)
+    .replace(/\[.*?\]/g, '') // [köşeli parantez içindekileri siler]
+    .replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>') // Kırmızı-Kalın yapar
+    .replace(/^\s*[\-\*]\s+/gm, '🔹 ') // Listeleri düzenler
+    .replace(/\n/g, '<br>'); // Satır başlarını korur
             if(active.source === "KHOJ") {
                 chatHistory.push({role: 'ai', text: formatted});
                 localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory));
             }
 
          ai.innerHTML = '';
-            // Metni hem kelimelere hem de HTML etiketlerine göre parçalıyoruz
-            let tokens = formatted.match(/(<[^>]+>|[^<>\s]+|\s+)/g);
+            // Metni HTML etiketlerini bozmadan parçalara ayırır
+            let tokens = formatted.match(/(<[^>]+>|[^<>\s]+|\s+)/g) || [];
             let i = 0;
 
             function type() {
                 if (i < tokens.length) {
-                    // Token bir HTML etiketi mi yoksa normal kelime mi?
                     ai.innerHTML += tokens[i];
                     i++;
-
                     box.scrollTop = box.scrollHeight;
-                    // Hız ayarı (kelime/etiket bazlı olduğu için speed'i biraz artırabilirsin)
+                    // Hız ayarı (kelime bazlı olduğu için speed'i düşük tutabilirsin, örn: 5-10)
                     setTimeout(type, sets.speed * 2);
                 }
             }
             type();
+            
         } catch (e) { ai.innerText = "Bağlantı hatası!"; }
     }
 
