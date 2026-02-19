@@ -524,21 +524,19 @@ padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px bo
             }
 
          ai.innerHTML = '';
-            let words = formatted.split(' ');
+            // Metni hem kelimelere hem de HTML etiketlerine göre parçalıyoruz
+            let tokens = formatted.match(/(<[^>]+>|[^<>\s]+|\s+)/g);
             let i = 0;
 
             function type() {
-                if (i < words.length) {
-                    // Kelimeleri ekliyoruz
-                    ai.innerHTML += words[i] + ' '; 
+                if (i < tokens.length) {
+                    // Token bir HTML etiketi mi yoksa normal kelime mi?
+                    ai.innerHTML += tokens[i];
                     i++;
-                    
-                    // KRİTİK DOKUNUŞ: Tarayıcıya "burayı bir daha oku ve kodları çalıştır" diyoruz
-                    // Bu satır sayesinde <b style...> anında kırmızı bir yazıya dönüşür.
-                    ai.innerHTML = ai.innerHTML; 
 
                     box.scrollTop = box.scrollHeight;
-                    setTimeout(type, sets.speed * 5);
+                    // Hız ayarı (kelime/etiket bazlı olduğu için speed'i biraz artırabilirsin)
+                    setTimeout(type, sets.speed * 2);
                 }
             }
             type();
