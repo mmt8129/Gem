@@ -138,6 +138,45 @@
         .set-ctrl span { flex: 2; text-align: center; font-weight: 800; font-size: 1.1rem; color: var(--text); border-left: 1px solid var(--brd); border-right: 1px solid var(--brd); }
         .btn-full { width: 100%; height: 55px; background: var(--primary); color: white; border: none; border-radius: 18px; font-size: 1rem; font-weight: 800; cursor: pointer; }
 
+@media (max-width: 600px) {
+    /* 1. Kategori butonlarını biraz küçültelim */
+    .cat-item {
+        padding: 6px 12px !important;
+        font-size: 11px !important;
+        letter-spacing: 0px !important;
+    }
+
+    /* 2. Haber detayındaki o büyük başlığı mobilde dizginleyelim */
+    .modal-body h2 {
+        font-size: 1.2em !important;
+        line-height: 1.2 !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* 3. Tarih ve kaynak kısmını daha minyon yapalım */
+    .modal-header span {
+        font-size: 10px !important;
+    }
+
+    /* 4. Resimlerin köşelerini biraz daha yumuşatalım */
+    .modal-body img {
+        border-radius: 10px !important;
+    }
+
+    /* 5. Yapay zeka panelindeki o 'Haber Hakkında Bilgiler Sor' yazısını küçültelim */
+    .chat-box .msg {
+        font-size: 13px !important;
+        padding: 8px 12px !important;
+    }
+
+    /* 6. En alttaki soru sorma kutusunu daha kibar yapalım */
+    #uInp {
+        font-size: 14px !important;
+        padding: 10px !important;
+    }
+}
+
+
         /* CHAT BOX */
         .chat-box {
             background: var(--bg) !important; border-radius: 20px; padding: 15px; flex: 1; 
@@ -287,7 +326,13 @@ items.forEach(el => {
     const title = el.querySelector("title")?.textContent || "";
     let link = el.querySelector("link")?.textContent || el.querySelector("link")?.getAttribute("href") || "";
     
-    // Resim ayıklama (Mynet, CNN vb. için)
+    // TARİHİ BURADA YAKALIYORUZ (Garantili yöntem)
+   const date = el.querySelector("pubDate")?.textContent || 
+             el.querySelector("dc\\:date")?.textContent || // Bazı sistemlerin kullandığı format
+             el.querySelector("date")?.textContent || 
+             el.querySelector("lastBuildDate")?.textContent || 
+             "";
+
     let img = "";
     const enclosure = el.querySelector("enclosure");
     if (enclosure) img = enclosure.getAttribute("url");
@@ -296,8 +341,9 @@ items.forEach(el => {
         news.push({
             title: title.trim(),
             link: link.trim(),
-            source: rss.ad,           // Firebase'deki Kaynak Adı
-            category: rss.kategori || "GÜNDEM", // İŞTE BURASI: Direkt Firebase'deki seçim!
+            source: rss.ad,
+            category: rss.kategori || "GÜNDEM",
+            pubDate: date, // İŞTE EKSİK OLAN BUYDU!
             thumbnail: img || rss.logo || "varsayilan-logo.png"
         });
     }
@@ -651,34 +697,55 @@ function quickAdjust(type, val) {
 }
 
 function openDetail(idx) {
-    if (idx !== -1 && idx !== -2) { active = news[idx]; }
+    
+	if (idx !== -1 && idx !== -2) { active = news[idx]; }
+	
+	console.log("Haber Verisi:", active);
+    console.log("Tarih Alanı:", active.pubDate);
+	
     const m = document.getElementById('mdl');
     const img = getBestImage(active, active.source);
-    const pubDate = active.pubDate ? new Date(active.pubDate).toLocaleString('tr-TR', {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'}) : '';
-    
-    // 1. ADIM: İçerik çekme hazırlığı
-    const cleanDesc = active.description ? active.description.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim().substring(0, 500) + "..." : "Haber içeriği yükleniyor...";
+	
+    // Hangi isimle gelirse gelsin tarihi yakalamaya çalışalım
+const hamTarih = active.pubDate || active.date || active.time || "";
+console.log("Yakalanan Tarih:", hamTarih); // F12'de bunu da göreceksin
 
-    if (document.activeElement) {
-        document.activeElement.blur(); 
+    // --- TARİH VE SAATİ GÜVENLİ FORMATLA ---
+    let displayDate = "";
+if (active.pubDate) {
+    const d = new Date(active.pubDate);
+    if (!isNaN(d.getTime())) {
+        displayDate = d.toLocaleString('tr-TR', {
+            day: 'numeric', 
+            month: 'long', 
+            hour: '2-digit', 
+            minute: '2-digit'
+        });
+    } else {
+        // Eğer tarih formatı garip gelirse (NTV bazen yapar), ilk kısmını al
+        displayDate = active.pubDate.split(' +')[0]; 
     }
+}
 
-    // Modal iskeletini basıyoruz
+    const cleanDesc = active.description ? active.description.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim().substring(0, 1000) + "..." : "Haber içeriği yükleniyor...";
+
+    if (document.activeElement) { document.activeElement.blur(); }
+
     m.innerHTML = `
         <div class="modal-header">
             <div style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap: wrap; gap: 10px;">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <span class="news-meta" style="background:#ef4444; color:white; padding:4px 10px; border-radius:6px; font-weight:bold;">${active.source}</span>
-                    <span style="font-size:12px; color:#888;">${pubDate}</span>
-                </div>
+               <div style="display:flex; align-items:center; gap:8px;">
+    <span style="background:#ef4444; color:white; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:800; letter-spacing:0.5px;">${active.source}</span>
+    <span style="font-size:11px; color:var(--text); opacity:0.5; font-weight:400; border-left:1px solid var(--brd); padding-left:8px;">${displayDate}</span>
+</div>
                 <div style="display:flex; align-items:center; gap:5px;">
                     <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;" onclick="quickAdjust('size', 1)">Y+</button>
                     <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;" onclick="quickAdjust('size', -1)">Y-</button>
                     <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold; margin-left:2px;" onclick="quickAdjust('weight', 100)">K+</button>
                     <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;" onclick="quickAdjust('weight', -100)">K-</button>
-                    <div style="width:1px; height:20px; background:#ddd; margin:0 5px;"></div>
+                    <div style="width:1px; height:20px; background:var(--brd); margin:0 5px;"></div>
                     ${active.link ? `<button class="btn-icon" style="width:32px; height:32px;" onclick="openFullNews('${active.link}')">🔗</button>` : ''}
-                    <button class="btn-icon" style="width:32px; height:32px;" onclick="shareNews('${active.title.replace(/'/g, "\\'")}', '${active.link}')">📤</button>
+                <button class="btn-icon" style="width:32px; height:32px;" onclick="shareNews(active.title.replace(/'/g, ''), active.link)">📤</button>
                     <button class="btn-icon" style="width:32px; height:32px;" onclick="saveNews()">💾</button>
                     <button class="btn-icon" style="width:32px; height:32px; color:red;" onclick="closeM()">❌</button>
                 </div>
@@ -690,8 +757,14 @@ function openDetail(idx) {
                 <p style="font-size:14px; line-height:1.6; margin:0;">${cleanDesc}</p>
             </div>
             ${active.source !== "KHOJ" ? `<img src="${img}" style="width:100%; border-radius:15px; margin-bottom:20px;">` : ''}
+            
             <div style="background:var(--card-bg); border:1px solid var(--brd); border-radius:12px; overflow:hidden;">
-                <div style="background:var(--brd); padding:8px 15px; font-size:11px; font-weight:bold; color:var(--text); opacity:0.7;">YAPAY ZEKA ANALİZİ</div>
+                <div style="background:var(--brd); padding:8px 15px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:11px; font-weight:bold; color:var(--text); opacity:0.7;">YAPAY ZEKA ANALİZİ</span>
+                    <button onclick="document.getElementById('uInp').value='Bu haberi özetle'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                        ✨ AI ile Özetle
+                    </button>
+                </div>
                 <div class="chat-box" id="cBox" style="min-height:250px;">
                     ${active.savedChat || ((active.source === "KHOJ" && chatHistory.length > 0) ? chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('') : `<div class="msg ai">Haber Hakkında Bilgiler Sor...</div>`)}
                 </div>
@@ -704,7 +777,7 @@ function openDetail(idx) {
             </div>
         </div>`;
 
-    // 2. ADIM: CLOUDFLARE ÜZERİNDEN TAM İÇERİĞİ ÇEKİP O KIRMIZI KUTUYA YAZMA
+    // Haber İçeriği Çekme (Cloudflare Üzerinden)
     const myProxy = "https://wild-sky-08d7.06mmt8129.workers.dev/?url=";
     if (active.link && active.source !== "KHOJ") {
         fetch(myProxy + encodeURIComponent(active.link))
@@ -713,29 +786,26 @@ function openDetail(idx) {
                 const doc = new DOMParser().parseFromString(html, 'text/html');
                 const paragraphs = Array.from(doc.querySelectorAll('p'))
                     .map(p => p.textContent.trim())
-                    .filter(t => t.length > 40) // Kısa cümleleri (reklam vb.) ele
-                    .slice(0, 3) // İlk 5 paragrafı al
-                    .join('<br><br>');
-                
-                if (paragraphs) {
-                    document.getElementById('dynamicContent').innerHTML = `<p style="font-size:14px; line-height:1.6; margin:0;">${paragraphs}</p>`;
-                }
+                    .filter(t => t.length > 40).slice(0, 5).join('<br><br>');
+                if (paragraphs) { document.getElementById('dynamicContent').innerHTML = `<p style="font-size:14px; line-height:1.6; margin:0;">${paragraphs}</p>`; }
             }).catch(e => console.log("İçerik çekilemedi."));
     }
-
-    // Modal açma ve odak işlemleri
-    setTimeout(() => {
-        const uInp = document.getElementById('uInp');
-        if (uInp) { uInp.blur(); window.scrollTo(0, 0); }
-    }, 100);
 
     document.getElementById('ovl').style.display = 'flex';
     const box = document.getElementById('cBox');
     box.scrollTop = box.scrollHeight;
     const inp = document.getElementById('uInp');
-    inp.focus();
+    
     inp.addEventListener('keypress', (e) => { if (e.key === 'Enter') ask(); });
     document.getElementById('sendBtn').onclick = ask;
+}
+// Yardımcı Fonksiyon (Özetleme butonuna basınca çalışması için)
+function askAI(prompt) {
+    const inp = document.getElementById('uInp');
+    if(inp) {
+        inp.value = prompt;
+        ask(); // Mevcut ask() fonksiyonunu tetikler
+    }
 }
 
 function openFullNews(url) {
@@ -797,6 +867,26 @@ function saveNews() {
     if(existingIndex !== -1) { saved[existingIndex] = newsToSave; showToast("Güncellendi! 💾"); } 
     else { saved.push(newsToSave); showToast("Kaydedildi! 💾"); }
     localStorage.setItem('khoj_saved_news', JSON.stringify(saved));
+}
+
+function shareNews(title, link) {
+    // Eğer tarayıcı modern paylaşımı destekliyorsa (Mobilde genelde destekler)
+    if (navigator.share) {
+        navigator.share({
+            title: title,
+            text: title + "\n\nBu habere göz at:\n",
+            url: link
+        }).then(() => {
+            console.log('Paylaşıldı');
+        }).catch((error) => {
+            console.log('Paylaşım iptal edildi veya hata oluştu', error);
+        });
+    } else {
+        // Eğer tarayıcı desteklemiyorsa (PC gibi), linki panoya kopyalayalım
+        navigator.clipboard.writeText(title + " " + link).then(() => {
+            alert("Haber linki panoya kopyalandı!");
+        });
+    }
 }
 
 function openSavedList() {
