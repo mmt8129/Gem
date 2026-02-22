@@ -38,7 +38,7 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; transition: background 0.3s; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; transition: none !important; }
 
         /* HEADER */
         .header {
@@ -151,7 +151,7 @@
         #toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
             background: var(--card-bg); color: var(--text); padding: 12px 25px; border-radius: 50px; font-weight: 800; font-size: 0.85rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 2px solid var(--primary); z-index: 9999; transition: 0.4s;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 2px solid var(--primary); z-index: 9999; transition: none !important;
         }
         #toast.show { transform: translateX(-50%) translateY(0); }
     </style>
@@ -260,90 +260,130 @@ function metniTemizle(hamMetin) {
 }
 
 // --- 2. HABERLER ---
-// --- 2. HABERLER (DİNAMİK VE KATEGORİLİ) ---
-let currentCategory = 'TÜMÜ';
-let rssListesi = {}; // RSS bilgilerini burada tutalım
+// --- 2. SİSTEM VE HABER MOTORU ---
+let rssListesi = {};
 
-db.ref('rss_ayarlari').on('value', rssSnap => {
-    rssListesi = rssSnap.val() || {};
-    if (Object.keys(rssListesi).length === 0) return;
-
+// 1. CANLI HABER ÇEKME FONKSİYONU
+async function fetchAllNews() {
     news = []; 
+    const proxyUrl = "https://wild-sky-08d7.06mmt8129.workers.dev/?url=";
+    
+    // Ekrana yükleniyor yazalım ki çalıştığını görelim
+    document.getElementById('newsFeed').innerHTML = '<div style="text-align:center; padding:50px; color:white;">Haberler Cloudflare hattından geliyor...</div>';
 
-    Object.keys(rssListesi).forEach(id => {
+    for (const id in rssListesi) {
         const rss = rssListesi[id];
-        
-        // Klasör adını tahmin et (trt, cnn, ntv vb.)
-        let temizAd = rss.ad.toLowerCase().split(' ')[0]
-            .replace(/ı/g, 'i').replace(/ü/g, 'u').replace(/ç/g, 'c').replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ö/g, 'o');
-        let fbKey = "haber_" + temizAd;
+        try {
+            const response = await fetch(proxyUrl + encodeURIComponent(rss.url));
+            const xmlText = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+            
+            // Mynet ve diğerleri için hem 'item' hem 'entry' tara
+            const items = xmlDoc.querySelectorAll("item, entry");
 
-        db.ref(fbKey + "/items").on("value", snap => {
-            if(snap.val()) {
-                // HABERİ MÜHÜRLE: rss.kategori'yi içine gömüyoruz
-                const data = snap.val().slice(0, 15).map(i => ({
-                    ...i, 
-                    source: rss.ad, 
-                    category: rss.kategori // ÖNEMLİ: Panelde seçtiğin kategori
-                }));
-                
-                news = news.filter(x => x.source !== rss.ad).concat(data);
-                render(); 
-            }
+            // --- SADECE FİREBASE KATEGORİSİNİ KULLANAN YAPI ---
+items.forEach(el => {
+    const title = el.querySelector("title")?.textContent || "";
+    let link = el.querySelector("link")?.textContent || el.querySelector("link")?.getAttribute("href") || "";
+    
+    // Resim ayıklama (Mynet, CNN vb. için)
+    let img = "";
+    const enclosure = el.querySelector("enclosure");
+    if (enclosure) img = enclosure.getAttribute("url");
+
+    if (title && title.length > 5) {
+        news.push({
+            title: title.trim(),
+            link: link.trim(),
+            source: rss.ad,           // Firebase'deki Kaynak Adı
+            category: rss.kategori || "GÜNDEM", // İŞTE BURASI: Direkt Firebase'deki seçim!
+            thumbnail: img || rss.logo || "varsayilan-logo.png"
         });
-    });
+    }
 });
+            
+            // Listeyi karıştır ve ekrana bas
+            news.sort(() => Math.random() - 0.5);
+            render(); 
+
+        } catch (e) {
+            console.log(rss.ad + " bağlantı sorunu:", e);
+        }
+    }
+}
+
+// 2. ANA DİNLEYİCİ (SAAT VE BUTONLARI KURTARAN KISIM)
+db.ref('rss_ayarlari').on('value', snap => {
+    rssListesi = snap.val() || {};
+    if (Object.keys(rssListesi).length > 0) {
+        fetchAllNews();
+    }
+});
+
+// Saati tekrar canlandırıyoruz
+setInterval(updateTime, 1000);
+updateTime();
 
 // Kategori Filtreleme Fonksiyonu (Hatalı olanı bununla değiştir abi)
 function filterCat(cat) {
-    currentCategory = cat;
-    
-    // Görsel olarak aktif butonu değiştir
-    document.querySelectorAll('.cat-item').forEach(el => {
-        el.classList.remove('active');
-        if(el.innerText === cat) el.classList.add('active');
+    // 1. Önce bütün butonlardan 'active' sınıfını siliyoruz
+    const items = document.querySelectorAll('.cat-item');
+    items.forEach(item => item.classList.remove('active'));
+
+    // 2. Hangi butona tıklandıysa onu bulup 'active' yapıyoruz
+    // Butonun içindeki yazı (innerText) ile gönderilen kategori (cat) aynı olmalı
+    items.forEach(item => {
+        if (item.innerText.trim() === cat) {
+            item.classList.add('active');
+        }
     });
 
-    render(); // Listeyi filtreye göre tekrar çiz
+    // 3. Konsola yazalım, bakalım buton değişmiş mi?
+    console.log("Seçilen yeni kategori:", cat);
+
+    // 4. Listeyi yeni kategoriye göre baştan çizdiriyoruz
+    render(); 
 }
 
 function render() {
-    const f = document.getElementById('newsFeed'); 
+    const f = document.getElementById('newsFeed');
     if(!f) return;
 
-    let filteredNews = news.filter(n => n.description && n.description.trim().length > 10);
-    
-    if (currentCategory !== 'TÜMÜ') {
-        filteredNews = filteredNews.filter(n => 
-            n.category && n.category.toString().toUpperCase() === currentCategory.toString().toUpperCase()
-        );
-    }
+    // Aktif butonu bul ve üzerindeki yazıyı al
+   const activeBtn = document.querySelector('.cat-item.active');
+    // Butondaki yazıyı tertemiz yap (BÜYÜK HARF ve Boşluksuz)
+    const currentCategory = activeBtn ? activeBtn.innerText.trim().toUpperCase() : "TÜMÜ";
 
-    // --- KRİTİK DEĞİŞİKLİK BURASI ---
-    // Kaynak (source) fark etmeksizin tüm listeyi rastgele harmanla
-    filteredNews.sort(() => Math.random() - 0.5); 
-    // --------------------------------
+    console.log("Seçili Buton:", currentCategory); // F12'de neye bastığını gör
 
-// 4. Eğer o kategoride haber yoksa uyarı ver
+    let filteredNews = news.filter(n => {
+        if (currentCategory === "TÜMÜ") return true;
+        
+        // Haber kategorisini de aynı temizlikten geçir
+        const haberKategorisi = n.category ? n.category.trim().toUpperCase() : "";
+        
+        // Örn: "SPOR" === "SPOR" mu?
+        return haberKategorisi === currentCategory;
+    });
+
     if (filteredNews.length === 0) {
-        f.innerHTML = `
-            <div style="text-align:center; padding:50px; color:#888;">
-                <div style="font-size:3rem; margin-bottom:10px;">📭</div>
-                <p>"${currentCategory}" kategorisinde henüz haber yok <br>
-                RSS Ayarlarından bir kaynağa bu kategoriyi atamalısın.</p>
-            </div>`;
+        f.innerHTML = `<div style="text-align:center; padding:50px; color:var(--text);">
+            <div style="font-size:30px;">📂</div>
+            <br>${currentCategory} kategorisinde henüz haber yok.
+        </div>`;
         return;
     }
 
-    f.innerHTML = filteredNews.map((n, i) => {
+    f.innerHTML = filteredNews.map((n) => {
         const realIdx = news.findIndex(x => x.title === n.title);
         return `
             <div class="news-card" onclick="openDetail(${realIdx})">
-                <img src="${getBestImage(n, n.source)}">
+                <img src="${n.thumbnail || 'logo.png'}" onerror="this.src='logo.png'">
                 <div style="flex:1">
                     <div class="news-meta">
-                        <span style="color:var(--primary); font-weight:800;">${n.source}</span> | 
-                        <span>${n.category}</span>
+                        <span style="color:#ffcc00; font-weight:bold;">${n.source}</span> | 
+                        <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:10px;">${n.category}</span>
                     </div>
                     <div class="news-title">${n.title}</div>
                 </div>
@@ -615,12 +655,15 @@ function openDetail(idx) {
     const m = document.getElementById('mdl');
     const img = getBestImage(active, active.source);
     const pubDate = active.pubDate ? new Date(active.pubDate).toLocaleString('tr-TR', {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'}) : '';
-    const cleanDesc = active.description ? active.description.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim().substring(0, 1000) + "..." : "Haber içeriği yüklenemedi abi.";
+    
+    // 1. ADIM: İçerik çekme hazırlığı
+    const cleanDesc = active.description ? active.description.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim().substring(0, 500) + "..." : "Haber içeriği yükleniyor...";
 
-// openDetail fonksiyonunun en sonuna (render bittikten sonraya) ekle:
-if (document.activeElement) {
-    document.activeElement.blur(); // Odaklanmış herhangi bir şey varsa odağı kaldır (klavyeyi kapatır)
-}
+    if (document.activeElement) {
+        document.activeElement.blur(); 
+    }
+
+    // Modal iskeletini basıyoruz
     m.innerHTML = `
         <div class="modal-header">
             <div style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap: wrap; gap: 10px;">
@@ -628,24 +671,22 @@ if (document.activeElement) {
                     <span class="news-meta" style="background:#ef4444; color:white; padding:4px 10px; border-radius:6px; font-weight:bold;">${active.source}</span>
                     <span style="font-size:12px; color:#888;">${pubDate}</span>
                 </div>
-                
                 <div style="display:flex; align-items:center; gap:5px;">
                     <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;" onclick="quickAdjust('size', 1)">Y+</button>
                     <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;" onclick="quickAdjust('size', -1)">Y-</button>
                     <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold; margin-left:2px;" onclick="quickAdjust('weight', 100)">K+</button>
                     <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;" onclick="quickAdjust('weight', -100)">K-</button>
-                    
                     <div style="width:1px; height:20px; background:#ddd; margin:0 5px;"></div>
                     ${active.link ? `<button class="btn-icon" style="width:32px; height:32px;" onclick="openFullNews('${active.link}')">🔗</button>` : ''}
-                   <button class="btn-icon" style="width:32px; height:32px;" onclick="shareNews('${active.title.replace(/'/g, "\\'")}', '${active.link}')">📤</button>
-				   <button class="btn-icon" style="width:32px; height:32px;" onclick="saveNews()">💾</button>
+                    <button class="btn-icon" style="width:32px; height:32px;" onclick="shareNews('${active.title.replace(/'/g, "\\'")}', '${active.link}')">📤</button>
+                    <button class="btn-icon" style="width:32px; height:32px;" onclick="saveNews()">💾</button>
                     <button class="btn-icon" style="width:32px; height:32px; color:red;" onclick="closeM()">❌</button>
                 </div>
             </div>
         </div>
         <div class="modal-body">
             <h2 style="margin-bottom:15px; line-height:1.3; font-size:1.4em;">${active.title}</h2>
-            <div style="background:rgba(239, 68, 68, 0.1); border-left:4px solid #ef4444; padding:15px; margin-bottom:20px; border-radius:0 10px 10px 0;">
+            <div id="dynamicContent" style="background:rgba(239, 68, 68, 0.1); border-left:4px solid #ef4444; padding:15px; margin-bottom:20px; border-radius:0 10px 10px 0;">
                 <p style="font-size:14px; line-height:1.6; margin:0;">${cleanDesc}</p>
             </div>
             ${active.source !== "KHOJ" ? `<img src="${img}" style="width:100%; border-radius:15px; margin-bottom:20px;">` : ''}
@@ -658,20 +699,36 @@ if (document.activeElement) {
         </div>
         <div class="modal-footer">
             <div style="display:flex; gap:10px; width:100%;">
-                <input type="text" id="uInp" readonly onfocus="this.removeAttribute('readonly');" 
-       placeholder="Bu olay neden oldu? / Özetle..." 
-       style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:16px;">
+                <input type="text" id="uInp" readonly onfocus="this.removeAttribute('readonly');" placeholder="Bu olay neden oldu? / Özetle..." style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:16px;">
                 <button class="btn-icon btn-save" id="sendBtn" style="width:50px;">➤</button>
             </div>
         </div>`;
-// Modal açıldıktan hemen sonra odağı zorla başka yere çekiyoruz
-setTimeout(() => {
-    const uInp = document.getElementById('uInp');
-    if (uInp) {
-        uInp.blur(); // Odağı bırak
-        window.scrollTo(0, 0); // Sayfayı en üste sabitle
+
+    // 2. ADIM: CLOUDFLARE ÜZERİNDEN TAM İÇERİĞİ ÇEKİP O KIRMIZI KUTUYA YAZMA
+    const myProxy = "https://wild-sky-08d7.06mmt8129.workers.dev/?url=";
+    if (active.link && active.source !== "KHOJ") {
+        fetch(myProxy + encodeURIComponent(active.link))
+            .then(res => res.text())
+            .then(html => {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const paragraphs = Array.from(doc.querySelectorAll('p'))
+                    .map(p => p.textContent.trim())
+                    .filter(t => t.length > 40) // Kısa cümleleri (reklam vb.) ele
+                    .slice(0, 3) // İlk 5 paragrafı al
+                    .join('<br><br>');
+                
+                if (paragraphs) {
+                    document.getElementById('dynamicContent').innerHTML = `<p style="font-size:14px; line-height:1.6; margin:0;">${paragraphs}</p>`;
+                }
+            }).catch(e => console.log("İçerik çekilemedi."));
     }
-}, 100);
+
+    // Modal açma ve odak işlemleri
+    setTimeout(() => {
+        const uInp = document.getElementById('uInp');
+        if (uInp) { uInp.blur(); window.scrollTo(0, 0); }
+    }, 100);
+
     document.getElementById('ovl').style.display = 'flex';
     const box = document.getElementById('cBox');
     box.scrollTop = box.scrollHeight;
@@ -679,54 +736,6 @@ setTimeout(() => {
     inp.focus();
     inp.addEventListener('keypress', (e) => { if (e.key === 'Enter') ask(); });
     document.getElementById('sendBtn').onclick = ask;
-}
-
-function shareNews(title, link) {
-    // 1. ADIM: GERÇEK LİNKİ AYIKLA
-    let finalLink = link;
-
-    try {
-        // Eğer link bir Google yönlendirmesiyse (Google News vb.)
-        if (link.includes("google.com") || link.includes("news.google")) {
-            const urlObj = new URL(link);
-            // Google genellikle 'url' veya 'article' parametresini kullanır
-            finalLink = urlObj.searchParams.get('url') || urlObj.searchParams.get('article') || link;
-        }
-        
-        // Bazı RSS servisleri linkin sonuna kendi reklamlarını ekler, onları temizle
-        finalLink = finalLink.split('?utm_source')[0].split('#')[0];
-    } catch (e) {
-        finalLink = link; // Hata olursa orijinal kalsın
-    }
-
-    const shareBody = `${title}\n\nDetaylar için:\n${finalLink}`;
-
-    // 2. ADIM: PAYLAŞMA VEYA KOPYALAMA
-    if (navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        navigator.share({
-            title: title,
-            text: title,
-            url: finalLink
-        }).catch(() => {});
-    } else {
-        // Bilgisayarda kopyalama işlemi
-        const dummy = document.createElement("textarea");
-        document.body.appendChild(dummy);
-        dummy.value = shareBody;
-        dummy.select();
-        
-        try {
-            const successful = document.execCommand('copy');
-            if (successful) {
-                // Toast fonksiyonun hangisiyse onu çağır
-                if(typeof showToast === "function") showToast("Haber linki kopyalandı! 📋");
-                else alert("Haber linki kopyalandı! 📋");
-            }
-        } catch (err) {
-            console.error('Kopyalama hatası:', err);
-        }
-        document.body.removeChild(dummy);
-    }
 }
 
 function openFullNews(url) {
