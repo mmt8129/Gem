@@ -760,19 +760,19 @@ if (active.pubDate) {
             
             <div style="background:var(--card-bg); border:1px solid var(--brd); border-radius:12px; overflow:hidden;">
                 <div style="background:var(--brd); padding:8px 15px; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:11px; font-weight:bold; color:var(--text); opacity:0.7;">YAPAY ZEKA ANALİZİ</span>
+                    <span style="font-size:11px; font-weight:bold; color:var(--text); opacity:0.7;">ANALİZ ET</span>
                     <button onclick="document.getElementById('uInp').value='Bu haberi özetle'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:4px;">
                         ✨ AI ile Özetle
                     </button>
                 </div>
                 <div class="chat-box" id="cBox" style="min-height:250px;">
-                    ${active.savedChat || ((active.source === "KHOJ" && chatHistory.length > 0) ? chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('') : `<div class="msg ai">Haber Hakkında Bilgiler Sor...</div>`)}
+                    ${active.savedChat || ((active.source === "KHOJ" && chatHistory.length > 0) ? chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('') : `<div class="msg ai">......</div>`)}
                 </div>
             </div>
         </div>
         <div class="modal-footer">
             <div style="display:flex; gap:10px; width:100%;">
-                <input type="text" id="uInp" readonly onfocus="this.removeAttribute('readonly');" placeholder="Bu olay neden oldu? / Özetle..." style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:16px;">
+                <input type="text" id="uInp" readonly onfocus="this.removeAttribute('readonly');" placeholder="....." style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:16px;">
                 <button class="btn-icon btn-save" id="sendBtn" style="width:50px;">➤</button>
             </div>
         </div>`;
