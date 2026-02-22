@@ -2,44 +2,101 @@
 <html lang="tr">
 <head>
     <link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gemini Pro Dashboard v7</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Orbitron:wght@600&display=swap" rel="stylesheet">
     <style>
+
+	
+        /* TEMA DEĞİŞKENLERİ */
         :root {
             --primary: #4880FF;
             --bg: #FFFFFF;
             --text: #1a1a1a;
+            --card-bg: #FFFFFF;
+            --brd: #f0f0f0;
             --chat-size: 13px;
             --chat-weight: 600;
+            --header-bg: #FFFFFF;
+			--news-size: 0.92rem;    /* Ana ekran yazı boyutu */
+    --news-weight: 700;      /* Ana ekran yazı kalınlığı */
+    --chat-size: 13px;       /* Pencere içi yazı boyutu */
+    --chat-weight: 600;      /* Pencere içi yazı kalınlığı */
+        }
+
+        [data-theme="dark"] {
+			--bg: #0f172a;
+            --text: #f1f5f9;
+            --card-bg: #1e293b;
+            --brd: #334155;
+            --header-bg: #1e293b;
+			
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; transition: background 0.3s; }
 
         /* HEADER */
         .header {
             position: fixed; top: 0; width: 100%; height: 75px;
-            background: white; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 15px; border-bottom: 1px solid #f0f0f0; z-index: 1001;
+            background: var(--header-bg); display: flex; justify-content: space-between; align-items: center;
+            padding: 0 15px; border-bottom: 1px solid var(--brd); z-index: 1001;
         }
         .header-left, .header-right { display: flex; gap: 10px; flex: 1; }
         .header-right { justify-content: flex-end; }
         .header-center { text-align: center; flex: 1.5; }
 
-        .time-text { font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 1.3rem; color: #111; display: block; }
+        .time-text { font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--text); display: block; }
         .date-text { font-size: 0.65rem; color: #aaa; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+
+/* Kategori Barı Tasarımı */
+.category-bar {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 15px;
+    background: var(--bg);
+    position: fixed;
+    top: 75px; /* Header'ın hemen altına yapışır */
+    width: 100%;
+    z-index: 1000;
+    border-bottom: 1px solid var(--brd);
+    scrollbar-width: none;
+}
+.category-bar::-webkit-scrollbar { display: none; }
+
+.cat-item {
+    padding: 6px 15px;
+    background: var(--card-bg);
+    border: 1px solid var(--brd);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+    color: var(--text);
+}
+.cat-item.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* Haberlerin kategori barının altında kalmaması için mesafeyi açıyoruz */
+#newsFeed { margin-top: 130px !important; }
+
 
         /* BUTONLAR */
         .btn-icon {
             width: 42px; height: 42px; border-radius: 12px; border: none;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; transition: all 0.2s; background: #fff;
-            border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            font-size: 1.2rem; transition: all 0.2s; background: var(--card-bg);
+            border: 1px solid var(--brd); color: var(--text);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         }
         .btn-icon:active { transform: scale(0.92); }
         .btn-gemini { background: #FFC107 !important; color: white !important; border: none !important; }
@@ -51,11 +108,11 @@
             overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px;
         }
         .news-card {
-            background: white; border-radius: 20px; padding: 12px; display: flex; gap: 12px;
-            border: 1px solid #f3f3f3; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            background: var(--card-bg); border-radius: 20px; padding: 12px; display: flex; gap: 12px;
+            border: 1px solid var(--brd); align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.02);
         }
         .news-card img { width: 80px; height: 80px; border-radius: 14px; object-fit: cover; flex-shrink: 0; background: #f9f9f9; }
-        .news-title { font-size: 0.92rem; font-weight: 700; color: #222; line-height: 1.4; }
+        .news-title { font-size: var(--news-size) !important; font-weight: var(--news-weight) !important; color: var(--text); line-height: 1.4; }
         .news-meta { font-size: 0.65rem; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 4px; }
 
         /* MODAL */
@@ -64,179 +121,39 @@
             backdrop-filter: blur(8px); display: none; z-index: 5000;
             justify-content: center; align-items: flex-end;
         }
-       /* MODAL ANA YAPI */
-/* MODAL ANA YAPI - ŞEFFAFLIK GİDERİLDİ */
-/* --- TERTEMİZ MODAL YAPISI (TIPSIZLIĞE SON) --- */
-.modal {
-    width: 98%; /* İnce görünümü bitiren sihirli değnek */
-    max-width: 500px; /* Çok büyük ekranlarda devasa olmasın diye sigorta */
-    display: flex;
-    width: 96% !important; /* Ekranın yanlarına iyice yayılması için */
-    flex-direction: column;
-    height: 95vh !important; /* Pencere boyu sabit */
-    background: #FFFFFF !important;
-    border-radius: 20px 20px 0 0;
-    overflow: hidden;
-    margin: 0 auto;
-}
+        .modal {
+            width: 96% !important; max-width: 500px; display: flex; flex-direction: column;
+            height: 95vh !important; background: var(--card-bg) !important;
+            border-radius: 20px 20px 0 0; overflow: hidden; margin: 0 auto;
+            border: 1px solid var(--brd);
+        }
+        .modal-header { padding: 20px; border-bottom: 1px solid var(--brd); flex-shrink: 0; background: var(--card-bg) !important; color: var(--text) !important;}
+        .modal-body { flex: 1; overflow-y: auto; padding: 20px; background: var(--bg) !important; color: var(--text) !important; -webkit-overflow-scrolling: touch; }
+        .modal-footer { padding: 15px 20px 30px 20px; border-top: 1px solid var(--brd); background: var(--card-bg) !important; flex-shrink: 0; }
+        
+        .set-row { margin-bottom: 25px; display: flex; flex-direction: column; gap: 10px; }
+        .set-label { font-size: 0.75rem; font-weight: 800; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+        .set-ctrl { display: flex; align-items: center; background: var(--bg); border: 2px solid var(--brd); border-radius: 18px; height: 60px; overflow: hidden; }
+        .set-ctrl button { flex: 1; height: 100%; border: none; background: transparent; font-size: 1.5rem; color: var(--primary); cursor: pointer; }
+        .set-ctrl span { flex: 2; text-align: center; font-weight: 800; font-size: 1.1rem; color: var(--text); border-left: 1px solid var(--brd); border-right: 1px solid var(--brd); }
+        .btn-full { width: 100%; height: 55px; background: var(--primary); color: white; border: none; border-radius: 18px; font-size: 1rem; font-weight: 800; cursor: pointer; }
 
-.modal-header {
-    padding: 20px;
-    border-bottom: 1px solid #eee;
-    flex-shrink: 0; /* Başlık yukarıda sabit kalsın */
-}
-
-.modal-body {
-    flex: 1; /* Liste tüm orta alanı doldursun */
-    overflow-y: auto; /* Sadece burası kaysın */
-    padding: 20px;
-    -webkit-overflow-scrolling: touch;
-}
-
-.modal-footer {
-    padding: 15px 20px 30px 20px;
-    border-top: 1px solid #eee;
-    background: white;
-    flex-shrink: 0; /* Buton en altta sabit kalsın */
-}
-
-/* ORTA ALAN - AYARLAR VE LİSTELER */
-.modal-body {
-    flex: 1; /* Kalan tüm boşluğu doldurur */
-    overflow-y: auto; /* İçerik taşarsa kaydırma çubuğu çıkar */
-    padding: 20px;
-    background: #FFFFFF;
-    /* Kaydırma çubuğunu gizlemek ama kaydırmayı tutmak istersen: */
-    scrollbar-width: none; /* Firefox için */
-}
-.modal-body::-webkit-scrollbar {
-    display: none; /* Chrome/Safari için çubuğu gizler, temiz durur */
-}
-
-/* AYAR SATIRLARI (HİZALAMA BURADA DÜZELİYOR) */
-.set-row {
-    margin-bottom: 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.set-label {
-    font-size: 0.75rem;
-    font-weight: 800;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-left: 5px;
-}
-
-/* KONTROL KUTUSU (Geniş ve profesyonel) */
-.set-ctrl {
-    display: flex;
-    align-items: center;
-    background: #f8f9fb;
-    border: 2px solid #edf0f5;
-    border-radius: 18px;
-    height: 60px; /* Daha rahat dokunma alanı */
-    overflow: hidden;
-    transition: 0.3s;
-}
-
-.set-ctrl:focus-within {
-    border-color: var(--primary);
-}
-
-.set-ctrl button {
-    flex: 1;
-    height: 100%;
-    border: none;
-    background: transparent;
-    font-size: 1.5rem;
-    font-weight: 400;
-    color: var(--primary);
-    cursor: pointer;
-}
-
-.set-ctrl button:active {
-    background: #eef2ff;
-}
-
-.set-ctrl span {
-    flex: 2;
-    text-align: center;
-    font-weight: 800;
-    font-size: 1.1rem;
-    color: #111;
-    border-left: 1px solid #eee;
-    border-right: 1px solid #eee;
-}
-
-/* ALT SABİT BUTON (KAYDET / KAPAT) */
-.modal-footer {
-    padding: 15px 20px 35px 20px;
-    background: white;
-    border-top: 1px solid #f2f2f2;
-}
-
-.btn-full {
-    width: 100%;
-    height: 55px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 18px;
-    font-size: 1rem;
-    font-weight: 800;
-    box-shadow: 0 10px 20px rgba(72, 128, 255, 0.2);
-    cursor: pointer;
-}
-/* CHAT KUTUSU AYARI (MODAL BODY İÇİNDE) */
-.chat-box {
-    background: #f8faff;
-    flex: 1; /* Pencerenin geri kalan tüm boşluğunu doldursun */
-    border-radius: 20px;
-    padding: 15px;
-    flex: 1; /* Altındaki boşluğu otomatik doldurur ve inputa yaklaşır */
-    overflow-y: auto;
-    margin: 15px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    border: 1px solid #eef2ff;
-    margin-bottom: 10px; /* Input ile arasında az bir mesafe bırakır */
-    border: none; /* Gereksiz çizgileri atıyoruz */
-    /* Sabit yükseklik yerine içeriğe göre uzasın, body scroll olacak */
-padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px boşluk bırakır */
-}
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        /* CHAT */
+        /* CHAT BOX */
         .chat-box {
-            background: #f8faff; border-radius: 20px; padding: 15px; flex: 1; /* Altındaki boşluğu otomatik doldurur ve inputa yaklaşır */ 
+            background: var(--bg) !important; border-radius: 20px; padding: 15px; flex: 1; 
             overflow-y: auto; margin: 15px 0; display: flex; flex-direction: column; gap: 10px;
-            border: 1px solid #eef2ff; margin-bottom: 10px; /* Input ile arasında az bir mesafe bırakır */
-        padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px boşluk bırakır */
+            border: 1px solid var(--brd) !important; padding-bottom: 300px !important;
         }
-        .msg {
-            max-width: 92%; padding: 12px 16px; border-radius: 18px;
-            font-size: var(--chat-size); font-weight: var(--chat-weight);
-            line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word;
-        }
+        .msg { max-width: 92%; padding: 12px 16px; border-radius: 18px; font-size: var(--chat-size); font-weight: var(--chat-weight); line-height: 1.5; word-wrap: break-word; }
         .msg.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .msg.ai { background: white; border: 1px solid #e0e6ed; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .msg.ai { background: var(--card-bg); border: 1px solid var(--brd); align-self: flex-start; color: var(--text); border-bottom-left-radius: 4px; }
 
-        /* TOAST BİLDİRİM */
         #toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: white; padding: 12px 25px; border-radius: 50px; font-weight: 800; font-size: 0.85rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 2px solid var(--primary);
-            z-index: 9999; transition: 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            background: var(--card-bg); color: var(--text); padding: 12px 25px; border-radius: 50px; font-weight: 800; font-size: 0.85rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 2px solid var(--primary); z-index: 9999; transition: 0.4s;
         }
         #toast.show { transform: translateX(-50%) translateY(0); }
-
-        /* WEB BROWSER */
-        #webWin { position: fixed; inset: 0; background: white; z-index: 6000; display: none; flex-direction: column; }
-        .web-bar { height: 65px; border-bottom: 1px solid #eee; display: flex; align-items: center; padding: 0 15px; gap: 10px; }
     </style>
 </head>
 <body>
@@ -246,342 +163,666 @@ padding-bottom: 300px !important; /* Mesajların bittiği yerin altında 50px bo
     <header class="header">
         <div class="header-left">
             <button class="btn-icon" onclick="openSettings()">⚙️</button>
-            <button class="btn-icon btn-gemini" onclick="openGeneralChat()">✨</button>
+            <button class="btn-icon" id="themeBtn" onclick="toggleTheme()">🌙</button>
         </div>
         <div class="header-center">
             <span class="time-text" id="clk">00:00</span>
             <span class="date-text" id="dt">YÜKLENİYOR</span>
         </div>
         <div class="header-right">
+            <button class="btn-icon btn-gemini" onclick="openGeneralChat()">✨</button>
             <button class="btn-icon btn-save" onclick="openSavedList()">💾</button>
-            <button class="btn-icon" onclick="location.reload()">🔄</button>
+           <button class="btn-icon" onclick="openRSSManager()" style="font-size: 1rem;">📡</button> <button class="btn-icon" onclick="softRefresh()">🔄</button>
         </div>
     </header>
 
+<div class="category-bar" id="catBar">
+    <div class="cat-item active" onclick="filterCat('TÜMÜ')">TÜMÜ</div>
+    <div class="cat-item" onclick="filterCat('TÜRKİYE')">TÜRKİYE</div>
+    <div class="cat-item" onclick="filterCat('DÜNYA')">DÜNYA</div>
+    <div class="cat-item" onclick="filterCat('GÜNDEM')">GÜNDEM</div>
+    <div class="cat-item" onclick="filterCat('TEKNOLOJİ')">TEKNOLOJİ</div>
+    <div class="cat-item" onclick="filterCat('SPOR')">SPOR</div>
+    <div class="cat-item" onclick="filterCat('OTOMOBİL')">OTOMOBİL</div>
+</div>
+
     <main id="newsFeed"></main>
-
     <div class="overlay" id="ovl"><div class="modal" id="mdl"></div></div>
-
-    <div id="webWin">
-        <div class="web-bar">
-            <button class="btn-icon" onclick="closeWeb()">⬅️</button>
-            <div style="flex:1; text-align:center; font-weight:800; font-size:0.75rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="webTit">Site</div>
-            <button class="btn-icon btn-gemini" onclick="closeWeb()">✨</button>
-        </div>
-        <iframe id="ifr" style="flex:1; border:none;"></iframe>
-    </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-<link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="white">
-<meta name="apple-mobile-web-app-title" content="Gemini AI">
-<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1624/1624453.png">
-
 <script>
-  // Service Worker Kaydı
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('PWA Hazır!'))
-        .catch(err => console.log('Hata:', err));
+// --- 1. SİSTEM AYARLARI ---
+const KHOJ_KEY = 'kk-ZeYLGGpxj0XScjEsTpgo4Aj2VjgJwtMJodqoyEsYtUI';
+const KHOJ_URL = "https://white-heart-ea96.06mmt8129.workers.dev/";
+
+const fbCfg = { apiKey: "AIzaSyAwQfifK4eaSrSjKpA776hD0RAlx_6a2_w", databaseURL: "https://piyasa-9049c-default-rtdb.firebaseio.com", projectId: "piyasa-9049c" };
+if (!firebase.apps.length) firebase.initializeApp(fbCfg);
+const db = firebase.database();
+
+let sets = JSON.parse(localStorage.getItem('khoj_sets')) || { size: 13, weight: 600, speed: 20 };
+let chatHistory = JSON.parse(localStorage.getItem('khoj_ai_history')) || [];
+let news = [];
+let active = null;
+
+function softRefresh() {
+    showToast("Haberler güncelleniyor...");
+    
+    // Sayfayı yenileme, sadece Firebase'den verileri tekrar iste
+    // Bu zaten news dizisini güncelleyip render() yapacaktır.
+    // currentCategory değişkeni değişmediği için hangi sekmedeysen orada kalırsın.
+    
+	// Mevcut news listesini karıştır
+    news = news.sort(() => Math.random() - 0.5);
+	
+    db.ref('rss_ayarlari').once('value', snap => {
+        // Zaten on('value') kullandığımız için aslında buna bile gerek yok 
+        // ama butona basınca bir 'tetikleme' istersen render'ı zorlayabiliriz.
+        render(); 
     });
-  }
-</script>
-    
-<script>
-    // --- 1. AYARLAR VE DEĞİŞKENLER ---
-    const KHOJ_KEY = 'kk-ZeYLGGpxj0XScjEsTpgo4Aj2VjgJwtMJodqoyEsYtUI';
-    const KHOJ_URL = "https://white-heart-ea96.06mmt8129.workers.dev/";
-    
-    const fbCfg = { 
-        apiKey: "AIzaSyAwQfifK4eaSrSjKpA776hD0RAlx_6a2_w", 
-        databaseURL: "https://piyasa-9049c-default-rtdb.firebaseio.com", 
-        projectId: "piyasa-9049c" 
-    };
-    if (!firebase.apps.length) firebase.initializeApp(fbCfg);
-    const db = firebase.database();
+}
 
-    let sets = JSON.parse(localStorage.getItem('khoj_sets')) || { size: 13, weight: 600, speed: 0, effect: 'typewriter' };
-    let chatHistory = JSON.parse(localStorage.getItem('khoj_ai_history')) || [];
-    let news = [];
-    let active = null;
+// TEMA SİSTEMİ
+function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme') || 'light';
+    const next = current === 'light' ? 'dark' : 'light';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('khoj_theme', next);
+    document.getElementById('themeBtn').innerText = next === 'light' ? '🌙' : '☀️';
+}
+// Tema Hafızası
+(function() {
+    const saved = localStorage.getItem('khoj_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('themeBtn').innerText = saved === 'light' ? '🌙' : '☀️';
+    });
+})();
 
-    // --- 2. SİSTEM BAŞLATICI ---
-    function updateTime() {
-        const n = new Date();
-        const clk = document.getElementById('clk');
-        const dt = document.getElementById('dt');
-        if(clk) clk.innerText = n.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
-        if(dt) dt.innerText = n.toLocaleDateString('tr-TR', {day:'numeric', month:'long'}).toUpperCase();
-    }
-    setInterval(updateTime, 1000); 
-    updateTime();
-    applySets();
+function updateTime() {
+    const n = new Date();
+    const clk = document.getElementById('clk');
+    const dt = document.getElementById('dt');
+    if(clk) clk.innerText = n.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+    if(dt) dt.innerText = n.toLocaleDateString('tr-TR', {day:'numeric', month:'long'}).toUpperCase();
+}
+setInterval(updateTime, 1000); updateTime(); applySets();
 
-    // --- 3. HABER SİSTEMİ ---
-    const sMap = { 'haber_trt': 'TRT', 'haber_cnn': 'CNN', 'haber_ntv': 'NTV', 'haber_webtekno': 'WEBTEKNO', 'haber_shiftdelete': 'SDN' };
-    Object.keys(sMap).forEach(key => {
-        db.ref(key + "/items").on("value", snap => {
+function metniTemizle(hamMetin) {
+    let temiz = hamMetin.replace(/␃🔚␗/g, '').replace(/\{"organic":[\s\S]*?\}\}/g, '').replace(/\{"peopleAlsoAsk":[\s\S]*?\}\}/g, '').replace(/"organic":\s*\[[\s\S]*?\]/g, '').replace(/"codeContext":\s*\{[\s\S]*?\}/g, '').replace(/"position":\s*\d+/g, '').replace(/\{.*?\}/g, '');
+    const ilkHarf = temiz.search(/[A-ZİĞÜŞÖÇ]/);
+    if (ilkHarf !== -1) { temiz = temiz.substring(ilkHarf); }
+    temiz = temiz.replace(/[\s\}\]奉",:]{2,}$/g, '');
+    temiz = temiz.replace(/^#{1,6}\s+(.*)$/gm, '<b style="color:#ef4444; font-size:1.1em;">$1</b>');
+    return temiz.replace(/\[\d+\]\(.*?\)/g, '').replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>').replace(/^\s*[\-\*]\s+/gm, '🔹 ').replace(/\n/g, '<br>');
+}
+
+// --- 2. HABERLER ---
+// --- 2. HABERLER (DİNAMİK VE KATEGORİLİ) ---
+let currentCategory = 'TÜMÜ';
+let rssListesi = {}; // RSS bilgilerini burada tutalım
+
+db.ref('rss_ayarlari').on('value', rssSnap => {
+    rssListesi = rssSnap.val() || {};
+    if (Object.keys(rssListesi).length === 0) return;
+
+    news = []; 
+
+    Object.keys(rssListesi).forEach(id => {
+        const rss = rssListesi[id];
+        
+        // Klasör adını tahmin et (trt, cnn, ntv vb.)
+        let temizAd = rss.ad.toLowerCase().split(' ')[0]
+            .replace(/ı/g, 'i').replace(/ü/g, 'u').replace(/ç/g, 'c').replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ö/g, 'o');
+        let fbKey = "haber_" + temizAd;
+
+        db.ref(fbKey + "/items").on("value", snap => {
             if(snap.val()) {
-                const data = snap.val().slice(0, 10).map(i => ({...i, source: sMap[key]}));
-                news = news.filter(x => x.source !== sMap[key]).concat(data).sort(() => Math.random() - 0.5);
-                render();
+                // HABERİ MÜHÜRLE: rss.kategori'yi içine gömüyoruz
+                const data = snap.val().slice(0, 15).map(i => ({
+                    ...i, 
+                    source: rss.ad, 
+                    category: rss.kategori // ÖNEMLİ: Panelde seçtiğin kategori
+                }));
+                
+                news = news.filter(x => x.source !== rss.ad).concat(data);
+                render(); 
             }
         });
     });
+});
 
-    function getBestImage(item, source) {
-        if(item.enclosure?.link) return item.enclosure.link;
-        if(item.thumbnail) return item.thumbnail;
-        return 'https://via.placeholder.com/100';
+// Kategori Filtreleme Fonksiyonu (Hatalı olanı bununla değiştir abi)
+function filterCat(cat) {
+    currentCategory = cat;
+    
+    // Görsel olarak aktif butonu değiştir
+    document.querySelectorAll('.cat-item').forEach(el => {
+        el.classList.remove('active');
+        if(el.innerText === cat) el.classList.add('active');
+    });
+
+    render(); // Listeyi filtreye göre tekrar çiz
+}
+
+function render() {
+    const f = document.getElementById('newsFeed'); 
+    if(!f) return;
+
+    let filteredNews = news.filter(n => n.description && n.description.trim().length > 10);
+    
+    if (currentCategory !== 'TÜMÜ') {
+        filteredNews = filteredNews.filter(n => 
+            n.category && n.category.toString().toUpperCase() === currentCategory.toString().toUpperCase()
+        );
     }
 
-    function render() {
-        const f = document.getElementById('newsFeed'); 
-        if(!f) return;
-        f.innerHTML = news.map((n, i) => `
-            <div class="news-card" onclick="openDetail(${i})">
+    // --- KRİTİK DEĞİŞİKLİK BURASI ---
+    // Kaynak (source) fark etmeksizin tüm listeyi rastgele harmanla
+    filteredNews.sort(() => Math.random() - 0.5); 
+    // --------------------------------
+
+// 4. Eğer o kategoride haber yoksa uyarı ver
+    if (filteredNews.length === 0) {
+        f.innerHTML = `
+            <div style="text-align:center; padding:50px; color:#888;">
+                <div style="font-size:3rem; margin-bottom:10px;">📭</div>
+                <p>"${currentCategory}" kategorisinde henüz haber yok <br>
+                RSS Ayarlarından bir kaynağa bu kategoriyi atamalısın.</p>
+            </div>`;
+        return;
+    }
+
+    f.innerHTML = filteredNews.map((n, i) => {
+        const realIdx = news.findIndex(x => x.title === n.title);
+        return `
+            <div class="news-card" onclick="openDetail(${realIdx})">
                 <img src="${getBestImage(n, n.source)}">
                 <div style="flex:1">
-                    <div class="news-meta">${n.source}</div>
+                    <div class="news-meta">
+                        <span style="color:var(--primary); font-weight:800;">${n.source}</span> | 
+                        <span>${n.category}</span>
+                    </div>
                     <div class="news-title">${n.title}</div>
                 </div>
-            </div>`).join('');
-    }
-
-// RESİM YAKALAMA VE LOGO SİSTEMİ
-    const logos = {
-        'TRT': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/TRT_Haber_logo.svg/512px-TRT_Haber_logo.svg.png',
-        'CNN': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/CNN.svg/512px-CNN.svg.png',
-        'NTV': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/NTV_Logo.svg/512px-NTV_Logo.svg.png',
-        'WEBTEKNO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Webtekno_Logo.png/512px-Webtekno_Logo.png',
-        'SDN': 'https://shiftdelete.net/wp-content/themes/sdn/assets/img/logo.png'
-    };
-
-    // GELİŞMİŞ RESİM YAKALAMA (NTV ve CNN İÇİN ÖZEL)
-    function getBestImage(item, source) {
-        // 1. Standart Enclosure kontrolü
-        if(item.enclosure?.link) return item.enclosure.link;
-        if(item.thumbnail) return item.thumbnail;
-        
-        // 2. NTV/CNN için description içindeki <img> tagını ayıkla
-        if (item.description && item.description.includes('<img')) {
-            const regex = /<img[^>]+src="([^">]+)"/g;
-            const match = regex.exec(item.description);
-            if (match && match[1]) return match[1];
-        }
-
-        // 3. Hiçbiri yoksa kaynağa özel HD logo koy
-        const logos = {
-            'TRT': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/TRT_Haber_logo.svg/512px-TRT_Haber_logo.svg.png',
-            'CNN': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/CNN.svg/512px-CNN.svg.png',
-            'NTV': 'https://upload.wikimedia.org/wikipedia/commons/b/b5/NTV_logo.png', // NTV HD Logo
-            'WEBTEKNO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Webtekno_Logo.png/512px-Webtekno_Logo.png',
-            'SDN': 'https://shiftdelete.net/wp-content/themes/sdn/assets/img/logo.png'
-        };
-        return logos[source] || 'https://via.placeholder.com/100';
-    }
-
-
-    
-    // --- 4. AYARLAR ---
-    function openSettings() {
-        const m = document.getElementById('mdl');
-        m.innerHTML = `
-            <div class="modal-header"><h2>AYARLAR</h2></div>
-            <div class="modal-body">
-                <div class="set-row"><label>YAZI BOYUTU</label><div class="set-ctrl"><button onclick="adjustSet('size',-1)">-</button><span>${sets.size}PX</span><button onclick="adjustSet('size',1)">+</button></div></div>
-                <div class="set-row"><label>YAZI KALINLIĞI</label><div class="set-ctrl"><button onclick="adjustSet('weight',-100)">-</button><span>${sets.weight}</span><button onclick="adjustSet('weight',100)">+</button></div></div>
-                <div class="set-row"><label>DAKTİLO HIZI</label><div class="set-ctrl"><button onclick="adjustSet('speed',-5)">-</button><span>${sets.speed}</span><button onclick="adjustSet('speed',5)">+</button></div></div>
-                <button class="btn-full" style="background:#ef4444; margin-top:10px;" onclick="clearHistory()">SOHBETİ SIFIRLA</button>
-            </div>
-            <div class="modal-footer"><button class="btn-full" onclick="closeM()">KAYDET</button></div>`;
-        document.getElementById('ovl').style.display = 'flex';
-    }
-
-    function adjustSet(k, v) { sets[k] = Math.max(1, (sets[k] || 0) + v); applySets(); openSettings(); }
-    function applySets() {
-        document.documentElement.style.setProperty('--chat-size', sets.size + 'px');
-        document.documentElement.style.setProperty('--chat-weight', sets.weight);
-        localStorage.setItem('khoj_sets', JSON.stringify(sets));
-    }
-
-    // --- 5. KAYDETME SİSTEMİ ---
-    function saveNews() {
-        let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
-        if(!saved.find(x => x.title === active.title)) {
-            saved.push(active);
-            localStorage.setItem('khoj_saved_news', JSON.stringify(saved));
-            showToast("Haber Kaydedildi! 💾");
-        } else {
-            showToast("Zaten Kayıtlı!");
-        }
-    }
-
-    function openSavedList() {
-        const saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
-        const m = document.getElementById('mdl');
-        let html = saved.length ? "" : "<p style='text-align:center; padding:20px;'>Kayıtlı haber yok abi.</p>";
-        saved.forEach((n, i) => {
-            html += `<div class="news-card" style="margin-bottom:10px;">
-                <img src="${getBestImage(n, n.source)}" style="width:40px; height:40px;">
-                <div style="flex:1" onclick="openSavedDetail(${i})"><div class="news-title">${n.title}</div></div>
-                <button onclick="deleteSaved(${i})" style="background:none; border:none; color:red;">🗑️</button>
             </div>`;
-        });
-        m.innerHTML = `<div class="modal-header"><h2>💾 KAYDEDİLENLER</h2></div><div class="modal-body">${html}</div><div class="modal-footer"><button class="btn-full" onclick="closeM()">KAPAT</button></div>`;
-        document.getElementById('ovl').style.display = 'flex';
-    }
+    }).join('');
+}
 
-    function deleteSaved(i) {
-        let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
-        saved.splice(i, 1);
-        localStorage.setItem('khoj_saved_news', JSON.stringify(saved));
-        openSavedList();
-    }
+function getBestImage(item, sourceName) {
+    // 1. Haberin kendi resmi varsa kullan
+    if (item.enclosure && item.enclosure.link) return item.enclosure.link;
+    if (item.thumbnail) return item.thumbnail;
     
-    function openSavedDetail(i) {
-        active = JSON.parse(localStorage.getItem('khoj_saved_news'))[i];
-        openDetail(-2);
+    // 2. Açıklamadan resim ayıkla
+    if (item.description && item.description.includes('<img')) {
+        const match = /<img[^>]+src="([^">]+)"/g.exec(item.description);
+        if (match && match[1]) return match[1];
     }
 
-    // --- 6. SOHBET VE AI ---
-    function openGeneralChat() {
-        active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Haberden bağımsız genel sohbet modundasın." };
-        openDetail(-1);
-    }
+    // 3. EĞER RESİM YOKSA: Firebase'den gelen logoyu kullan
+    // rssListesi değişkenini bir önceki adımda global yapmıştık hatırlarsan
+    let kaynakLogosu = "";
+    Object.values(rssListesi).forEach(r => {
+        if(r.ad === sourceName) kaynakLogosu = r.logo;
+    });
 
-   function openDetail(idx) {
-    // 1. Önce veriyi belirle (if/else yapısı kesintisiz olmalı)
-    if (idx === -1) {
-        active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." };
-    } else if (idx !== -2) {
-        active = news[idx];
-    }
+    // Eğer logo adresi varsa onu döndür, yoksa şık bir yer tutucu (placeholder)
+    return kaynakLogosu || `https://ui-avatars.com/api/?name=${sourceName}&background=random&color=fff&size=200`;
+}
 
-    // 2. Sonra modalı ve içeriği hazırla
+// --- 3. MODAL FONKSİYONLARI ---
+function openSettings() {
     const m = document.getElementById('mdl');
-    const img = getBestImage(active, active.source);
+    m.innerHTML = `<div class="modal-header"><h2>AYARLAR</h2></div><div class="modal-body"><div class="set-row"><label class="set-label">YAZI BOYUTU</label><div class="set-ctrl"><button onclick="adjustSet('size',-1)">-</button><span>${sets.size}PX</span><button onclick="adjustSet('size',1)">+</button></div></div><div class="set-row"><label class="set-label">YAZI KALINLIĞI</label><div class="set-ctrl"><button onclick="adjustSet('weight',-100)">-</button><span>${sets.weight}</span><button onclick="adjustSet('weight',100)">+</button></div></div><button class="btn-full" style="background:#ef4444; margin-top:10px;" onclick="clearHistory()">SOHBETİ SIFIRLA</button></div><div class="modal-footer"><button class="btn-full" onclick="closeM()">KAYDET</button></div>`;
+    document.getElementById('ovl').style.display = 'flex';
+}
 
-    // 3. En sona da o "en alta kaydır" kodunu ekle (Modal açıldıktan sonra çalışması için)
-    setTimeout(() => {
-        const box = document.getElementById('cBox');
-        if (box) {
-            box.scrollTop = box.scrollHeight;
+// 📡 RSS Listesini Firebase'den çekip gösteren dinamik fonksiyon
+function openRSSManager() {
+    const m = document.getElementById('mdl');
+    
+    // Önce "Yükleniyor..." ekranı gösterelim
+    m.innerHTML = `
+        <div class="modal-header">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <h2 style="font-size:1.1rem; font-weight:900;">📡 RSS AYARLARI</h2>
+                <button class="btn-icon" onclick="openAddRSS()" style="background:var(--primary); color:white; border:none; width:35px; height:35px; font-weight:bold; font-size:1.2rem;">+</button>
+            </div>
+        </div>
+        <div class="modal-body" id="rssListContainer">
+            <p style="text-align:center; padding:20px; color:#888;">Kaynaklar yükleniyor...</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-full" onclick="closeM()">KAPAT</button>
+        </div>
+    `;
+    document.getElementById('ovl').style.display = 'flex';
+
+    // Firebase'den verileri çekiyoruz
+    db.ref('rss_ayarlari').on('value', snap => {
+        const container = document.getElementById('rssListContainer');
+        if(!container) return;
+        
+        const data = snap.val();
+        if(!data) {
+            container.innerHTML = `<p style="text-align:center; padding:20px; color:#888;">Henüz hiç RSS eklenmemiş abi.</p>`;
+            return;
         }
-    }, 100); // Süreyi biraz artırdım ki modal tam açılsın
 
-    // ... Fonksiyonun geri kalan kodları buraya devam edecek (m.style.display = 'flex' vb.)
+        let html = `<p style="font-size:11px; color:#888; font-weight:800; text-transform:uppercase; margin-bottom:10px;">Ekli Kaynaklar</p>`;
+        
+        // Verileri döngüye sokup ekrana basıyoruz
+        Object.keys(data).forEach(key => {
+            const rss = data[key];
+            html += `
+                <div style="padding:12px; background:var(--bg); border:1px solid var(--brd); border-radius:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-weight:bold; font-size:14px;">${rss.ad}</span>
+                        <span style="font-size:10px; color:var(--primary); font-weight:800;">${rss.kategori}</span>
+                    </div>
+					<span onclick="editRSS('${key}')" style="cursor:pointer; font-size:1.2rem;">✏️</span>
+                    <span onclick="deleteRSS('${key}')" style="color:#ef4444; cursor:pointer; font-size:1.2rem; padding:5px;">🗑️</span>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    });
+}
+
+function editRSS(key) {
+    db.ref('rss_ayarlari/' + key).once('value', snap => {
+        const rss = snap.val();
+        if(!rss) return;
+
+        const m = document.getElementById('mdl');
         m.innerHTML = `
             <div class="modal-header">
-                <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-                    <span class="news-meta">${active.source}</span>
-                    <div style="display:flex; gap:10px;">
-                        ${active.link ? `<button class="btn-icon" onclick="window.open('${active.link}','_blank')">🔗</button>` : ''}
-                        <button class="btn-icon" onclick="saveNews()">💾</button>
-                        <button class="btn-icon" style="color:red;" onclick="closeM()">❌</button>
-                    </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <button class="btn-icon" onclick="openRSSManager()" style="width:35px; height:35px;">⬅️</button>
+                    <h2 style="font-size:1.1rem; font-weight:900;">RSS DÜZENLE</h2>
                 </div>
             </div>
             <div class="modal-body">
-                <h3 style="margin-bottom:10px;">${active.title}</h3>
-                ${active.source !== "KHOJ" ? `<img src="${img}" style="width:100%; border-radius:15px; margin-bottom:10px;">` : ''}
-                <div class="chat-box" id="cBox" style="min-height:250px;">
-                    ${(active.source === "KHOJ" && chatHistory.length > 0) ? 
-                        chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('') : 
-                        `<div class="msg ai">Seni dinliyorum abi...</div>`
-                    }
+                <div class="set-row"><label class="set-label">RSS ADI</label>
+                    <input type="text" id="edit_rssName" value="${rss.ad}" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text);">
+                </div>
+                <div class="set-row"><label class="set-label">RSS KAYNAĞI (URL)</label>
+                    <input type="text" id="edit_rssUrl" value="${rss.url}" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text);">
+                </div>
+                <div class="set-row"><label class="set-label">LOGO URL</label>
+                    <input type="text" id="edit_rssLogo" value="${rss.logo || ''}" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text);">
+                </div>
+                <div class="set-row"><label class="set-label">KATEGORİ</label>
+                    <select id="edit_rssCat" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text);">
+                        ${['TÜRKİYE','DÜNYA','GÜNDEM','TEKNOLOJİ','SPOR','OTOMOBİL','DİĞER'].map(c => 
+                            `<option value="${c}" ${rss.kategori === c ? 'selected' : ''}>${c}</option>`
+                        ).join('')}
+                    </select>
                 </div>
             </div>
             <div class="modal-footer">
-                <div style="display:flex; gap:10px;">
-                    <input type="text" id="uInp" placeholder="Bir şey yaz..." style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd;">
-                    <button class="btn-icon btn-save" onclick="ask()">➤</button>
-                </div>
-            </div>`;
-        document.getElementById('ovl').style.display = 'flex';
-        document.getElementById('cBox').scrollTop = 9999;
-    }
+                <button class="btn-full" onclick="updateRSS('${key}')">GÜNCELLEMELERİ KAYDET</button>
+            </div>
+        `;
+    });
+}
 
-    async function ask() {
-        const inp = document.getElementById('uInp'); const box = document.getElementById('cBox');
-        if(!inp.value) return; 
-        const q = inp.value; inp.value = '';
-        box.innerHTML += `<div class="msg user">${q}</div>`;
- // SİHİRLİ SATIR: Senin mesajın eklenince kutuyu ortalıyoruz
-    // Bu yöntem id gerektirmez, en son eklenen mesajı görür
-    box.scrollTo({
-        top: box.scrollHeight - 150, // Seni tam yukarı değil, biraz daha insancıl bir yere çeker
-        behavior: 'smooth'
+function updateRSS(key) {
+    const ad = document.getElementById('edit_rssName').value;
+    const url = document.getElementById('edit_rssUrl').value;
+    const kat = document.getElementById('edit_rssCat').value;
+    const logo = document.getElementById('edit_rssLogo').value;
+
+    if(!ad || !url) { alert("Alanlar boş bırakılamaz abi!"); return; }
+
+    db.ref('rss_ayarlari/' + key).update({
+        ad: ad,
+        url: url,
+        kategori: kat,
+        logo: logo
+    }).then(() => {
+        showToast("Güncellendi! ✅");
+        openRSSManager(); // Listeye geri dön
+    }).catch(e => alert("Hata: " + e.message));
+}
+
+// RSS Silme Fonksiyonu
+function deleteRSS(key) {
+    if(confirm("Bu RSS kaynağını silmek istediğine emin misin abi?")) {
+        db.ref('rss_ayarlari/' + key).remove()
+            .then(() => showToast("Kaynak Silindi 🗑️"))
+            .catch(e => alert("Hata: " + e.message));
+    }
+}
+
+// Kategorileri filtrelemek için (Şimdilik sadece tıklama efekti verir)
+function filterCat(cat) {
+    // 1. Seçilen kategoriyi ana değişkene ata (En önemli kısım burasıydı)
+    currentCategory = cat; 
+    
+    // 2. Görsel olarak butonun rengini değiştir
+    document.querySelectorAll('.cat-item').forEach(el => {
+        el.classList.remove('active');
+        if(el.innerText === cat) el.classList.add('active');
     });
 
-    if(active.source === "KHOJ") chatHistory.push({role: 'user', text: q});
-    //
-        const ai = document.createElement('div'); ai.className = 'msg ai'; ai.innerHTML = '...';
-        box.appendChild(ai); box.scrollTop = box.scrollHeight;
+    // 3. Konsola bilgi yaz (Teyit için)
+    console.log("Sistem Kategorisi Değişti: ", currentCategory);
 
-        try {
-            const res = await fetch(KHOJ_URL, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${KHOJ_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ q: `Haber: ${active.title}. Soru: ${q}`, stream: false })
-            });
-            const d = await res.json();
-           let formatted = d.response
-    .replace(/\(.*?\)/g, '') // (parantez içindekileri ve linkleri siler)
-    .replace(/\[.*?\]/g, '') // [köşeli parantez içindekileri siler]
-    .replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>') // Kırmızı-Kalın yapar
-    .replace(/^\s*[\-\*]\s+/gm, '🔹 ') // Listeleri düzenler
-    .replace(/\n/g, '<br>'); // Satır başlarını korur
-            if(active.source === "KHOJ") {
-                chatHistory.push({role: 'ai', text: formatted});
-                localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory));
-            }
+    // 4. Haberleri yeni kategoriye göre tekrar dök
+    render(); 
+}
 
-       ai.innerHTML = '';
-            // Linkleri ve parantezleri siliyoruz
-            let cleanText = formatted.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '');
-            let tokens = cleanText.match(/(<[^>]+>|[^<>\s]+|\s+)/g) || [];
-            let i = 0;
+// "+" Butonuna basınca açılacak "Ekleme" formu
+function openAddRSS() {
+    const m = document.getElementById('mdl');
+    m.innerHTML = `
+        <div class="modal-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button class="btn-icon" onclick="openRSSManager()" style="width:35px; height:35px;">⬅️</button>
+                <h2 style="font-size:1.1rem; font-weight:900;">YENİ RSS EKLE</h2>
+            </div>
+        </div>
+		
+        <div class="modal-body">
+            <div class="set-row">
+                <label class="set-label">RSS ADI</label>
+                <input type="text" id="rssName" placeholder="Örn: TRT Haber" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:14px;">
+            </div>
+            <div class="set-row">
+                <label class="set-label">RSS KAYNAĞI (URL)</label>
+                <input type="text" id="rssUrl" placeholder="https://..." style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:14px;">
+            </div>
+			<div class="set-row">
+    <label class="set-label">LOGO URL (İsteğe bağlı)</label>
+    <input type="text" id="rssLogo" placeholder="https://...png" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:14px;">
+</div>
+            <div class="set-row">
+                <label class="set-label">KATEGORİ</label>
+                <select id="rssCat" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-weight:bold; font-size:14px;">
+                    <option value="TÜRKİYE">TÜRKİYE</option>
+                    <option value="DÜNYA">DÜNYA</option>
+                    <option value="GÜNDEM">GÜNDEM</option>
+                    <option value="TEKNOLOJİ">TEKNOLOJİ</option>
+                    <option value="SPOR">SPOR</option>
+                    <option value="OTOMOBİL">OTOMOBİL</option>
+                    <option value="DİĞER">DİĞER</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer" style="display:flex; gap:10px;">
+            <button class="btn-full" style="background:#888; flex:1;" onclick="openRSSManager()">İPTAL</button>
+            <button class="btn-full" style="flex:2;" onclick="saveNewRSS()">KAYDET</button>
+        </div>
+    `;
+}
 
-            function type() {
-    if (i < tokens.length) {
-        ai.innerHTML += tokens[i];
-        i++;
+// Formdaki verileri Firebase'e gönderir
+function saveNewRSS() {
+    const ad = document.getElementById('rssName').value;
+    const url = document.getElementById('rssUrl').value;
+    const kat = document.getElementById('rssCat').value;
+	const logo = document.getElementById('rssLogo').value; // Yeni alan
 
-        // --- İŞTE YENİLEME YAPAN SİHİRLİ SATIR BURASI ---
-        ai.innerHTML = ai.innerHTML; 
-        // -----------------------------------------------
+    if(!ad || !url) { alert("Lütfen tüm alanları doldur abi!"); return; }
 
-        box.scrollTop = box.scrollHeight; // Her kelimede aşağı odakla
-        setTimeout(type, sets.speed);
+    // Firebase'e "rss_ayarlari" adında yeni bir tabloya yazıyoruz
+    const newRssRef = db.ref('rss_ayarlari').push();
+    newRssRef.set({
+        ad: ad,
+        url: url,
+        kategori: kat,
+        eklenmeTarihi: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+        showToast("RSS Başarıyla Eklendi! 🚀");
+        openRSSManager(); // Kayıttan sonra listeye geri dön
+    }).catch((e) => {
+        alert("Hata oluştu abi: " + e.message);
+    });
+}
+
+function adjustSet(k, v) { 
+    if(k === 'size') sets.size = Math.max(8, (sets.size || 13) + v);
+    if(k === 'weight') sets.weight = Math.max(100, (sets.weight || 600) + v);
+    applySets(); 
+    openSettings(); 
+}
+
+function applySets() {
+    // Ana ekran değişkenlerini güncelle
+    document.documentElement.style.setProperty('--news-size', sets.size + 'px');
+    document.documentElement.style.setProperty('--news-weight', sets.weight);
+    localStorage.setItem('khoj_sets', JSON.stringify(sets));
+}
+
+// Pencere içi (Chat/Detay) anlık değişim fonksiyonu
+function quickAdjust(type, val) {
+    if(type === 'size') {
+        sets.chatSize = (sets.chatSize || 13) + val;
+        document.documentElement.style.setProperty('--chat-size', sets.chatSize + 'px');
     } else {
-        box.scrollTop = box.scrollHeight; // Bittiğinde son kez odakla
+        sets.chatWeight = (sets.chatWeight || 600) + val;
+        document.documentElement.style.setProperty('--chat-weight', sets.chatWeight);
     }
+    localStorage.setItem('khoj_sets', JSON.stringify(sets));
 }
-            type();
+
+function openDetail(idx) {
+    if (idx !== -1 && idx !== -2) { active = news[idx]; }
+    const m = document.getElementById('mdl');
+    const img = getBestImage(active, active.source);
+    const pubDate = active.pubDate ? new Date(active.pubDate).toLocaleString('tr-TR', {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'}) : '';
+    const cleanDesc = active.description ? active.description.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim().substring(0, 1000) + "..." : "Haber içeriği yüklenemedi abi.";
+
+    m.innerHTML = `
+        <div class="modal-header">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap: wrap; gap: 10px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span class="news-meta" style="background:#ef4444; color:white; padding:4px 10px; border-radius:6px; font-weight:bold;">${active.source}</span>
+                    <span style="font-size:12px; color:#888;">${pubDate}</span>
+                </div>
+                
+                <div style="display:flex; align-items:center; gap:5px;">
+                    <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;" onclick="quickAdjust('size', 1)">Y+</button>
+                    <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;" onclick="quickAdjust('size', -1)">Y-</button>
+                    <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold; margin-left:2px;" onclick="quickAdjust('weight', 100)">K+</button>
+                    <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;" onclick="quickAdjust('weight', -100)">K-</button>
+                    
+                    <div style="width:1px; height:20px; background:#ddd; margin:0 5px;"></div>
+                    ${active.link ? `<button class="btn-icon" style="width:32px; height:32px;" onclick="openFullNews('${active.link}')">🔗</button>` : ''}
+                   <button class="btn-icon" style="width:32px; height:32px;" onclick="shareNews('${active.title.replace(/'/g, "\\'")}', '${active.link}')">📤</button>
+				   <button class="btn-icon" style="width:32px; height:32px;" onclick="saveNews()">💾</button>
+                    <button class="btn-icon" style="width:32px; height:32px; color:red;" onclick="closeM()">❌</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <h2 style="margin-bottom:15px; line-height:1.3; font-size:1.4em;">${active.title}</h2>
+            <div style="background:rgba(239, 68, 68, 0.1); border-left:4px solid #ef4444; padding:15px; margin-bottom:20px; border-radius:0 10px 10px 0;">
+                <p style="font-size:14px; line-height:1.6; margin:0;">${cleanDesc}</p>
+            </div>
+            ${active.source !== "KHOJ" ? `<img src="${img}" style="width:100%; border-radius:15px; margin-bottom:20px;">` : ''}
+            <div style="background:var(--card-bg); border:1px solid var(--brd); border-radius:12px; overflow:hidden;">
+                <div style="background:var(--brd); padding:8px 15px; font-size:11px; font-weight:bold; color:var(--text); opacity:0.7;">YAPAY ZEKA ANALİZİ</div>
+                <div class="chat-box" id="cBox" style="min-height:250px;">
+                    ${active.savedChat || ((active.source === "KHOJ" && chatHistory.length > 0) ? chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('') : `<div class="msg ai">Haber Hakkında Bilgiler Sor...</div>`)}
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div style="display:flex; gap:10px; width:100%;">
+                <input type="text" id="uInp" placeholder="Bu olay neden oldu? / Özetle..." style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:14px;">
+                <button class="btn-icon btn-save" id="sendBtn" style="width:50px;">➤</button>
             
-        } catch (e) { ai.innerText = "Bağlantı hatası!"; }
-    }
+</div>
+        </div>`;
 
-    function clearHistory() { chatHistory = []; localStorage.removeItem('khoj_ai_history'); closeM(); showToast("Sıfırlandı!"); }
-    function closeM() { document.getElementById('ovl').style.display = 'none'; }
-    function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
-
-    // --- PWA SERVICE WORKER KAYDI ---
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(reg => {
-            console.log('Service Worker Kayıtlı!', reg);
-        }).catch(err => {
-            console.log('Service Worker Hatası:', err);
-        });
-    });
+    document.getElementById('ovl').style.display = 'flex';
+    const box = document.getElementById('cBox');
+    box.scrollTop = box.scrollHeight;
+    const inp = document.getElementById('uInp');
+    inp.focus();
+    inp.addEventListener('keypress', (e) => { if (e.key === 'Enter') ask(); });
+    document.getElementById('sendBtn').onclick = ask;
 }
 
+function shareNews(title, link) {
+    // 1. ADIM: GERÇEK LİNKİ AYIKLA
+    let finalLink = link;
+
+    try {
+        // Eğer link bir Google yönlendirmesiyse (Google News vb.)
+        if (link.includes("google.com") || link.includes("news.google")) {
+            const urlObj = new URL(link);
+            // Google genellikle 'url' veya 'article' parametresini kullanır
+            finalLink = urlObj.searchParams.get('url') || urlObj.searchParams.get('article') || link;
+        }
+        
+        // Bazı RSS servisleri linkin sonuna kendi reklamlarını ekler, onları temizle
+        finalLink = finalLink.split('?utm_source')[0].split('#')[0];
+    } catch (e) {
+        finalLink = link; // Hata olursa orijinal kalsın
+    }
+
+    const shareBody = `${title}\n\nDetaylar için:\n${finalLink}`;
+
+    // 2. ADIM: PAYLAŞMA VEYA KOPYALAMA
+    if (navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        navigator.share({
+            title: title,
+            text: title,
+            url: finalLink
+        }).catch(() => {});
+    } else {
+        // Bilgisayarda kopyalama işlemi
+        const dummy = document.createElement("textarea");
+        document.body.appendChild(dummy);
+        dummy.value = shareBody;
+        dummy.select();
+        
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                // Toast fonksiyonun hangisiyse onu çağır
+                if(typeof showToast === "function") showToast("Haber linki kopyalandı! 📋");
+                else alert("Haber linki kopyalandı! 📋");
+            }
+        } catch (err) {
+            console.error('Kopyalama hatası:', err);
+        }
+        document.body.removeChild(dummy);
+    }
+}
+
+function openFullNews(url) {
+    const fullView = document.createElement('div');
+    fullView.id = 'fullNewsView';
+    // Burası çok önemli: Arka planı her zaman beyaz (white) yapıyoruz ki site orijinal kalsın
+    fullView.style = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; flex-direction: column;`;
+    
+    // Üst barın rengi yine bizim temaya uysun ama içerik (iframe) her zaman aydınlık kalsın
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const headerBg = isDark ? '#1e293b' : '#f8f9fa';
+    const textColor = isDark ? '#f1f5f9' : '#1a1a1a';
+
+    fullView.innerHTML = `
+        <div style="padding: 10px; background: ${headerBg}; border-bottom: 1px solid var(--brd); display: flex; gap: 15px; align-items: center; color: ${textColor}">
+            <button onclick="document.getElementById('fullNewsView').remove()" 
+                style="padding: 8px 15px; border-radius: 8px; border: 1px solid var(--brd); background: var(--card-bg); color: var(--text); cursor: pointer;">❌ Kapat</button>
+            
+            <button onclick="triggerSummaryFromFull()" 
+                style="padding: 8px 15px; border-radius: 8px; border: none; background: #ef4444; color: white; cursor: pointer; font-weight: bold;">✨ Özetle</button>
+            
+            <span style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex:1;">${active.title}</span>
+        </div>
+        <iframe src="${url}" style="flex: 1; border: none; width: 100%; background: white !important;"></iframe>
+    `;
+    document.body.appendChild(fullView);
+}
+
+function triggerSummaryFromFull() {
+    const fv = document.getElementById('fullNewsView'); if(fv) fv.remove();
+    const inp = document.getElementById('uInp');
+    if(inp) { inp.value = "Bu haberi çok kısa şekilde özetle."; ask(); }
+}
+
+async function ask() {
+    const inp = document.getElementById('uInp'); const box = document.getElementById('cBox');
+    if(!inp.value) return; const q = inp.value; inp.value = '';
+    box.innerHTML += `<div class="msg user">${q}</div>`; box.scrollTop = box.scrollHeight;
+    if(active.source === "KHOJ") chatHistory.push({role: 'user', text: q});
+    const ai = document.createElement('div'); ai.className = 'msg ai'; ai.innerHTML = '...'; box.appendChild(ai);
+    let finalQuery = (active && active.source !== "KHOJ") ? `Haber: ${active.title}. Soru: ${q}` : q;
+
+    try {
+        const res = await fetch(KHOJ_URL, { method: 'POST', headers: { 'Authorization': `Bearer ${KHOJ_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ q: finalQuery, stream: true }) });
+        const reader = res.body.getReader(); const decoder = new TextDecoder(); let fullText = "";
+        while (true) {
+            const { done, value } = await reader.read(); if (done) break;
+            fullText += decoder.decode(value); ai.innerHTML = metniTemizle(fullText); box.scrollTop = box.scrollHeight;
+        }
+        if(active.source === "KHOJ") { chatHistory.push({role: 'ai', text: ai.innerHTML}); localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory)); }
+    } catch (e) { ai.innerText = "Bağlantı hatası!"; }
+}
+
+function saveNews() {
+    let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+    const currentChat = document.getElementById('cBox') ? document.getElementById('cBox').innerHTML : "";
+    const newsToSave = { ...active, savedChat: currentChat, saveDate: new Date().toISOString() };
+    const existingIndex = saved.findIndex(x => x.title === active.title);
+    if(existingIndex !== -1) { saved[existingIndex] = newsToSave; showToast("Güncellendi! 💾"); } 
+    else { saved.push(newsToSave); showToast("Kaydedildi! 💾"); }
+    localStorage.setItem('khoj_saved_news', JSON.stringify(saved));
+}
+
+function openSavedList() {
+    const saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+    const m = document.getElementById('mdl');
+    let html = saved.length ? "" : "<p style='text-align:center; padding:20px;'>Kayıtlı haber yok abi.</p>";
+    saved.forEach((n, i) => {
+        html += `<div class="news-card" style="margin-bottom:10px;">
+            <img src="${getBestImage(n, n.source)}" style="width:40px; height:40px;">
+            <div style="flex:1" onclick="openSavedDetail(${i})"><div class="news-title">${n.title}</div></div>
+            <button onclick="deleteSaved(${i})" style="background:none; border:none; color:red; font-size:1.2rem;">🗑️</button>
+        </div>`;
+    });
+    m.innerHTML = `<div class="modal-header"><h2>💾 KAYDEDİLENLER</h2></div><div class="modal-body">${html}</div><div class="modal-footer"><button class="btn-full" onclick="closeM()">KAPAT</button></div>`;
+    document.getElementById('ovl').style.display = 'flex';
+}
+
+let lastNewsCount = 0;
+
+db.ref('rss_ayarlari').on('value', () => {
+    // Haberler her güncellendiğinde toplam sayıyı kontrol et
+    setTimeout(() => {
+        if (lastNewsCount > 0 && news.length > lastNewsCount) {
+            showNewNewsBadge();
+        }
+        lastNewsCount = news.length;
+    }, 2000); 
+});
+
+function showNewNewsBadge() {
+    // Eğer zaten bar varsa tekrar ekleme
+    if (document.getElementById('newNewsBadge')) return;
+
+    const badge = document.createElement('div');
+    badge.id = 'newNewsBadge';
+    badge.innerHTML = `🔥 Yeni haberler geldi! <span onclick="softRefresh(); this.parentElement.remove();">Tıkla ve Karıştır</span>`;
+    badge.style = "position:fixed; top:70px; left:50%; transform:translateX(-50%); background:var(--primary); color:#000; padding:10px 20px; border-radius:30px; font-weight:bold; z-index:1000; box-shadow:0 4px 15px rgba(0,0,0,0.3); cursor:pointer; animation: slideDown 0.5s;";
+    document.body.appendChild(badge);
+}
+
+
+function deleteSaved(i) { let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]'); saved.splice(i, 1); localStorage.setItem('khoj_saved_news', JSON.stringify(saved)); openSavedList(); }
+function openSavedDetail(i) { active = JSON.parse(localStorage.getItem('khoj_saved_news'))[i]; openDetail(-2); }
+function openGeneralChat() { active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." }; openDetail(-1); }
+function clearHistory() { chatHistory = []; localStorage.removeItem('khoj_ai_history'); closeM(); showToast("Sıfırlandı!"); }
+function closeM() { document.getElementById('ovl').style.display = 'none'; }
+function showToast(m) { const t = document.getElementById('toast'); if(t) { t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); } }
 </script>
 </body>
 </html>
