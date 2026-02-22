@@ -617,6 +617,10 @@ function openDetail(idx) {
     const pubDate = active.pubDate ? new Date(active.pubDate).toLocaleString('tr-TR', {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'}) : '';
     const cleanDesc = active.description ? active.description.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim().substring(0, 1000) + "..." : "Haber içeriği yüklenemedi abi.";
 
+// openDetail fonksiyonunun en sonuna (render bittikten sonraya) ekle:
+if (document.activeElement) {
+    document.activeElement.blur(); // Odaklanmış herhangi bir şey varsa odağı kaldır (klavyeyi kapatır)
+}
     m.innerHTML = `
         <div class="modal-header">
             <div style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap: wrap; gap: 10px;">
@@ -654,12 +658,20 @@ function openDetail(idx) {
         </div>
         <div class="modal-footer">
             <div style="display:flex; gap:10px; width:100%;">
-                <input type="text" id="uInp" placeholder="Bu olay neden oldu? / Özetle..." style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:14px;">
+                <input type="text" id="uInp" readonly onfocus="this.removeAttribute('readonly');" 
+       placeholder="Bu olay neden oldu? / Özetle..." 
+       style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:16px;">
                 <button class="btn-icon btn-save" id="sendBtn" style="width:50px;">➤</button>
-            
-</div>
+            </div>
         </div>`;
-
+// Modal açıldıktan hemen sonra odağı zorla başka yere çekiyoruz
+setTimeout(() => {
+    const uInp = document.getElementById('uInp');
+    if (uInp) {
+        uInp.blur(); // Odağı bırak
+        window.scrollTo(0, 0); // Sayfayı en üste sabitle
+    }
+}, 100);
     document.getElementById('ovl').style.display = 'flex';
     const box = document.getElementById('cBox');
     box.scrollTop = box.scrollHeight;
