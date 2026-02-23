@@ -11,7 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Orbitron:wght@600&display=swap" rel="stylesheet">
     <style>
 
-	
         /* TEMA DEĞİŞKENLERİ */
         :root {
             --primary: #4880FF;
@@ -122,11 +121,18 @@
             justify-content: center; align-items: flex-end;
         }
         .modal {
-            width: 96% !important; max-width: 500px; display: flex; flex-direction: column;
-            height: 95vh !important; background: var(--card-bg) !important;
-            border-radius: 20px 20px 0 0; overflow: hidden; margin: 0 auto;
-            border: 1px solid var(--brd);
-        }
+    width: 100% !important; /* %96'dan %100'e çektik */
+    max-width: 100% !important; /* 500px sınırını kaldırdık */
+    display: flex; 
+    flex-direction: column;
+    height: 95vh !important; 
+    background: var(--card-bg) !important;
+    border-radius: 20px 20px 0 0; 
+    overflow: hidden;
+    margin: 0; /* Ortalamayı kapatıp sola yasladık */
+    border: 1px solid var(--brd);
+}
+
         .modal-header { padding: 20px; border-bottom: 1px solid var(--brd); flex-shrink: 0; background: var(--card-bg) !important; color: var(--text) !important;}
         .modal-body { flex: 1; overflow-y: auto; padding: 20px; background: var(--bg) !important; color: var(--text) !important; -webkit-overflow-scrolling: touch; }
         .modal-footer { padding: 15px 20px 30px 20px; border-top: 1px solid var(--brd); background: var(--card-bg) !important; flex-shrink: 0; }
@@ -139,26 +145,24 @@
         .btn-full { width: 100%; height: 55px; background: var(--primary); color: white; border: none; border-radius: 18px; font-size: 1rem; font-weight: 800; cursor: pointer; }
 
 @media (max-width: 600px) {
-    /* Pencerenin kendisini telefon kenarlarına tam yaslıyoruz */
     #mdl {
         width: 100% !important;
         max-width: 100% !important;
-        height: 100vh !important; /* Tam ekran yapıyoruz */
+        height: 100vh !important; /* Mobilde tam ekran boyu */
         margin: 0 !important;
-        border-radius: 0 !important; /* Köşe yuvarlaklığını kaldırıyoruz */
-        position: fixed !important;
-        bottom: 0 !important;
+        border-radius: 0 !important; /* Kenarlara tam yaslanması için yuvarlaklığı sildik */
         left: 0 !important;
-        transform: none !important;
+        bottom: 0 !important;
     }
-
-    #ovl {
-        padding: 0 !important;
+    
+    .overlay {
+        padding: 0 !important; /* Dıştaki boşluğu sıfırladık */
     }
+}
 
     /* Sarı alan: İçerideki fazladan boşlukları ve çerçeveyi kaldırıyoruz */
     .modal-body {
-        padding: 10px 0 !important; /* Yan boşluklar sıfırlandı */
+        height: calc(100vh - 70px) !important; /* Başlık kısmını düşüp içeriği tam ekran yapar */
     }
 
     .chat-box {
@@ -175,12 +179,23 @@
     }
 }
 
+#chat-container {
+        height: 100% !important;
+    }
+}
+
 
         /* CHAT BOX */
         .chat-box {
-            background: var(--bg) !important; border-radius: 20px; padding: 15px; flex: 1; 
-            overflow-y: auto; margin: 15px 0; display: flex; flex-direction: column; gap: 10px;
-            border: 1px solid var(--brd) !important; padding-bottom: 300px !important;
+			 width: 100% !important;
+			height: 100vh !important;
+            background: var(--bg) !important; 
+			border-radius: 20px; padding: 15px; flex: 1; 
+            overflow-y: auto; 
+			margin: 15px 0; 
+			display: flex; flex-direction: column; gap: 10px;
+            border: 1px solid var(--brd) !important; 
+			padding-bottom: 300px !important;
         }
         .msg { max-width: 92%; padding: 12px 16px; border-radius: 18px; font-size: var(--chat-size); font-weight: var(--chat-weight); line-height: 1.5; word-wrap: break-word; }
         .msg.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
@@ -239,10 +254,18 @@ const fbCfg = { apiKey: "AIzaSyAwQfifK4eaSrSjKpA776hD0RAlx_6a2_w", databaseURL: 
 if (!firebase.apps.length) firebase.initializeApp(fbCfg);
 const db = firebase.database();
 
-let sets = JSON.parse(localStorage.getItem('khoj_sets')) || { size: 13, weight: 600, speed: 20 };
+// 1. Ayarları yükle, yoksa varsayılanları kur
+let sets = JSON.parse(localStorage.getItem('khoj_sets')) || { size: 13, weight: 600, speed: 20, newsLimit: 10 };
+
+// 2. Başlangıç sayacını ayardan çek (En önemli kısım burası!)
+let visibleCount = sets.newsLimit || 10;
 let chatHistory = JSON.parse(localStorage.getItem('khoj_ai_history')) || [];
 let news = [];
 let active = null;
+
+let currentNewsLimit = parseInt(localStorage.getItem('news_limit')) || 10; // Varsayılan 10
+let displayedNewsCount = {}; // Her kategori için kaç haber gösterildiğini tutacak
+let allCachedNews = JSON.parse(localStorage.getItem('khoj_cache')) || {}; // Hafızadaki haberler
 
 function softRefresh() {
     showToast("Haberler güncelleniyor...");
@@ -306,6 +329,19 @@ async function fetchAllNews() {
     news = []; 
     const proxyUrl = "https://wild-sky-08d7.06mmt8129.workers.dev/?url=";
     
+	const cachedData = localStorage.getItem('khoj_news_cache');
+    const cacheTime = localStorage.getItem('khoj_news_time');
+    const now = new Date().getTime();
+    const birSaat = 60 * 60 * 1000; // Milisaniye cinsinden
+
+    // Eğer haberler varsa ve 1 saatten yeniyse hafızadan yükle
+    if (cachedData && cacheTime && (now - cacheTime < birSaat)) {
+        console.log("Haberler hafızadan yükleniyor...");
+        news = JSON.parse(cachedData);
+        render(); // Haberleri ekrana bas
+        return;   // Fonksiyonun geri kalanını (internet kısmını) çalıştırma
+    }
+	
     // Ekrana yükleniyor yazalım ki çalıştığını görelim
     document.getElementById('newsFeed').innerHTML = '<div style="text-align:center; padding:50px; color:white;">Haberler Cloudflare hattından geliyor...</div>';
 
@@ -350,6 +386,8 @@ items.forEach(el => {
             
             // Listeyi karıştır ve ekrana bas
             news.sort(() => Math.random() - 0.5);
+			localStorage.setItem('khoj_news_cache', JSON.stringify(news));
+    localStorage.setItem('khoj_news_time', new Date().getTime());
             render(); 
 
         } catch (e) {
@@ -395,32 +433,32 @@ function render() {
     const f = document.getElementById('newsFeed');
     if(!f) return;
 
-    // Aktif butonu bul ve üzerindeki yazıyı al
-   const activeBtn = document.querySelector('.cat-item.active');
-    // Butondaki yazıyı tertemiz yap (BÜYÜK HARF ve Boşluksuz)
+    // 1. Aktif kategoriyi belirleyelim 🏷️
+    const activeBtn = document.querySelector('.cat-item.active');
     const currentCategory = activeBtn ? activeBtn.innerText.trim().toUpperCase() : "TÜMÜ";
 
-    console.log("Seçili Buton:", currentCategory); // F12'de neye bastığını gör
-
+    // 2. Önce tüm haberleri kategoriye göre filtreleyelim 🔍
     let filteredNews = news.filter(n => {
         if (currentCategory === "TÜMÜ") return true;
-        
-        // Haber kategorisini de aynı temizlikten geçir
         const haberKategorisi = n.category ? n.category.trim().toUpperCase() : "";
-        
-        // Örn: "SPOR" === "SPOR" mu?
         return haberKategorisi === currentCategory;
     });
 
+    // 3. Eğer filtrelenmiş haber yoksa mesajı gösterip durduralım 📂
     if (filteredNews.length === 0) {
-        f.innerHTML = `<div style="text-align:center; padding:50px; color:var(--text);">
-            <div style="font-size:30px;">📂</div>
-            <br>${currentCategory} kategorisinde henüz haber yok.
-        </div>`;
+        f.innerHTML = `
+            <div style="text-align:center; padding:50px; color:var(--text);">
+                <div style="font-size:30px;">📂</div>
+                <br>${currentCategory} kategorisinde henüz haber yok.
+            </div>`;
         return;
     }
 
-    f.innerHTML = filteredNews.map((n) => {
+    // 4. ŞİMDİ "visibleCount" kadarını kesip alalım (Hata buradaydı, artık dışarıda) ✂️
+    const displayedNews = filteredNews.slice(0, visibleCount);
+
+    // 5. Kesilen haberleri (displayedNews) ekrana basalım 📺
+    f.innerHTML = displayedNews.map((n) => {
         const realIdx = news.findIndex(x => x.title === n.title);
         return `
             <div class="news-card" onclick="openDetail(${realIdx})">
@@ -434,7 +472,27 @@ function render() {
                 </div>
             </div>`;
     }).join('');
+
+    // 6. Eğer hala gösterilmemiş haber varsa butonu ekleyelim ➕
+    if (filteredNews.length > visibleCount) {
+        f.innerHTML += `
+            <div id="loadMoreArea" style="text-align:center; padding:20px;">
+                <button class="btn-full" style="background:var(--primary); color:white; font-weight:bold;" onclick="loadMoreNews()">
+                    ➕ DAHA FAZLA GÖSTER
+                </button>
+            </div>`;
+    }
 }
+
+function loadMoreNews() {
+    // Görünür haber sayısını ayardaki limit kadar artır (Ayar yoksa 10 artır)
+    const artisMiktari = (sets && sets.newsLimit) ? sets.newsLimit : 10;
+    visibleCount += artisMiktari;
+    
+    // Ekranı yeni sayıya göre tekrar çiz
+    render();
+}
+
 
 function getBestImage(item, sourceName) {
     // 1. Haberin kendi resmi varsa kullan
@@ -467,6 +525,19 @@ function openSettings() {
             <button class="btn-icon" onclick="closeM()" style="color:red;">❌</button>
         </div>
         <div class="modal-body">
+		<div class="set-row">
+                <label class="set-label">HABER SAYISI</label>
+                <div class="set-ctrl">
+                    <div class="set-row">
+    <label class="set-label">HABER SAYISI</label>
+    <div class="set-ctrl">
+        <button onclick="adjustNewsLimit(-5)">-</button>
+        <span id="newsLimitDisplay" style="min-width:45px; text-align:center; font-weight:bold;">${sets.newsLimit || 10}</span>
+        <button onclick="adjustNewsLimit(5)">+</button>
+    </div>
+</div>
+                </div>
+            </div>
             <div class="set-row">
                 <label class="set-label">YAZI BOYUTU</label>
                 <div class="set-ctrl">
@@ -499,6 +570,30 @@ function openSettings() {
             <button class="btn-full" style="background:#22c55e; color:white;" onclick="closeM()">TAMAM</button>
         </div>`;
     document.getElementById('ovl').style.display = 'flex';
+}
+
+function adjustNewsLimit(amount) {
+    if(!sets.newsLimit) sets.newsLimit = 10;
+    let newLimit = sets.newsLimit + amount;
+
+    if (newLimit >= 5 && newLimit <= 20) {
+        sets.newsLimit = newLimit;
+        
+        // KRİTİK EKLEME: Ekrandaki canlı sayacı da hemen güncelle! 🎯
+        visibleCount = newLimit; 
+        
+        const display = document.getElementById('newsLimitDisplay');
+        if (display) display.innerText = newLimit;
+        
+        saveSets();
+        
+        // Opsiyonel: Değişikliği anında ekranda görmek istersen:
+        // render(); 
+    }
+}
+
+function saveSets() {
+    localStorage.setItem('khoj_sets', JSON.stringify(sets));
 }
 
 // 📡 RSS Listesini Firebase'den çekip gösteren dinamik fonksiyon
@@ -786,47 +881,57 @@ if (active.pubDate) {
     if (document.activeElement) { document.activeElement.blur(); }
 
     m.innerHTML = `
-        <div class="modal-header">
-            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap: wrap; gap: 10px;">
-               <div style="display:flex; align-items:center; gap:8px;">
-    <span style="background:#ef4444; color:white; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:800; letter-spacing:0.5px;">${active.source}</span>
+       
+    <span style="background:#ef4444; color:white; padding:10px 15px; border-radius:4px; font-size:11px; font-weight:800; letter-spacing:0.5px;">${active.source}</span>
     <span style="font-size:11px; color:var(--text); opacity:0.5; font-weight:400; border-left:1px solid var(--brd); padding-left:8px;">${displayDate}</span>
 </div>
-                <div style="display:flex; align-items:center; gap:5px;">
+               <div class="modal-header" style="padding: 10px 15px;">
+    <div style="display:flex; justify-content: space-between; align-items:center; width:100%;">
+        <div style="font-weight: 800; font-size: 0.9rem; color: var(--primary); font-family: 'Orbitron';">
+            ${active.source === "KHOJ" ? "✨ GENEL SOHBET" : "HABER DETAYI"}
+        </div>
+
+        <div style="display:flex; align-items:center; gap:5px;">
+         
                     <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;" onclick="quickAdjust('size', 1)">Y+</button>
                     <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;" onclick="quickAdjust('size', -1)">Y-</button>
                     <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold; margin-left:2px;" onclick="quickAdjust('weight', 100)">K+</button>
                     <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;" onclick="quickAdjust('weight', -100)">K-</button>
                     <div style="width:1px; height:20px; background:var(--brd); margin:0 5px;"></div>
                     ${active.link ? `<button class="btn-icon" style="width:32px; height:32px;" onclick="openFullNews('${active.link}')">🔗</button>` : ''}
-                <button class="btn-icon" style="width:32px; height:32px;" onclick="shareNews(active.title.replace(/'/g, ''), active.link)">📤</button>
+                    <button class="btn-icon" style="width:32px; height:32px;" onclick="shareNews(active.title.replace(/'/g, ''), active.link)">📤</button>
                     <button class="btn-icon" style="width:32px; height:32px;" onclick="saveNews()">💾</button>
                     <button class="btn-icon" style="width:32px; height:32px; color:red;" onclick="closeM()">❌</button>
                 </div>
             </div>
         </div>
-        <div class="modal-body">
-            <h2 style="margin-bottom:15px; line-height:1.3; font-size:1.4em;">${active.title}</h2>
-            <div id="dynamicContent" style="background:rgba(239, 68, 68, 0.1); border-left:4px solid #ef4444; padding:15px; margin-bottom:20px; border-radius:0 10px 10px 0;">
-                <p style="font-size:14px; line-height:1.6; margin:0;">${cleanDesc}</p>
-            </div>
-            ${active.source !== "KHOJ" ? `<img src="${img}" style="width:100%; border-radius:15px; margin-bottom:20px;">` : ''}
+       <div class="modal-body">
+            ${active.source !== "KHOJ" ? `
+                <h2 style="margin-bottom:15px; line-height:1.3; font-size:1.4em;">${active.title}</h2>
+                <div id="dynamicContent" style="background:rgba(239, 68, 68, 0.1); border-left:4px solid #ef4444; padding:15px; margin-bottom:20px; border-radius:0 10px 10px 0;">
+                    <p style="font-size:14px; line-height:1.6; margin:0;">${cleanDesc}</p>
+                </div>
+                <img src="${img}" style="width:100%; border-radius:15px; margin-bottom:20px;">
+            ` : ''}
             
             <div style="background:var(--card-bg); border:1px solid var(--brd); border-radius:12px; overflow:hidden;">
+                ${active.source !== "KHOJ" ? `
                 <div style="background:var(--brd); padding:8px 15px; display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:11px; font-weight:bold; color:var(--text); opacity:0.7;">YAPAY ZEKA ANALİZİ</span>
                     <button onclick="document.getElementById('uInp').value='Bu haberi özetle'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:4px;">
                         ✨ AI ile Özetle
                     </button>
-                </div>
-                <div class="chat-box" id="cBox" style="min-height:250px;">
-                    ${active.savedChat || ((active.source === "KHOJ" && chatHistory.length > 0) ? chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('') : `<div class="msg ai">Haber Hakkında Bilgiler Sor...</div>`)}
+                </div>` : ''}
+                <div class="chat-box" id="cBox" style="min-height:300px;">
+                    ${active.savedChat || (active.source === "KHOJ" ? chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('') : `<div class="msg ai">Haber Hakkında Bilgiler Sor...</div>`)}
                 </div>
             </div>
         </div>
         <div class="modal-footer">
             <div style="display:flex; gap:10px; width:100%;">
-                <input type="text" id="uInp" readonly onfocus="this.removeAttribute('readonly');" placeholder="Bu olay neden oldu? / Özetle..." style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:16px;">
+                <input type="text" id="uInp" 
+    placeholder="${active.source === 'KHOJ' ? 'Bir şeyler sor veya sohbet et...' : 'Bu haberi analiz et...'}" 
+    style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:16px;">
                 <button class="btn-icon btn-save" id="sendBtn" style="width:50px;">➤</button>
             </div>
         </div>`;
