@@ -139,35 +139,34 @@
         .btn-full { width: 100%; height: 55px; background: var(--primary); color: white; border: none; border-radius: 18px; font-size: 1rem; font-weight: 800; cursor: pointer; }
 
 @media (max-width: 600px) {
-    /* 1. Kategori butonlarını biraz küçültelim */
-    .cat-item {
-        padding: 6px 12px !important;
-        font-size: 11px !important;
-        letter-spacing: 0px !important;
+    /* Pencerenin kendisini telefon kenarlarına tam yaslıyoruz */
+    #mdl {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100vh !important; /* Tam ekran yapıyoruz */
+        margin: 0 !important;
+        border-radius: 0 !important; /* Köşe yuvarlaklığını kaldırıyoruz */
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        transform: none !important;
     }
 
-    /* 2. Haber detayındaki o büyük başlığı mobilde dizginleyelim */
-    .modal-body h2 {
-        font-size: 1.2em !important;
-        line-height: 1.2 !important;
-        margin-bottom: 10px !important;
+    #ovl {
+        padding: 0 !important;
     }
 
-    /* 3. Tarih ve kaynak kısmını daha minyon yapalım */
-    .modal-header span {
-        font-size: 10px !important;
+    /* Sarı alan: İçerideki fazladan boşlukları ve çerçeveyi kaldırıyoruz */
+    .modal-body {
+        padding: 10px 0 !important; /* Yan boşluklar sıfırlandı */
     }
 
-    /* 4. Resimlerin köşelerini biraz daha yumuşatalım */
-    .modal-body img {
-        border-radius: 10px !important;
+    .chat-box {
+        border: none !important; /* Sohbet kutusunun kendi çerçevesini sildik */
+        margin: 0 !important;
+        border-radius: 0 !important;
     }
-
-    /* 5. Yapay zeka panelindeki o 'Haber Hakkında Bilgiler Sor' yazısını küçültelim */
-    .chat-box .msg {
-        font-size: 13px !important;
-        padding: 8px 12px !important;
-    }
+}
 
     /* 6. En alttaki soru sorma kutusunu daha kibar yapalım */
     #uInp {
@@ -211,7 +210,7 @@
         <div class="header-right">
             <button class="btn-icon btn-gemini" onclick="openGeneralChat()">✨</button>
             <button class="btn-icon btn-save" onclick="openSavedList()">💾</button>
-           <button class="btn-icon" onclick="openRSSManager()" style="font-size: 1rem;">📡</button> <button class="btn-icon" onclick="softRefresh()">🔄</button>
+           <button class="btn-icon" onclick="softRefresh()">🔄</button>
         </div>
     </header>
 
@@ -462,7 +461,43 @@ function getBestImage(item, sourceName) {
 // --- 3. MODAL FONKSİYONLARI ---
 function openSettings() {
     const m = document.getElementById('mdl');
-    m.innerHTML = `<div class="modal-header"><h2>AYARLAR</h2></div><div class="modal-body"><div class="set-row"><label class="set-label">YAZI BOYUTU</label><div class="set-ctrl"><button onclick="adjustSet('size',-1)">-</button><span>${sets.size}PX</span><button onclick="adjustSet('size',1)">+</button></div></div><div class="set-row"><label class="set-label">YAZI KALINLIĞI</label><div class="set-ctrl"><button onclick="adjustSet('weight',-100)">-</button><span>${sets.weight}</span><button onclick="adjustSet('weight',100)">+</button></div></div><button class="btn-full" style="background:#ef4444; margin-top:10px;" onclick="clearHistory()">SOHBETİ SIFIRLA</button></div><div class="modal-footer"><button class="btn-full" onclick="closeM()">KAYDET</button></div>`;
+    m.innerHTML = `
+        <div class="modal-header">
+            <h2>AYARLAR</h2>
+            <button class="btn-icon" onclick="closeM()" style="color:red;">❌</button>
+        </div>
+        <div class="modal-body">
+            <div class="set-row">
+                <label class="set-label">YAZI BOYUTU</label>
+                <div class="set-ctrl">
+                    <button onclick="adjustSet('size',-1)">-</button>
+                    <span style="min-width:45px; text-align:center;">${sets.size}PX</span>
+                    <button onclick="adjustSet('size',1)">+</button>
+                </div>
+            </div>
+
+            <div class="set-row">
+                <label class="set-label">YAZI KALINLIĞI</label>
+                <div class="set-ctrl">
+                    <button onclick="adjustSet('weight',-100)">-</button>
+                    <span style="min-width:45px; text-align:center;">${sets.weight}</span>
+                    <button onclick="adjustSet('weight',100)">+</button>
+                </div>
+            </div>
+
+            <hr style="border:0; border-top:1px solid var(--brd); margin:15px 0;">
+
+            <button class="btn-full" style="background:var(--card-bg); color:var(--text); border:1px solid var(--brd); margin-bottom:10px; display:flex; align-items:center; justify-content:center; gap:10px;" onclick="openRSSManager()">
+                📡 RSS KAYNAKLARINI YÖNET
+            </button>
+
+            <button class="btn-full" style="background:#ef4444; color:white;" onclick="clearHistory()">
+                🗑️ SOHBETİ SIFIRLA
+            </button>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-full" style="background:#22c55e; color:white;" onclick="closeM()">TAMAM</button>
+        </div>`;
     document.getElementById('ovl').style.display = 'flex';
 }
 
@@ -482,7 +517,7 @@ function openRSSManager() {
             <p style="text-align:center; padding:20px; color:#888;">Kaynaklar yükleniyor...</p>
         </div>
         <div class="modal-footer">
-            <button class="btn-full" onclick="closeM()">KAPAT</button>
+            <button onclick="openSettings()" class="btn-full">GERİ DÖN</button>
         </div>
     `;
     document.getElementById('ovl').style.display = 'flex';
@@ -510,7 +545,7 @@ function openRSSManager() {
                         <span style="font-size:10px; color:var(--primary); font-weight:800;">${rss.kategori}</span>
                     </div>
 					<span onclick="editRSS('${key}')" style="cursor:pointer; font-size:1.2rem;">✏️</span>
-                    <span onclick="deleteRSS('${key}')" style="color:#ef4444; cursor:pointer; font-size:1.2rem; padding:5px;">🗑️</span>
+                    <span onclick="confirmDeleteRSS('${key}')" style="color:#ef4444; cursor:pointer; font-size:1.2rem; padding:5px;">🗑️</span>
                 </div>
             `;
         });
@@ -562,7 +597,7 @@ function updateRSS(key) {
     const kat = document.getElementById('edit_rssCat').value;
     const logo = document.getElementById('edit_rssLogo').value;
 
-    if(!ad || !url) { alert("Alanlar boş bırakılamaz abi!"); return; }
+    if(!ad || !url) { alert("Alanlar boş bırakılamaz!"); return; }
 
     db.ref('rss_ayarlari/' + key).update({
         ad: ad,
@@ -575,14 +610,33 @@ function updateRSS(key) {
     }).catch(e => alert("Hata: " + e.message));
 }
 
-// RSS Silme Fonksiyonu
-function deleteRSS(key) {
-    if(confirm("Bu RSS kaynağını silmek istediğine emin misin abi?")) {
-        db.ref('rss_ayarlari/' + key).remove()
-            .then(() => showToast("Kaynak Silindi 🗑️"))
-            .catch(e => alert("Hata: " + e.message));
-    }
+// Asıl silme işlemini yapan fonksiyon (Firebase bağlantılı)
+function executeDeleteRSS(key) {
+    db.ref('rss_ayarlari/' + key).remove()
+        .then(() => {
+            showToast("Kaynak Silindi 🗑️");
+            openRSSManager(); // Listeyi yenilemek için geri dön
+        })
+        .catch(e => alert("Hata: " + e.message));
 }
+
+function confirmDeleteRSS(key) {
+    const m = document.getElementById('mdl');
+    m.innerHTML = `
+        <div class="modal-header">
+            <h2 style="color:#ef4444;">KAYNAĞI SİL?</h2>
+            <button class="btn-icon" onclick="openRSSManager()" style="color:red;">❌</button>
+        </div>
+        <div class="modal-body" style="text-align:center; padding:20px;">
+            <p style="font-size:16px; margin-bottom:25px; line-height:1.5;">Bu RSS kaynağını listeden kaldırmak istediğine emin misin abi?</p>
+            <div style="display:flex; gap:12px;">
+                <button class="btn-full" onclick="executeDeleteRSS('${key}')" style="background:#ef4444; color:white; font-weight:bold;">EVET, SİL</button>
+                <button class="btn-full" onclick="openRSSManager()" style="background:var(--brd); color:var(--text);">VAZGEÇ</button>
+            </div>
+        </div>
+    `;
+}
+
 
 // Kategorileri filtrelemek için (Şimdilik sadece tıklama efekti verir)
 function filterCat(cat) {
@@ -760,19 +814,19 @@ if (active.pubDate) {
             
             <div style="background:var(--card-bg); border:1px solid var(--brd); border-radius:12px; overflow:hidden;">
                 <div style="background:var(--brd); padding:8px 15px; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:11px; font-weight:bold; color:var(--text); opacity:0.7;">ANALİZ ET</span>
+                    <span style="font-size:11px; font-weight:bold; color:var(--text); opacity:0.7;">YAPAY ZEKA ANALİZİ</span>
                     <button onclick="document.getElementById('uInp').value='Bu haberi özetle'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:4px;">
                         ✨ AI ile Özetle
                     </button>
                 </div>
                 <div class="chat-box" id="cBox" style="min-height:250px;">
-                    ${active.savedChat || ((active.source === "KHOJ" && chatHistory.length > 0) ? chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('') : `<div class="msg ai">......</div>`)}
+                    ${active.savedChat || ((active.source === "KHOJ" && chatHistory.length > 0) ? chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('') : `<div class="msg ai">Haber Hakkında Bilgiler Sor...</div>`)}
                 </div>
             </div>
         </div>
         <div class="modal-footer">
             <div style="display:flex; gap:10px; width:100%;">
-                <input type="text" id="uInp" readonly onfocus="this.removeAttribute('readonly');" placeholder="....." style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:16px;">
+                <input type="text" id="uInp" readonly onfocus="this.removeAttribute('readonly');" placeholder="Bu olay neden oldu? / Özetle..." style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:16px;">
                 <button class="btn-icon btn-save" id="sendBtn" style="width:50px;">➤</button>
             </div>
         </div>`;
