@@ -79,6 +79,16 @@
     cursor: pointer;
     color: var(--text);
 }
+
+#fullNewsView {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+}
+
 .cat-item.active {
     background: var(--primary);
     color: white;
@@ -199,7 +209,7 @@
         }
         .msg { max-width: 92%; padding: 12px 16px; border-radius: 18px; font-size: var(--chat-size); font-weight: var(--chat-weight); line-height: 1.5; word-wrap: break-word; }
         .msg.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .msg.ai { background: var(--card-bg); border: 1px solid var(--brd); align-self: flex-start; color: var(--text); border-bottom-left-radius: 4px; }
+        .msg.ai { background: var(--card-bg); border: 1px solid var(--brd); align-self: flex-start; color: var(--text); border-bottom-left-radius: 4px; word-wrap: break-word, overflow-wrap: break-word, white-space: pre-wrap; }
 
         #toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
@@ -300,14 +310,10 @@ function updateTime() {
 }
 setInterval(updateTime, 1000); updateTime(); applySets();
 
-function metniTemizle(hamMetin) {
-    // Bu fonksiyon orijinal kodda kalmalı (metin temizleme mantığı)
-    let temiz = hamMetin.replace(/ /g, '').replace(/\{"organic":[\s\S]*?\}\}/g, '').replace(/\{"peopleAlsoAsk":[\s\S]*?\}\}/g, '').replace(/"organic":\s*\[[\s\S]*?\]/g, '').replace(/"codeContext":\s*\{[\s\S]*?\}/g, '').replace(/"position":\s*\d+/g, '').replace(/\{.*?\}/g, '');
-    const ilkHarf = temiz.search(/[A-ZİĞÜŞÖÇ]/);
-    if (ilkHarf !== -1) { temiz = temiz.substring(ilkHarf); }
-    temiz = temiz.replace(/[\s\}\]奉",:]{2,}$/g, '');
-    temiz = temiz.replace(/^#{1,6}\s+(.*)$/gm, '<b style="color:#ef4444; font-size:1.1em;">$1</b>');
-    return temiz.replace(/\[\d+\]\(.*?\)/g, '').replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>').replace(/^\s*[\-\*]\s+/gm, '🔹 ').replace(/\n/g, '<br>');
+function metniTemizle(t) {
+    // DÜZELTME 3: Boşluk sorununu gidermek için 'pre-wrap' mantığını CSS'e ekledik,
+    // ama burada da temiz formatlama yapalım:
+    return t.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>').replace(/^- /gm, '🔹 ').replace(/&nbsp;/g, ' ');
 }
 
 // --- 3. HABER MOTORU (Aynı kaldı) ---
@@ -819,8 +825,8 @@ if (active.pubDate) {
 </div>
                <div class="modal-header" style="padding: 10px 15px;">
     <div style="display:flex; justify-content: space-between; align-items:center; width:100%;">
-        <div style="font-weight: 800; font-size: 0.9rem; color: var(--primary); font-family: 'Orbitron';">
-            ${active.source === "KHOJ" ? "✨ GENEL SOHBET" : "HABER DETAYI"}
+        <div style="font-weight: 600; font-size: 0.7rem; color: var(--primary); font-family: 'Orbitron';">
+            ${active.source === "KHOJ" ? "✨ GENEL SOHBET" : "Haber Detayı"}
         </div>
 
         <div style="display:flex; align-items:center; gap:5px;">
@@ -850,7 +856,7 @@ if (active.pubDate) {
                 ${active.source !== "KHOJ" ? `
                 <div style="background:var(--brd); padding:8px 15px; display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:11px; font-weight:bold; color:var(--text); opacity:0.7;">YAPAY ZEKA ANALİZİ</span>
-                    <button onclick="document.getElementById('uInp').value='Bu haberi özetle'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                    <button onclick="askAItoSummarizeActiveNews().value='Bu haberi özetle'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:4px;">
                         ✨ AI ile Özetle
                     </button>
                 </div>` : ''}
@@ -904,31 +910,26 @@ function openFullNews(url) {
     const headerBg = isDark ? '#1e293b' : '#f8f9fa';
     const textColor = isDark ? '#f1f5f9' : '#1a1a1a';
 
-    fullView.innerHTML = `
-        <div style="padding: 10px; background: ${headerBg}; border-bottom: 1px solid var(--brd); display: flex; gap: 15px; align-items: center; color: ${textColor}">
-            <button onclick="document.getElementById('fullNewsView').remove()" 
-                style="padding: 8px 15px; border-radius: 8px; border: 1px solid var(--brd); background: var(--card-bg); color: var(--text); cursor: pointer;">❌ Kapat</button>
-            
-            <button onclick="triggerSummaryFromFull()" 
-                style="padding: 8px 15px; border-radius: 8px; border: none; background: #ef4444; color: white; cursor: pointer; font-weight: bold;">✨ Özetle</button>
-            
-            <span style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex:1;">${active.title}</span>
+   fullView.innerHTML = `
+        <div style="padding: 15px; background: ${headerBg}; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--brd);">
+            <button onclick="document.getElementById('fullNewsView').remove()" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">❌</button>
+            <button onclick="triggerSummaryFromFull()" style="background:var(--primary); color:white; border:none; padding:8px 15px; border-radius:10px; font-weight:bold; font-size:12px;">✨ ÖZETLE</button>
+            <span style="font-size: 12px; color:${textColor}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight:800;">${active.title}</span>
         </div>
-        <iframe src="${url}" style="flex: 1; border: none; width: 100%; background: white !important;"></iframe>
+        <iframe src="${url}" style="flex: 1; border: none; width: 100%; background: white;"></iframe>
     `;
     document.body.appendChild(fullView);
 }
 
 function triggerSummaryFromFull() {
     const fv = document.getElementById('fullNewsView'); if(fv) fv.remove();
-    const inp = document.getElementById('uInp');
-    if(inp) { inp.value = "Bu haberi çok kısa şekilde özetle."; ask(); }
+    askAItoSummarizeActiveNews(); // Yeni fonksiyonumuz
 }
 
 function openSavedList() {
     const saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
     const m = document.getElementById('mdl');
-    let html = saved.length ? "" : "<p style='text-align:center; padding:20px;'>Kayıtlı haber yok abi.</p>";
+    let html = saved.length ? "" : "<p style='text-align:center; padding:20px;'>Kayıtlı haber yok.</p>";
     saved.forEach((n, i) => {
         html += `<div class="news-card" style="margin-bottom:10px;">
             <img src="${getBestImage(n, n.source)}" style="width:40px; height:40px;">
@@ -1195,6 +1196,62 @@ function saveNews() {
     if(existingIndex !== -1) { saved[existingIndex] = newsToSave; showToast("Güncellendi! 💾"); } 
     else { saved.push(newsToSave); showToast("Kaydedildi! 💾"); }
     localStorage.setItem('khoj_saved_news', JSON.stringify(saved));
+}
+
+// DÜZELTME 1: AI ÖZETLEME (Kısıtlama kaldırıldı, link gizli gidiyor)
+async function askAItoSummarizeActiveNews() {
+    if (!active || !active.link) {
+        showToast("Özetlenecek haber linki bulunamadı ABİ!");
+        return;
+    }
+
+    const box = document.getElementById('cBox');
+    if (!box) return;
+    
+    addChatMsg('user', `Haberin detaylarını bana özetler misin?`);
+    
+    const botDiv = document.createElement('div');
+    botDiv.className = 'msg ai'; 
+    botDiv.innerHTML = '🔹 Haberi inceliyorum ABİ, biraz bekle...'; 
+    box.appendChild(botDiv); 
+    box.scrollTop = box.scrollHeight;
+
+    const grokKey = localStorage.getItem('grok_key');
+
+    if (!grokKey) {
+        botDiv.innerHTML = "ABİ! Grok API anahtarı ayarlanmamış.";
+        return;
+    }
+
+    try {
+        const summaryRes = await fetch(`${PROXY_URL}?url=https://api.groq.com/openai/v1/chat/completions`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${grokKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                model: "llama-3.3-70b-versatile", 
+                messages: [
+                    {
+                        role: "system", 
+                        content: "Sen benim samimi bir arkadaşımsın. Sana gönderilen linkteki haberi detaylıca analiz et ve kullanıcıya akıcı bir şekilde anlat. Cevabına \'ABİ\' diyerek başla. Kelimeler arasında boşluk bırakmayı ve okunaklı olmayı unutma."
+                    },
+                    {role: "user", content: "Şu haberi detaylıca özetle: " + active.link}
+                ]
+            })
+        });
+        
+        const chatData = await summaryRes.json();
+        let reply = chatData.choices[0].message.content;
+        
+        reply = metniTemizle(reply);
+        if (!reply.startsWith("ABİ")) reply = "ABİ " + reply;
+
+        botDiv.innerHTML = reply;
+        box.scrollTop = box.scrollHeight;
+        
+    } catch(e) { 
+        console.error(e);
+        botDiv.innerHTML = "ABİ, siteye ulaşırken bir sorun oldu. Link engellenmiş olabilir."; 
+    }
 }
 
 function shareNews(title, link) {
