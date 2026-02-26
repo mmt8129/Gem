@@ -80,6 +80,34 @@
     color: var(--text);
 }
 
+/* Sabit Alt Banner Tasarımı */
+.bottom-banner {
+    position: fixed; bottom: 0; left: 0; width: 100%;
+    background: var(--header-bg); border-top: 1px solid var(--brd);
+    padding: 10px 15px; display: flex; gap: 10px; z-index: 2000;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+}
+.bottom-banner input {
+    flex: 1; padding: 12px 15px; border-radius: 12px;
+    border: 2px solid var(--brd); background: var(--bg);
+    color: var(--text); font-size: 15px; font-weight: 600;
+}
+.bottom-banner button {
+    width: 45px; height: 45px; border-radius: 12px;
+    background: var(--primary); color: white; border: none;
+    cursor: pointer; font-size: 1.2rem;
+}
+
+/* Haber listesinin alt banner altında kalmaması için */
+#newsFeed { padding-bottom: 120px !important; }
+
+/* Arama Sonucu Rozeti */
+.search-count {
+    background: var(--primary); color: white; padding: 4px 12px;
+    border-radius: 20px; font-size: 0.7rem; font-weight: 800;
+}
+
+
 #fullNewsView {
     position: fixed;
     inset: 0;
@@ -232,11 +260,11 @@
             <span class="time-text" id="clk">00:00</span>
             <span class="date-text" id="dt">YÜKLENİYOR</span>
         </div>
-        <div class="header-right">
+       <div class="header-right">
             <button class="btn-icon btn-gemini" onclick="openGeneralChat()">✨</button>
             <button class="btn-icon btn-save" onclick="openSavedList()">💾</button>
            <button class="btn-icon" onclick="softRefresh()">🔄</button>
-        </div>
+        </div> 
     </header>
 
 <div class="category-bar" id="catBar">
@@ -251,7 +279,18 @@
 
     <main id="newsFeed"></main>
     <div class="overlay" id="ovl"><div class="modal" id="mdl"></div></div>
+	
+	  <!-- Yeni Alt Banner -->
+    <div class="bottom-banner">
+        <input type="text" id="mainInp" placeholder="Sohbet et veya *haber ara*..." 
+               onkeypress="if(event.key==='Enter') handleMainInput()">
+        <button onclick="handleMainInput()">➤</button>
+    </div>
 
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+...
+	
+	
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -271,6 +310,8 @@ let displayedNewsCount = {};
 let allCachedNews = JSON.parse(localStorage.getItem('khoj_cache')) || {}; 
 let currentNewsLimit = parseInt(localStorage.getItem('news_limit')) || 10; 
 let rssListesi = {};
+// --- GLOBAL DEĞİŞKENLERE EKLE ---
+let activeSearchQuery = null; // Yeni değişken: Aktif arama sorgusunu tutacak
 
 // --- 2. SİSTEM AYARLARI (Kalan Fonksiyonlar) ---
 const fbCfg = { apiKey: "AIzaSyAwQfifK4eaSrSjKpA776hD0RAlx_6a2_w", databaseURL: "https://piyasa-9049c-default-rtdb.firebaseio.com", projectId: "piyasa-9049c" };
@@ -446,9 +487,9 @@ function render() {
 
     if (filteredNews.length > visibleCount) {
         f.innerHTML += `
-            <div id="loadMoreArea" style="text-align:center; padding:20px;">
+            <div id="loadMoreArea" style="text-align:center; padding: 2px;">
                 <button class="btn-full" style="background:var(--primary); color:white; font-weight:bold;" onclick="loadMoreNews()">
-                    ➕ DAHA FAZLA GÖSTER
+                    ➕ DAHA FAZLA HABER GÖSTER
                 </button>
             </div>`;
     }
@@ -839,7 +880,7 @@ if (active.pubDate) {
                     ${active.link ? `<button class="btn-icon" style="width:32px; height:32px;" onclick="openFullNews('${active.link}')">🔗</button>` : ''}
                     <button class="btn-icon" style="width:32px; height:32px;" onclick="shareNews(active.title.replace(/'/g, ''), active.link)">📤</button>
                     <button class="btn-icon" style="width:32px; height:32px;" onclick="saveNews()">💾</button>
-                    <button class="btn-icon" style="width:32px; height:32px; color:red;" onclick="closeM()">❌</button>
+                     <button class="btn-icon" style="width:32px; height:32px; color:red; border-color:rgba(255,0,0,0.2);" onclick="closeM()">❌</button>
                 </div>
             </div>
         </div>
@@ -954,7 +995,28 @@ function deleteSaved(i) { let saved = JSON.parse(localStorage.getItem('khoj_save
 function openSavedDetail(i) { active = JSON.parse(localStorage.getItem('khoj_saved_news'))[i]; openDetail(-2); }
 function openGeneralChat() { active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." }; openDetail(-1); }
 function clearHistory() { chatHistory = []; localStorage.removeItem('khoj_ai_history'); closeM(); showToast("Sıfırlandı!"); }
-function closeM() { document.getElementById('ovl').style.display = 'none'; }
+function closeM() { 
+   document.getElementById('ovl').style.display = 'none'; 
+    
+    // *** YENİ EKLENEN KISIM ***
+    if (activeSearchQuery) {
+        // Arama listesini tekrar aç
+        // Not: openDetail'dan dönerken aktif modal'ın içerisindeki veriyi (arama sonuçlarını) kaybetmemek için
+        // en iyisi, arama sonuçlarını tutan HTML'i saklamak veya yeniden tetiklemektir.
+        // Basitlik adına, kapatıldığında tekrar arama yapalım:
+        performLocalNewsSearch(activeSearchQuery); 
+    } else if (active && active.source === "KHOJ") {
+        // Eğer AI sohbet ekranından çıkılıyorsa, bunu kapat. 
+        // Eğer bu ekran AI sohbeti ise, onu sadece kapatmalıyız.
+    }
+    // Eğer bir haber detayından çıkıyorsak ve activeSearchQuery varsa, yukarıdaki if bloğu onu yakalar.
+}
+
+function closeSearch() {
+    activeSearchQuery = null; // Sorgu hafızasını temizle!
+    closeM(); // Ardından genel modal kapatma işlevini çağır (ki bu da sadece modalı gizler, sorguyu tetiklemez)
+}
+
 function showToast(m) { const t = document.getElementById('toast'); if(t) { t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); } }
 
 
@@ -1271,6 +1333,91 @@ function shareNews(title, link) {
         });
     }
 }
+
+function handleMainInput() {
+    const inp = document.getElementById('mainInp');
+    if (!inp || !inp.value.trim()) return;
+
+    const val = inp.value.trim();
+    
+    // Regex: * kelime * formatını kontrol et
+    const searchRegex = /\*(.*?)\*/; 
+    const match = val.match(searchRegex);
+
+    if (match) {
+        // ARAMA MODU: * işaretleri arasındaki kelimeyi al
+        const query = match[1].trim();
+        performLocalNewsSearch(query);
+    } else {
+        // SOHBET MODU: Normal metni genel sohbete gönder
+        openGeneralChatWithText(val);
+    }
+    inp.value = ''; // Kutuyu temizle
+}
+
+// Haberler İçinde Arama Yapma
+function performLocalNewsSearch(q) {
+    const results = news.filter(n => 
+        n.title.toLowerCase().includes(q.toLowerCase()) || 
+        (n.description && n.description.toLowerCase().includes(q.toLowerCase()))
+    );
+
+  // *** YENİ EKLENEN KISIM ***
+    activeSearchQuery = q; 
+    // ****************************
+
+    const m = document.getElementById('mdl');
+let html = `
+        <div class="modal-header">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <div>
+                    <h2 style="font-size:1.1rem;">🔍 ARAMA SONUÇLARI</h2>
+                    <p style="font-size:11px; opacity:0.7;">"${q}" kelimesi geçen haberler</p>
+                </div>
+                <span class="search-count">${results.length} HABER BULUNDU</span>
+                <button class="btn-icon" onclick="closeSearch()" style="color:red;">❌</button> <!-- DEĞİŞTİ: closeM() yerine closeSearch() -->
+            </div>
+        </div>
+        <div class="modal-body">`;
+
+    if (results.length === 0) {
+        html += `<p style="text-align:center; padding:40px; color:#888;">Aradığın kriterde haber bulamadım ABİ. 😔</p>`;
+    } else {
+        results.forEach(n => {
+            const realIdx = news.findIndex(x => x.title === n.title);
+            html += `
+                <div class="news-card" onclick="openDetail(${realIdx})" style="margin-bottom:10px; cursor:pointer;">
+                    <img src="${n.thumbnail || 'logo.png'}" style="width:50px; height:50px;">
+                    <div style="flex:1">
+                        <div class="news-meta"><span>${n.source}</span></div>
+                        <div class="news-title" style="font-size:0.85rem;">${n.title}</div>
+                    </div>
+                </div>`;
+        });
+    }
+    
+  html += `</div><div class="modal-footer">
+                <button class="btn-full" onclick="closeSearch()">KAPAT</button> <!-- DEĞİŞTİ: closeM() yerine closeSearch() -->
+            </div>`;
+    m.innerHTML = html;
+    document.getElementById('ovl').style.display = 'flex';
+}
+
+// Genel Sohbeti Metinle Başlatma
+function openGeneralChatWithText(text) {
+    // Mevcut openGeneralChat fonksiyonunu tetikle
+    openGeneralChat();
+    
+    // Modalın yüklenmesi için kısa bir bekleme
+    setTimeout(() => {
+        const chatInp = document.getElementById('uInp');
+        if (chatInp) {
+            chatInp.value = text;
+            ask(); // Otomatik olarak AI'ya sor
+        }
+    }, 300);
+}
+
 
 
 </script>
