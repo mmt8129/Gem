@@ -7,13 +7,13 @@
     <link rel="apple-touch-icon" href="icon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gemini Pro Dashboard v7 (Grok/Tavily)</title>
+    <title>Gemini Pro Dashboard v7</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Orbitron:wght@600&display=swap" rel="stylesheet">
     <style>
 
-       DEĞİŞKENLERİ */
+        /* TEMA DEĞİŞKENLERİ */
         :root {
-            --primary: #ef4444; 
+            --primary: #4880FF;
             --bg: #FFFFFF;
             --text: #1a1a1a;
             --card-bg: #FFFFFF;
@@ -21,20 +21,19 @@
             --chat-size: 13px;
             --chat-weight: 600;
             --header-bg: #FFFFFF;
-			--news-size: 0.92rem;
-            --news-weight: 700;
-            --chat-size: 13px;
-            --chat-weight: 600;
+			--news-size: 0.92rem;    /* Ana ekran yazı boyutu */
+    --news-weight: 700;      /* Ana ekran yazı kalınlığı */
+    --chat-size: 13px;       /* Pencere içi yazı boyutu */
+    --chat-weight: 600;      /* Pencere içi yazı kalınlığı */
         }
 
         [data-theme="dark"] {
-            /* TAMAMEN SİYAH (OLED BLACK) TEMASI */
-            --bg: #000000;          /* Ana Arka Plan: TAM SİYAH */
-            --card-bg: #0a0a0a;     /* Kartlar/Modallar: Çok Koyu Gri */
-            --brd: #1a1a1a;         /* Kenarlıklar: Siyah üzerinde hafif ayrım */
-            --text: #ffffff;        /* Yazı Rengi: Beyaz */
-            --header-bg: #000000;   /* Header Arka Planı */
-            --text-dim: #a0a0a0;
+			--bg: #0f172a;
+            --text: #f1f5f9;
+            --card-bg: #1e293b;
+            --brd: #334155;
+            --header-bg: #1e293b;
+			
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -124,6 +123,14 @@
     border-color: var(--primary);
 }
 
+
+
+.cat-item.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
 /* Haberlerin kategori barının altında kalmaması için mesafeyi açıyoruz */
 #newsFeed { margin-top: 130px !important; }
 
@@ -145,20 +152,11 @@
             margin-top: 85px; height: calc(100vh - 85px);
             overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px;
         }
-         .news-card {
-            background: var(--card-bg); border-radius: 20px; padding: 16px; display: flex; gap: 10px; /* Daha fazla boşluk */
-            border: 1px solid #ffffff; /* Çerçeveyi BEYAZ yap (Sadece haber kartı için) */
-            align-items: center; 
-           box-shadow: 0 0 15px rgba(255, 255, 255, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3); 
+        .news-card {
+            background: var(--card-bg); border-radius: 20px; padding: 12px; display: flex; gap: 12px;
+            border: 1px solid var(--brd); align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.02);
         }
-        .news-card img { 
-            width: 120px; /* Daha büyük resim */
-            height: 120px; /* Daha büyük resim */
-            border-radius: 16px; 
-            object-fit: cover; 
-            flex-shrink: 0; 
-            background: #f9f9f9; 
-        }
+        .news-card img { width: 80px; height: 80px; border-radius: 14px; object-fit: cover; flex-shrink: 0; background: #f9f9f9; }
         .news-title { font-size: var(--news-size) !important; font-weight: var(--news-weight) !important; color: var(--text); line-height: 1.4; }
         .news-meta { font-size: 0.65rem; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 4px; }
 
@@ -168,9 +166,8 @@
             backdrop-filter: blur(8px); display: none; z-index: 5000;
             justify-content: center; align-items: flex-end;
         }
-		
         .modal {
-    width: 100% !important; /* �'dan  0'e çektik */
+    width: 100% !important; /* %96'dan %100'e çektik */
     max-width: 100% !important; /* 500px sınırını kaldırdık */
     display: flex; 
     flex-direction: column;
@@ -248,7 +245,7 @@
         }
         .msg { max-width: 92%; padding: 12px 16px; border-radius: 18px; font-size: var(--chat-size); font-weight: var(--chat-weight); line-height: 1.5; word-wrap: break-word; }
         .msg.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .msg.ai { background: var(--card-bg); border: 1px solid var(--brd); align-self: flex-start; color: var(--text); border-bottom-left-radius: 4px; word-wrap: break-word, overflow-wrap: break-word, white-space: pre-wrap; }
+        .msg.ai { background: var(--card-bg); border: 1px solid var(--brd); align-self: flex-start; color: var(--text); border-bottom-left-radius: 4px; }
 
         #toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
@@ -271,11 +268,11 @@
             <span class="time-text" id="clk">00:00</span>
             <span class="date-text" id="dt">YÜKLENİYOR</span>
         </div>
-       <div class="header-right">
+        <div class="header-right">
             <button class="btn-icon btn-gemini" onclick="openGeneralChat()">✨</button>
             <button class="btn-icon btn-save" onclick="openSavedList()">💾</button>
            <button class="btn-icon" onclick="softRefresh()">🔄</button>
-        </div> 
+        </div>
     </header>
 
 <div class="category-bar" id="catBar">
@@ -290,8 +287,8 @@
 
     <main id="newsFeed"></main>
     <div class="overlay" id="ovl"><div class="modal" id="mdl"></div></div>
-	
-	  <!-- Yeni Alt Banner -->
+
+  <!-- Yeni Alt Banner -->
     <div class="bottom-banner">
         <input type="text" id="mainInp" placeholder="Sohbet et veya *haber ara*..." 
                onkeypress="if(event.key==='Enter') handleMainInput()">
@@ -299,58 +296,48 @@
     </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-...
-	
-	
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
-// --- 1. YENİ AI ENGINE AYARLARI (GROK/TAVILY) ---
-// Eski KHOJ_URL/KEY kaldırıldı, Grok/Tavily Proxy ve Anahtarları alındı
-const PROXY_URL = "https://autumn-dew-1884.06mmt8129.workers.dev/"; // Tavily/Grok için Proxy URL
-let chatHistory = []; // Konuşma geçmişini tutacak
-let news = [];
-let active = null;
-// --- GLOBAL DEĞİŞKENLERE EKLEME (Tavily Kontrolü) ---
-let tavily_is_active = false; // Tavily Manuel Kontrol Durumu
+// --- 1. SİSTEM AYARLARI ---
+const KHOJ_KEY = 'kk-ZeYLGGpxj0XScjEsTpgo4Aj2VjgJwtMJodqoyEsYtUI';
+const KHOJ_URL = "https://white-heart-ea96.06mmt8129.workers.dev/";
 
-
-// Ayarlar ve Versiyon (Haber motoru ayarları aynı kaldı)
-let sets = JSON.parse(localStorage.getItem('khoj_sets')) || { size: 13, weight: 600, speed: 20, newsLimit: 10 };
-
-let visibleCount = sets.newsLimit || 10;
-let displayedNewsCount = {}; 
-let allCachedNews = JSON.parse(localStorage.getItem('khoj_cache')) || {}; 
-let currentNewsLimit = parseInt(localStorage.getItem('news_limit')) || 10; 
-let rssListesi = {};
-// --- GLOBAL DEĞİŞKENLERE EKLE ---
-let activeSearchQuery = null; // Yeni değişken: Aktif arama sorgusunu tutacak
-
-// --- 2. SİSTEM AYARLARI (Kalan Fonksiyonlar) ---
 const fbCfg = { apiKey: "AIzaSyAwQfifK4eaSrSjKpA776hD0RAlx_6a2_w", databaseURL: "https://piyasa-9049c-default-rtdb.firebaseio.com", projectId: "piyasa-9049c" };
 if (!firebase.apps.length) firebase.initializeApp(fbCfg);
 const db = firebase.database();
 
+// 1. Ayarları yükle, yoksa varsayılanları kur
+let sets = JSON.parse(localStorage.getItem('khoj_sets')) || { size: 13, weight: 600, speed: 20, newsLimit: 10 };
+
+// 2. Başlangıç sayacını ayardan çek (En önemli kısım burası!)
+let visibleCount = sets.newsLimit || 10;
+let chatHistory = JSON.parse(localStorage.getItem('khoj_ai_history')) || [];
+let news = [];
+let active = null;
+
+let currentNewsLimit = parseInt(localStorage.getItem('news_limit')) || 10; // Varsayılan 10
+let displayedNewsCount = {}; // Her kategori için kaç haber gösterildiğini tutacak
+let allCachedNews = JSON.parse(localStorage.getItem('khoj_cache')) || {}; // Hafızadaki haberler
+
 function softRefresh() {
     showToast("Haberler güncelleniyor...");
+    
+    // Sayfayı yenileme, sadece Firebase'den verileri tekrar iste
+    // Bu zaten news dizisini güncelleyip render() yapacaktır.
+    // currentCategory değişkeni değişmediği için hangi sekmedeysen orada kalırsın.
+    
+	// Mevcut news listesini karıştır
     news = news.sort(() => Math.random() - 0.5);
-	db.ref('rss_ayarlari').once('value', snap => {
+	
+    db.ref('rss_ayarlari').once('value', snap => {
+        // Zaten on('value') kullandığımız için aslında buna bile gerek yok 
+        // ama butona basınca bir 'tetikleme' istersen render'ı zorlayabiliriz.
         render(); 
     });
 }
 
-function getCurrentDateFormatted() {
-    // YYYY-MM-DD formatında bugünün tarihini döndürür.
-    return new Date().toISOString().split('T')[0];
-}
-
-function getEnhancedSearchQuery(userMsg) {
-    const todayDate = getCurrentDateFormatted();
-    // Yayın akışı gibi güncel içerikler için en iyi sorgu yapısı
-    return `${todayDate} ${userMsg} tam yayın akışı saatleri`; 
-}
-
+// TEMA SİSTEMİ
 function toggleTheme() {
     const html = document.documentElement;
     const current = html.getAttribute('data-theme') || 'light';
@@ -359,6 +346,7 @@ function toggleTheme() {
     localStorage.setItem('khoj_theme', next);
     document.getElementById('themeBtn').innerText = next === 'light' ? '🌙' : '☀️';
 }
+// Tema Hafızası
 (function() {
     const saved = localStorage.getItem('khoj_theme') || 'light';
     document.documentElement.setAttribute('data-theme', saved);
@@ -376,13 +364,20 @@ function updateTime() {
 }
 setInterval(updateTime, 1000); updateTime(); applySets();
 
-function metniTemizle(t) {
-    // DÜZELTME 3: Boşluk sorununu gidermek için 'pre-wrap' mantığını CSS'e ekledik,
-    // ama burada da temiz formatlama yapalım:
-    return t.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>').replace(/^- /gm, '🔹 ').replace(/&nbsp;/g, ' ');
+function metniTemizle(hamMetin) {
+    let temiz = hamMetin.replace(/␃🔚␗/g, '').replace(/\{"organic":[\s\S]*?\}\}/g, '').replace(/\{"peopleAlsoAsk":[\s\S]*?\}\}/g, '').replace(/"organic":\s*\[[\s\S]*?\]/g, '').replace(/"codeContext":\s*\{[\s\S]*?\}/g, '').replace(/"position":\s*\d+/g, '').replace(/\{.*?\}/g, '');
+    const ilkHarf = temiz.search(/[A-ZİĞÜŞÖÇ]/);
+    if (ilkHarf !== -1) { temiz = temiz.substring(ilkHarf); }
+    temiz = temiz.replace(/[\s\}\]奉",:]{2,}$/g, '');
+    temiz = temiz.replace(/^#{1,6}\s+(.*)$/gm, '<b style="color:#ef4444; font-size:1.1em;">$1</b>');
+    return temiz.replace(/\[\d+\]\(.*?\)/g, '').replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>').replace(/^\s*[\-\*]\s+/gm, '🔹 ').replace(/\n/g, '<br>');
 }
 
-// --- 3. HABER MOTORU (Aynı kaldı) ---
+// --- 2. HABERLER ---
+// --- 2. SİSTEM VE HABER MOTORU ---
+let rssListesi = {};
+
+// 1. CANLI HABER ÇEKME FONKSİYONU
 async function fetchAllNews() {
     news = []; 
     const proxyUrl = "https://wild-sky-08d7.06mmt8129.workers.dev/?url=";
@@ -390,15 +385,17 @@ async function fetchAllNews() {
 	const cachedData = localStorage.getItem('khoj_news_cache');
     const cacheTime = localStorage.getItem('khoj_news_time');
     const now = new Date().getTime();
-    const birSaat = 60 * 60 * 1000; 
+    const birSaat = 60 * 60 * 1000; // Milisaniye cinsinden
 
+    // Eğer haberler varsa ve 1 saatten yeniyse hafızadan yükle
     if (cachedData && cacheTime && (now - cacheTime < birSaat)) {
         console.log("Haberler hafızadan yükleniyor...");
         news = JSON.parse(cachedData);
-        render();
-        return;
+        render(); // Haberleri ekrana bas
+        return;   // Fonksiyonun geri kalanını (internet kısmını) çalıştırma
     }
 	
+    // Ekrana yükleniyor yazalım ki çalıştığını görelim
     document.getElementById('newsFeed').innerHTML = '<div style="text-align:center; padding:50px; color:white;">Haberler Cloudflare hattından geliyor...</div>';
 
     for (const id in rssListesi) {
@@ -409,36 +406,41 @@ async function fetchAllNews() {
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xmlText, "text/xml");
             
+            // Mynet ve diğerleri için hem 'item' hem 'entry' tara
             const items = xmlDoc.querySelectorAll("item, entry");
 
-            items.forEach(el => {
-                const title = el.querySelector("title")?.textContent || "";
-                let link = el.querySelector("link")?.textContent || el.querySelector("link")?.getAttribute("href") || "";
-                const date = el.querySelector("pubDate")?.textContent || 
-                         el.querySelector("dc\\:date")?.textContent || 
-                         el.querySelector("date")?.textContent || 
-                         el.querySelector("lastBuildDate")?.textContent || 
-                         "";
+            // --- SADECE FİREBASE KATEGORİSİNİ KULLANAN YAPI ---
+items.forEach(el => {
+    const title = el.querySelector("title")?.textContent || "";
+    let link = el.querySelector("link")?.textContent || el.querySelector("link")?.getAttribute("href") || "";
+    
+    // TARİHİ BURADA YAKALIYORUZ (Garantili yöntem)
+   const date = el.querySelector("pubDate")?.textContent || 
+             el.querySelector("dc\\:date")?.textContent || // Bazı sistemlerin kullandığı format
+             el.querySelector("date")?.textContent || 
+             el.querySelector("lastBuildDate")?.textContent || 
+             "";
 
-                let img = "";
-                const enclosure = el.querySelector("enclosure");
-                if (enclosure) img = enclosure.getAttribute("url");
+    let img = "";
+    const enclosure = el.querySelector("enclosure");
+    if (enclosure) img = enclosure.getAttribute("url");
 
-                if (title && title.length > 5) {
-                    news.push({
-                        title: title.trim(),
-                        link: link.trim(),
-                        source: rss.ad,
-                        category: rss.kategori || "GÜNDEM",
-                        pubDate: date,
-                        thumbnail: img || rss.logo || "varsayilan-logo.png"
-                    });
-                }
-            });
+    if (title && title.length > 5) {
+        news.push({
+            title: title.trim(),
+            link: link.trim(),
+            source: rss.ad,
+            category: rss.kategori || "GÜNDEM",
+            pubDate: date, // İŞTE EKSİK OLAN BUYDU!
+            thumbnail: img || rss.logo || "varsayilan-logo.png"
+        });
+    }
+});
             
+            // Listeyi karıştır ve ekrana bas
             news.sort(() => Math.random() - 0.5);
 			localStorage.setItem('khoj_news_cache', JSON.stringify(news));
-            localStorage.setItem('khoj_news_time', new Date().getTime());
+    localStorage.setItem('khoj_news_time', new Date().getTime());
             render(); 
 
         } catch (e) {
@@ -447,6 +449,7 @@ async function fetchAllNews() {
     }
 }
 
+// 2. ANA DİNLEYİCİ (SAAT VE BUTONLARI KURTARAN KISIM)
 db.ref('rss_ayarlari').on('value', snap => {
     rssListesi = snap.val() || {};
     if (Object.keys(rssListesi).length > 0) {
@@ -454,20 +457,28 @@ db.ref('rss_ayarlari').on('value', snap => {
     }
 });
 
+// Saati tekrar canlandırıyoruz
 setInterval(updateTime, 1000);
 updateTime();
 
+// Kategori Filtreleme Fonksiyonu (Hatalı olanı bununla değiştir abi)
 function filterCat(cat) {
+    // 1. Önce bütün butonlardan 'active' sınıfını siliyoruz
     const items = document.querySelectorAll('.cat-item');
     items.forEach(item => item.classList.remove('active'));
 
+    // 2. Hangi butona tıklandıysa onu bulup 'active' yapıyoruz
+    // Butonun içindeki yazı (innerText) ile gönderilen kategori (cat) aynı olmalı
     items.forEach(item => {
         if (item.innerText.trim() === cat) {
             item.classList.add('active');
         }
     });
 
+    // 3. Konsola yazalım, bakalım buton değişmiş mi?
     console.log("Seçilen yeni kategori:", cat);
+
+    // 4. Listeyi yeni kategoriye göre baştan çizdiriyoruz
     render(); 
 }
 
@@ -475,15 +486,18 @@ function render() {
     const f = document.getElementById('newsFeed');
     if(!f) return;
 
+    // 1. Aktif kategoriyi belirleyelim 🏷️
     const activeBtn = document.querySelector('.cat-item.active');
     const currentCategory = activeBtn ? activeBtn.innerText.trim().toUpperCase() : "TÜMÜ";
 
+    // 2. Önce tüm haberleri kategoriye göre filtreleyelim 🔍
     let filteredNews = news.filter(n => {
         if (currentCategory === "TÜMÜ") return true;
         const haberKategorisi = n.category ? n.category.trim().toUpperCase() : "";
         return haberKategorisi === currentCategory;
     });
 
+    // 3. Eğer filtrelenmiş haber yoksa mesajı gösterip durduralım 📂
     if (filteredNews.length === 0) {
         f.innerHTML = `
             <div style="text-align:center; padding:50px; color:var(--text);">
@@ -493,8 +507,10 @@ function render() {
         return;
     }
 
+    // 4. ŞİMDİ "visibleCount" kadarını kesip alalım (Hata buradaydı, artık dışarıda) ✂️
     const displayedNews = filteredNews.slice(0, visibleCount);
 
+    // 5. Kesilen haberleri (displayedNews) ekrana basalım 📺
     f.innerHTML = displayedNews.map((n) => {
         const realIdx = news.findIndex(x => x.title === n.title);
         return `
@@ -510,41 +526,57 @@ function render() {
             </div>`;
     }).join('');
 
+    // 6. Eğer hala gösterilmemiş haber varsa butonu ekleyelim ➕
     if (filteredNews.length > visibleCount) {
         f.innerHTML += `
-            <div id="loadMoreArea" style="text-align:center; padding: 2px;">
+            <div id="loadMoreArea" style="text-align:center; padding:1px;">
                 <button class="btn-full" style="background:var(--primary); color:white; font-weight:bold;" onclick="loadMoreNews()">
-                    ➕ DAHA FAZLA HABER GÖSTER
+                    ➕ DAHA FAZLA GÖSTER
                 </button>
             </div>`;
     }
 }
 
+// Bu fonksiyonu, mevcut diğer fonksiyonların (closeM, saveNews vb.) yanına ekleyin.
+
+function closeSearch() {
+    activeSearchQuery = null; // Sorgu hafızasını temizle!
+    closeM(); // Ardından genel modal kapatma işlevini çağır (ki bu da sadece modalı gizler, sorguyu tetiklemez)
+}
+
 function loadMoreNews() {
+    // Görünür haber sayısını ayardaki limit kadar artır (Ayar yoksa 10 artır)
     const artisMiktari = (sets && sets.newsLimit) ? sets.newsLimit : 10;
     visibleCount += artisMiktari;
-    render(); 
+    
+    // Ekranı yeni sayıya göre tekrar çiz
+    render();
 }
 
 
 function getBestImage(item, sourceName) {
+    // 1. Haberin kendi resmi varsa kullan
     if (item.enclosure && item.enclosure.link) return item.enclosure.link;
     if (item.thumbnail) return item.thumbnail;
     
+    // 2. Açıklamadan resim ayıkla
     if (item.description && item.description.includes('<img')) {
         const match = /<img[^>]+src="([^">]+)"/g.exec(item.description);
         if (match && match[1]) return match[1];
     }
 
+    // 3. EĞER RESİM YOKSA: Firebase'den gelen logoyu kullan
+    // rssListesi değişkenini bir önceki adımda global yapmıştık hatırlarsan
     let kaynakLogosu = "";
     Object.values(rssListesi).forEach(r => {
         if(r.ad === sourceName) kaynakLogosu = r.logo;
     });
 
+    // Eğer logo adresi varsa onu döndür, yoksa şık bir yer tutucu (placeholder)
     return kaynakLogosu || `https://ui-avatars.com/api/?name=${sourceName}&background=random&color=fff&size=200`;
 }
 
-// --- 4. MODAL FONKSİYONLARI (Aynı kaldı) ---
+// --- 3. MODAL FONKSİYONLARI ---
 function openSettings() {
     const m = document.getElementById('mdl');
     m.innerHTML = `
@@ -606,10 +638,17 @@ function adjustNewsLimit(amount) {
 
     if (newLimit >= 5 && newLimit <= 20) {
         sets.newsLimit = newLimit;
+        
+        // KRİTİK EKLEME: Ekrandaki canlı sayacı da hemen güncelle! 🎯
         visibleCount = newLimit; 
+        
         const display = document.getElementById('newsLimitDisplay');
         if (display) display.innerText = newLimit;
-        saveSets(); 
+        
+        saveSets();
+        
+        // Opsiyonel: Değişikliği anında ekranda görmek istersen:
+        // render(); 
     }
 }
 
@@ -617,8 +656,11 @@ function saveSets() {
     localStorage.setItem('khoj_sets', JSON.stringify(sets));
 }
 
+// 📡 RSS Listesini Firebase'den çekip gösteren dinamik fonksiyon
 function openRSSManager() {
     const m = document.getElementById('mdl');
+    
+    // Önce "Yükleniyor..." ekranı gösterelim
     m.innerHTML = `
         <div class="modal-header">
             <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
@@ -635,6 +677,7 @@ function openRSSManager() {
     `;
     document.getElementById('ovl').style.display = 'flex';
 
+    // Firebase'den verileri çekiyoruz
     db.ref('rss_ayarlari').on('value', snap => {
         const container = document.getElementById('rssListContainer');
         if(!container) return;
@@ -647,6 +690,7 @@ function openRSSManager() {
 
         let html = `<p style="font-size:11px; color:#888; font-weight:800; text-transform:uppercase; margin-bottom:10px;">Ekli Kaynaklar</p>`;
         
+        // Verileri döngüye sokup ekrana basıyoruz
         Object.keys(data).forEach(key => {
             const rss = data[key];
             html += `
@@ -688,7 +732,7 @@ function editRSS(key) {
                     <input type="text" id="edit_rssLogo" value="${rss.logo || ''}" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text);">
                 </div>
                 <div class="set-row"><label class="set-label">KATEGORİ</label>
-                    <select id="edit_rssCat" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-weight:bold; font-size:14px;">
+                    <select id="edit_rssCat" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text);">
                         ${['TÜRKİYE','DÜNYA','GÜNDEM','TEKNOLOJİ','SPOR','OTOMOBİL','DİĞER'].map(c => 
                             `<option value="${c}" ${rss.kategori === c ? 'selected' : ''}>${c}</option>`
                         ).join('')}
@@ -717,15 +761,16 @@ function updateRSS(key) {
         logo: logo
     }).then(() => {
         showToast("Güncellendi! ✅");
-        openRSSManager();
+        openRSSManager(); // Listeye geri dön
     }).catch(e => alert("Hata: " + e.message));
 }
 
+// Asıl silme işlemini yapan fonksiyon (Firebase bağlantılı)
 function executeDeleteRSS(key) {
     db.ref('rss_ayarlari/' + key).remove()
         .then(() => {
             showToast("Kaynak Silindi 🗑️");
-            openRSSManager();
+            openRSSManager(); // Listeyi yenilemek için geri dön
         })
         .catch(e => alert("Hata: " + e.message));
 }
@@ -748,20 +793,25 @@ function confirmDeleteRSS(key) {
 }
 
 
+// Kategorileri filtrelemek için (Şimdilik sadece tıklama efekti verir)
 function filterCat(cat) {
+    // 1. Seçilen kategoriyi ana değişkene ata (En önemli kısım burasıydı)
     currentCategory = cat; 
     
-    const items = document.querySelectorAll('.cat-item');
-    items.forEach(item => {
-        item.classList.remove('active');
-        if(item.innerText.trim() === cat) item.classList.add('active');
+    // 2. Görsel olarak butonun rengini değiştir
+    document.querySelectorAll('.cat-item').forEach(el => {
+        el.classList.remove('active');
+        if(el.innerText === cat) el.classList.add('active');
     });
 
+    // 3. Konsola bilgi yaz (Teyit için)
     console.log("Sistem Kategorisi Değişti: ", currentCategory);
 
+    // 4. Haberleri yeni kategoriye göre tekrar dök
     render(); 
 }
 
+// "+" Butonuna basınca açılacak "Ekleme" formu
 function openAddRSS() {
     const m = document.getElementById('mdl');
     m.innerHTML = `
@@ -805,24 +855,25 @@ function openAddRSS() {
     `;
 }
 
+// Formdaki verileri Firebase'e gönderir
 function saveNewRSS() {
     const ad = document.getElementById('rssName').value;
     const url = document.getElementById('rssUrl').value;
     const kat = document.getElementById('rssCat').value;
-	const logo = document.getElementById('rssLogo').value;
+	const logo = document.getElementById('rssLogo').value; // Yeni alan
 
     if(!ad || !url) { alert("Lütfen tüm alanları doldur abi!"); return; }
 
+    // Firebase'e "rss_ayarlari" adında yeni bir tabloya yazıyoruz
     const newRssRef = db.ref('rss_ayarlari').push();
     newRssRef.set({
         ad: ad,
         url: url,
         kategori: kat,
-        logo: logo,
         eklenmeTarihi: firebase.database.ServerValue.TIMESTAMP
     }).then(() => {
         showToast("RSS Başarıyla Eklendi! 🚀");
-        openRSSManager();
+        openRSSManager(); // Kayıttan sonra listeye geri dön
     }).catch((e) => {
         alert("Hata oluştu abi: " + e.message);
     });
@@ -836,11 +887,13 @@ function adjustSet(k, v) {
 }
 
 function applySets() {
+    // Ana ekran değişkenlerini güncelle
     document.documentElement.style.setProperty('--news-size', sets.size + 'px');
     document.documentElement.style.setProperty('--news-weight', sets.weight);
     localStorage.setItem('khoj_sets', JSON.stringify(sets));
 }
 
+// Pencere içi (Chat/Detay) anlık değişim fonksiyonu
 function quickAdjust(type, val) {
     if(type === 'size') {
         sets.chatSize = (sets.chatSize || 13) + val;
@@ -862,9 +915,11 @@ function openDetail(idx) {
     const m = document.getElementById('mdl');
     const img = getBestImage(active, active.source);
 	
-    const hamTarih = active.pubDate || active.date || active.time || "";
-console.log("Yakalanan Tarih:", hamTarih); 
+    // Hangi isimle gelirse gelsin tarihi yakalamaya çalışalım
+const hamTarih = active.pubDate || active.date || active.time || "";
+console.log("Yakalanan Tarih:", hamTarih); // F12'de bunu da göreceksin
 
+    // --- TARİH VE SAATİ GÜVENLİ FORMATLA ---
     let displayDate = "";
 if (active.pubDate) {
     const d = new Date(active.pubDate);
@@ -876,6 +931,7 @@ if (active.pubDate) {
             minute: '2-digit'
         });
     } else {
+        // Eğer tarih formatı garip gelirse (NTV bazen yapar), ilk kısmını al
         displayDate = active.pubDate.split(' +')[0]; 
     }
 }
@@ -891,8 +947,8 @@ if (active.pubDate) {
 </div>
                <div class="modal-header" style="padding: 10px 15px;">
     <div style="display:flex; justify-content: space-between; align-items:center; width:100%;">
-        <div style="font-weight: 600; font-size: 0.7rem; color: var(--primary); font-family: 'Orbitron';">
-            ${active.source === "KHOJ" ? "✨ GENEL SOHBET" : "Haber Detayı"}
+        <div style="font-weight: 800; font-size: 0.9rem; color: var(--primary); font-family: 'Orbitron';">
+            ${active.source === "KHOJ" ? "✨ GENEL SOHBET" : "HABER DETAYI"}
         </div>
 
         <div style="display:flex; align-items:center; gap:5px;">
@@ -905,7 +961,7 @@ if (active.pubDate) {
                     ${active.link ? `<button class="btn-icon" style="width:32px; height:32px;" onclick="openFullNews('${active.link}')">🔗</button>` : ''}
                     <button class="btn-icon" style="width:32px; height:32px;" onclick="shareNews(active.title.replace(/'/g, ''), active.link)">📤</button>
                     <button class="btn-icon" style="width:32px; height:32px;" onclick="saveNews()">💾</button>
-                     <button class="btn-icon" style="width:32px; height:32px; color:red; border-color:rgba(255,0,0,0.2);" onclick="closeM()">❌</button>
+                    <button class="btn-icon" style="width:32px; height:32px; color:red;" onclick="closeM()">❌</button>
                 </div>
             </div>
         </div>
@@ -922,7 +978,7 @@ if (active.pubDate) {
                 ${active.source !== "KHOJ" ? `
                 <div style="background:var(--brd); padding:8px 15px; display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:11px; font-weight:bold; color:var(--text); opacity:0.7;">YAPAY ZEKA ANALİZİ</span>
-                    <button onclick="askAItoSummarizeActiveNews().value='Bu haberi özetle'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                    <button onclick="document.getElementById('uInp').value='Bu haberi özetle'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:4px;">
                         ✨ AI ile Özetle
                     </button>
                 </div>` : ''}
@@ -940,6 +996,7 @@ if (active.pubDate) {
             </div>
         </div>`;
 
+    // Haber İçeriği Çekme (Cloudflare Üzerinden)
     const myProxy = "https://wild-sky-08d7.06mmt8129.workers.dev/?url=";
     if (active.link && active.source !== "KHOJ") {
         fetch(myProxy + encodeURIComponent(active.link))
@@ -959,502 +1016,80 @@ if (active.pubDate) {
     const inp = document.getElementById('uInp');
     
     inp.addEventListener('keypress', (e) => { if (e.key === 'Enter') ask(); });
-	
-	 // *** YENİ EKLENEN TAVILY TOGGLE BUTONU ***
-     // --- DÜZELTME 2.1: Sohbet Modalı İçin Buton Ekleme Kontrolü ---
-    const toggleBtn = document.createElement('button');
-    toggleBtn.id = 'tavilyToggleBtn_Modal'; // Modale özel ID
-    toggleBtn.className = 'btn-icon';
-    toggleBtn.style = 'width: 42px; height: 42px; margin-right: 10px; font-size: 1.1rem;';
-    toggleBtn.innerHTML = '🌐'; 
-    toggleBtn.onclick = () => {
-        tavily_is_active = !tavily_is_active;
-        toggleBtn.style.backgroundColor = tavily_is_active ? 'rgba(72, 128, 255, 0.2)' : 'var(--card-bg)'; 
-        showToast(tavily_is_active ? "Tavily ARAMA AKTİF" : "Tavily ARAMA PASİF (Model İç Bilgi)");
-    };
-    
-    // Başlangıç rengini ayarla (Önemli: Modal açıldığında mevcut durumu yansıtmalı)
-    toggleBtn.style.backgroundColor = tavily_is_active ? 'rgba(72, 128, 255, 0.2)' : 'var(--card-bg)'; 
-    
-    const footerDiv = document.querySelector('.modal-footer > div');
-    const sendBtn = document.getElementById('sendBtn');
-    
-    // Butonun zaten eklenip eklenmediğini kontrol et
-    if(footerDiv && inp && sendBtn && !document.getElementById('tavilyToggleBtn_Modal')) {
-        footerDiv.insertBefore(toggleBtn, inp); // Input'un soluna ekle
-    }
-    
-    // Gönder düğmesi ve input dinleyicileri
-    inp.addEventListener('keypress', (e) => { if (e.key === 'Enter') ask(); });
-    sendBtn.onclick = ask;
-    
-	
-	
     document.getElementById('sendBtn').onclick = ask;
-	
-   
 }
+// Yardımcı Fonksiyon (Özetleme butonuna basınca çalışması için)
 function askAI(prompt) {
     const inp = document.getElementById('uInp');
     if(inp) {
         inp.value = prompt;
-        ask();
+        ask(); // Mevcut ask() fonksiyonunu tetikler
     }
 }
 
 function openFullNews(url) {
     const fullView = document.createElement('div');
     fullView.id = 'fullNewsView';
+    // Burası çok önemli: Arka planı her zaman beyaz (white) yapıyoruz ki site orijinal kalsın
+    fullView.style = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; flex-direction: column;`;
+    
+    // Üst barın rengi yine bizim temaya uysun ama içerik (iframe) her zaman aydınlık kalsın
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const headerBg = isDark ? '#1e293b' : '#f8f9fa';
     const textColor = isDark ? '#f1f5f9' : '#1a1a1a';
 
-   fullView.innerHTML = `
-        <div style="padding: 15px; background: ${headerBg}; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--brd);">
-            <button onclick="document.getElementById('fullNewsView').remove()" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">❌</button>
-            <button onclick="triggerSummaryFromFull()" style="background:var(--primary); color:white; border:none; padding:8px 15px; border-radius:10px; font-weight:bold; font-size:12px;">✨ ÖZETLE</button>
-            <span style="font-size: 12px; color:${textColor}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight:800;">${active.title}</span>
+    fullView.innerHTML = `
+        <div style="padding: 10px; background: ${headerBg}; border-bottom: 1px solid var(--brd); display: flex; gap: 15px; align-items: center; color: ${textColor}">
+            <button onclick="document.getElementById('fullNewsView').remove()" 
+                style="padding: 8px 15px; border-radius: 8px; border: 1px solid var(--brd); background: var(--card-bg); color: var(--text); cursor: pointer;">❌ Kapat</button>
+            
+            <button onclick="triggerSummaryFromFull()" 
+                style="padding: 8px 15px; border-radius: 8px; border: none; background: #ef4444; color: white; cursor: pointer; font-weight: bold;">✨ Özetle</button>
+            
+            <span style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex:1;">${active.title}</span>
         </div>
-        <iframe src="${url}" style="flex: 1; border: none; width: 100%; background: white;"></iframe>
+        <iframe src="${url}" style="flex: 1; border: none; width: 100%; background: white !important;"></iframe>
     `;
     document.body.appendChild(fullView);
 }
 
 function triggerSummaryFromFull() {
     const fv = document.getElementById('fullNewsView'); if(fv) fv.remove();
-    askAItoSummarizeActiveNews(); // Yeni fonksiyonumuz
+    const inp = document.getElementById('uInp');
+    if(inp) { inp.value = "Bu haberi çok kısa şekilde özetle."; ask(); }
 }
 
-function openSavedList() {
-    const saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
-    const m = document.getElementById('mdl');
-    let html = saved.length ? "" : "<p style='text-align:center; padding:20px;'>Kayıtlı haber yok.</p>";
-    saved.forEach((n, i) => {
-        html += `<div class="news-card" style="margin-bottom:10px;">
-            <img src="${getBestImage(n, n.source)}" style="width:40px; height:40px;">
-            <div style="flex:1" onclick="openSavedDetail(${i})"><div class="news-title">${n.title}</div></div>
-            <button onclick="deleteSaved(${i})" style="background:none; border:none; color:red; font-size:1.2rem;">🗑️</button>
-        </div>`;
-    });
-    m.innerHTML = `<div class="modal-header"><h2>💾 KAYDEDİLENLER</h2></div><div class="modal-body">${html}</div><div class="modal-footer"><button class="btn-full" onclick="closeM()">KAPAT</button></div>`;
-    document.getElementById('ovl').style.display = 'flex';
-}
-
-function showNewNewsBadge() {
-    if (document.getElementById('newNewsBadge')) return;
-    const badge = document.createElement('div');
-    badge.id = 'newNewsBadge';
-    badge.innerHTML = `🔥 Yeni haberler geldi! <span onclick="softRefresh(); this.parentElement.remove();">Tıkla ve Karıştır</span>`;
-    badge.style = "position:fixed; top:70px; left:50%; transform:translateX(-50%); background:var(--primary); color:#000; padding:10px 20px; border-radius:30px; font-weight:bold; z-index:1000; box-shadow:0 4px 15px rgba(0,0,0,0.3); cursor:pointer; animation: slideDown 0.5s;";
-    document.body.appendChild(badge);
-}
-
-function deleteSaved(i) { let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]'); saved.splice(i, 1); localStorage.setItem('khoj_saved_news', JSON.stringify(saved)); openSavedList(); }
-function openSavedDetail(i) { active = JSON.parse(localStorage.getItem('khoj_saved_news'))[i]; openDetail(-2); }
-function openGeneralChat() { active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." }; openDetail(-1); }
-function clearHistory() { chatHistory = []; localStorage.removeItem('khoj_ai_history'); closeM(); showToast("Sıfırlandı!"); }
-function closeM() { 
-   document.getElementById('ovl').style.display = 'none'; 
-    
-    // *** YENİ EKLENEN KISIM ***
-    if (activeSearchQuery) {
-        // Arama listesini tekrar aç
-        // Not: openDetail'dan dönerken aktif modal'ın içerisindeki veriyi (arama sonuçlarını) kaybetmemek için
-        // en iyisi, arama sonuçlarını tutan HTML'i saklamak veya yeniden tetiklemektir.
-        // Basitlik adına, kapatıldığında tekrar arama yapalım:
-        performLocalNewsSearch(activeSearchQuery); 
-    } else if (active && active.source === "KHOJ") {
-        // Eğer AI sohbet ekranından çıkılıyorsa, bunu kapat. 
-        // Eğer bu ekran AI sohbeti ise, onu sadece kapatmalıyız.
-    }
-    // Eğer bir haber detayından çıkıyorsak ve activeSearchQuery varsa, yukarıdaki if bloğu onu yakalar.
-}
-
-function closeSearch() {
-    activeSearchQuery = null; // Sorgu hafızasını temizle!
-    closeM(); // Ardından genel modal kapatma işlevini çağır (ki bu da sadece modalı gizler, sorguyu tetiklemez)
-}
-
-function showToast(m) { const t = document.getElementById('toast'); if(t) { t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); } }
-
-
-// --- 5. YENİ AI ETKİLEŞİM MOTORU (GROK/TAVILY ENTEGRASYONU) ---
-
-// Anahtarları yerel depodan yükle (Kod 1'den miras kaldı)
-window.onload = () => {
-    document.getElementById('themeBtn').innerText = (localStorage.getItem('khoj_theme') === 'dark') ? '☀️' : '🌙'; // Tema butonu düzeltmesi
-    document.getElementById('grokKeyInput').value = localStorage.getItem('grok_key') || '';
-    document.getElementById('tavilyKeyInput').value = localStorage.getItem('tavily_key') || '';
-    
-    // Haber motoru ayarlarını da kontrol et
-    if (Object.keys(rssListesi).length > 0) {
-        fetchAllNews();
-		setupBottomBarToggle(); // YENİ EKLEME
-	   setupMainTavilyToggle(); // *** BURAYI EKLE ***
-    }
-};
-
-// --- YENİ: Ana Sayfa Tavily Toggle Butonu (Sadece Bir Kere Eklenecek) ---
-function setupMainTavilyToggle() {
-    const mainInpDiv = document.querySelector('.bottom-banner');
-    const mainInp = document.getElementById('mainInp');
-    
-    // Eğer buton zaten varsa VEYA input yoksa, dur.
-    if (!mainInpDiv || !mainInp || document.getElementById('mainTavilyToggleBtn')) return;
-
-    const mainToggleBtn = document.createElement('button');
-    mainToggleBtn.id = 'mainTavilyToggleBtn';
-    mainToggleBtn.innerHTML = '🌐';
-    mainToggleBtn.style = 'width: 38px; height: 38px; margin-right: 8px; font-size: 1.1rem; border-radius: 50%; border: 1px solid var(--brd); cursor: pointer; transition: 0.3s; background-color: var(--card-bg);';
-    
-    mainToggleBtn.onclick = () => {
-        tavily_is_active = !tavily_is_active;
-        const color = tavily_is_active ? 'rgba(72, 128, 255, 0.2)' : 'var(--card-bg)';
-        
-        mainToggleBtn.style.backgroundColor = color;
-        
-        // Modal butonunu da güncelle
-        const modalBtn = document.getElementById('tavilyToggleBtn_Modal');
-        if(modalBtn) modalBtn.style.backgroundColor = color;
-        
-        showToast(tavily_is_active ? "Tavily ARAMA AKTİF" : "Tavily ARAMA PASİF");
-    };
-
-    // Input'un hemen soluna ekle (float: left yerine flex ile yerleştiriyoruz)
-    mainInpDiv.style.display = 'flex';
-    mainInpDiv.style.alignItems = 'center';
-    mainInpDiv.insertBefore(mainToggleBtn, mainInp);
-}
-
-function setupBottomBarToggle() {
-    const mainInpDiv = document.querySelector('.bottom-banner');
-    if (!mainInpDiv || document.getElementById('mainTavilyToggleBtn')) return; // Zaten eklenmişse atla
-
-    const mainToggleBtn = document.createElement('button');
-    mainToggleBtn.id = 'mainTavilyToggleBtn';
-    mainToggleBtn.innerHTML = '🌐';
-    mainToggleBtn.style = 'background:var(--card-bg); color:var(--text); border:1px solid var(--brd); width: 38px; height: 38px; font-size: 1.0rem; margin-right: 5px;';
-    
-    mainToggleBtn.onclick = () => {
-        tavily_is_active = !tavily_is_active;
-        mainToggleBtn.style.backgroundColor = tavily_is_active ? 'rgba(72, 128, 255, 0.2)' : 'var(--card-bg)';
-        showToast(tavily_is_active ? "Tavily ARAMA AKTİF" : "Tavily ARAMA PASİF (Model İç Bilgi)");
-    };
-    
-    mainToggleBtn.style.backgroundColor = tavily_is_active ? 'rgba(72, 128, 255, 0.2)' : 'var(--card-bg)'; 
-
-    const mainInp = document.getElementById('mainInp');
-    const mainSendBtn = mainInpDiv.querySelector('button[onclick="handleMainInput()"]');
-    
-    if(mainInp && mainSendBtn) {
-        mainToggleBtn.style.float = 'left'; 
-        mainInpDiv.insertBefore(mainToggleBtn, mainInp);
-    }
-}
-
-function saveKeys() {
-    const grokKey = document.getElementById('grokKeyInput').value;
-    const tavilyKey = document.getElementById('tavilyKeyInput').value;
-    localStorage.setItem('grok_key', grokKey);
-    localStorage.setItem('tavily_key', tavilyKey);
-    showToast("ABİ Anahtarlar kaydedildi!");
-}
-
-function addMsg(s, t) {
-    const d = document.createElement('div');
-    d.className = `msg ${s}`; d.innerText = t;
-    const c = document.getElementById('chat');
-    c.appendChild(d); c.scrollTop = c.scrollHeight;
-}
-
-// Bu fonksiyon, Modal içindeki sohbet kutusuna mesaj ekler (openDetail içinde ayarlandı)
-function addChatMsg(role, text) {
-    const box = document.getElementById('cBox');
-    if (!box) return;
-    const d = document.createElement('div');
-    d.className = `msg ${role}`; 
-    d.innerHTML = text; // metniTemizle kullanıldığı için innerHTML ile basıyoruz
-    box.appendChild(d); 
-    box.scrollTop = box.scrollHeight;
-}
-
-// ANA SORU CEVAP FONKSİYONU (Eski Khoj/Gemini ask() yerine geçti)
 async function ask() {
-    const input = document.getElementById('uInp'); 
-    const box = document.getElementById('cBox');
-    if(!input || !input.value) return; 
-    
-    const msg = input.value.trim();
-    input.value = ''; // Girişi temizle
-    
-    // Kullanıcı mesajını ekle
-    let currentChatRole = active && active.source === "KHOJ" ? 'user' : 'user'; // Modal içinde her zaman 'user' olarak göster
-    addChatMsg(currentChatRole, msg);
-    
-    // Bot bekleme mesajını ekle
-    const botDiv = document.createElement('div');
-    botDiv.className = 'msg ai'; 
-    botDiv.innerHTML = '🔹 Düşünüyorum...'; 
-    box.appendChild(botDiv); 
-    box.scrollTop = box.scrollHeight;
+    const inp = document.getElementById('uInp'); const box = document.getElementById('cBox');
+    if(!inp.value) return; const q = inp.value; inp.value = '';
+    box.innerHTML += `<div class="msg user">${q}</div>`; box.scrollTop = box.scrollHeight;
+    if(active.source === "KHOJ") chatHistory.push({role: 'user', text: q});
+    const ai = document.createElement('div'); ai.className = 'msg ai'; ai.innerHTML = '...'; box.appendChild(ai);
+    let finalQuery = (active && active.source !== "KHOJ") ? `Haber: ${active.title}. Soru: ${q}` : q;
 
-    const grokKey = localStorage.getItem('grok_key');
-    const tavilyKey = localStorage.getItem('tavily_key');
-
-    if (!grokKey || !tavilyKey) {
-        botDiv.innerHTML = "ABİ! Grok veya Tavily anahtarları ayarlanmamış. Lütfen ayarlara bak.";
-        return;
-    }
-
-    try { 
-        let finalQuery = msg; 
-        let context = ""; 
-        const grokKey = localStorage.getItem('grok_key');
-        const tavilyKey = localStorage.getItem('tavily_key');
-
-        // YENİ KONTROL: Tavily Aktif mi?
-        if (tavily_is_active) { 
-            if (!tavilyKey) {
-                botDiv.innerHTML = "ABİ! Tavily aktif ama API anahtarın ayarlanmamış. Lütfen ayarlara bak.";
-                return;
-            }
-            
-            const enhancedQuery = getEnhancedSearchQuery(msg); // Geliştirilmiş sorgu
-            
-            botDiv.innerHTML = '🔹 Tavily ile en güncel veriler toplanıyor...';
-            
-            // Tavily API Çağrısı: EN ÜST DÜZEY AYARLAR
-            const sRes = await fetch(`${PROXY_URL}?url=https://api.tavily.com/search`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    api_key: tavilyKey, 
-                    query: enhancedQuery,
-                    search_depth: "advanced", // Kesin sonuç için zorunlu
-                    time_range: "day",        // SON 24 SAAT İÇERİĞİNİ AL
-                    include_content: true,    // İçeriği çek
-                    max_results: 5            // 5 farklı kaynaktan oku
-                })
-            });
-            const sData = await sRes.json();
-            
-            // Tüm sonuç içeriklerini context olarak birleştir
-            context = sData.results.map(r => r.content).join("\\n---\n");
-            
-            // LLM'e TALİMAT: Verilen tüm kaynaklardaki her şeyi listele
-            finalQuery = `ABİ, aşağıdaki güncel bilgi kaynaklarını kullanarak, kullanıcının sorusunu ${msg} **TÜMÜNÜ LİSTELE**. Saatleri ve programları AYIR. Kaynaklar: ${context}`;
-            
-        } else {
-            // Tavily PASİF: Sadece Grok Bilgi Tabanı
-            finalQuery = msg;
-            context = ""; 
+    try {
+        const res = await fetch(KHOJ_URL, { method: 'POST', headers: { 'Authorization': `Bearer ${KHOJ_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ q: finalQuery, stream: true }) });
+        const reader = res.body.getReader(); const decoder = new TextDecoder(); let fullText = "";
+        while (true) {
+            const { done, value } = await reader.read(); if (done) break;
+            fullText += decoder.decode(value); ai.innerHTML = metniTemizle(fullText); box.scrollTop = box.scrollHeight;
         }
-
-        // SYSTEM PROMPT GÜNCELLEMESİ (Kısa ve öz ibaresi kaldırıldı, listeleme zorlandı)
-        const systemPrompt = "Sen samimi ciddi bir arkadaşımsın. Her cevaba ABİ diyerek başla. cevaplarında maddeleme yaparken başlarda 🔹 simgesini kullan ve tüm cevaplarında emojiler kullan. Cevabın **kısa, doğrudan ve anlaşılır** olsun. Sadece sorunun tam karşılığını ver. Eğer liste istendiyse liste yap, ancak gereksiz detaylara girme.";
-
-        const finalMessages = [ 
-            { role: "system", content: systemPrompt }, 
-            ...chatHistory.slice(-6), // Geçmişi sınırlıyoruz
-            { role: "user", content: finalQuery } 
-        ]; 
-
-        // Grok Çağrısı
-        const chatRes = await fetch(`${PROXY_URL}?url=https://api.groq.com/openai/v1/chat/completions`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${grokKey}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                model: "llama-3.3-70b-versatile", 
-                messages: finalMessages,
-                temperature: 0.5 // Liste ve kesin bilgi için sıcaklığı biraz düşürdük
-            })
-        });
-        
-        const chatData = await chatRes.json();
-        let reply = chatData.choices[0].message.content;
-        
-        reply = metniTemizle(reply);
-        if (!reply.startsWith("ABİ")) {
-            reply = "ABİ " + reply;
-        }
-
-        // Hafızaya ekle
-        if (active && active.source === "KHOJ") { 
-            chatHistory.push({ role: "user", content: msg });
-            chatHistory.push({ role: "assistant", content: reply });
-            localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory));
-        }
-
-        botDiv.innerHTML = reply; 
-        
-    } catch (e) { 
-        console.error("AI Entegrasyon Hatası:", e); 
-        botDiv.innerText = "ABİ, API'ye bağlanırken bir hata oldu: " + e.message; 
-    }
-	 }
-
-// --- AYAR MODALI İÇİN EKLEMELER (Grok/Tavily Anahtar Girişleri) ---
-
-function openSettings() {
-    const m = document.getElementById('mdl');
-    m.innerHTML = `
-        <div class="modal-header">
-            <h2>AYARLAR</h2>
-            <button class="btn-icon" onclick="closeM()" style="color:red;">❌</button>
-        </div>
-        <div class="modal-body">
-		<div class="set-row">
-                <label class="set-label">GROK (LLM) API KEY</label>
-                <input type="text" id="grokKeyInput" placeholder="gsk_..." style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text);">
-            </div>
-            <div class="set-row">
-                <label class="set-label">TAVILY (SEARCH) API KEY</label>
-                <input type="text" id="tavilyKeyInput" placeholder="tvly-..." style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text);">
-            </div>
-            <button class="btn-full" onclick="saveKeys()" style="background:var(--primary); color:white; margin-bottom:20px;">ANAHTARLARI KAYDET</button>
-
-		<div class="set-row">
-                <label class="set-label">HABER SAYISI</label>
-                <div class="set-ctrl">
-                    <div class="set-row">
-    <label class="set-label">HABER SAYISI</label>
-    <div class="set-ctrl">
-        <button onclick="adjustNewsLimit(-5)">-</button>
-        <span id="newsLimitDisplay" style="min-width:45px; text-align:center; font-weight:bold;">${sets.newsLimit || 10}</span>
-        <button onclick="adjustNewsLimit(5)">+</button>
-    </div>
-</div>
-                </div>
-            </div>
-            <div class="set-row">
-                <label class="set-label">YAZI BOYUTU (Genel)</label>
-                <div class="set-ctrl">
-                    <button onclick="adjustSet('size',-1)">-</button>
-                    <span style="min-width:45px; text-align:center;">${sets.size}PX</span>
-                    <button onclick="adjustSet('size',1)">+</button>
-                </div>
-            </div>
-
-            <div class="set-row">
-                <label class="set-label">YAZI KALINLIĞI (Genel)</label>
-                <div class="set-ctrl">
-                    <button onclick="adjustSet('weight',-100)">-</button>
-                    <span style="min-width:45px; text-align:center;">${sets.weight}</span>
-                    <button onclick="adjustSet('weight',100)">+</button>
-                </div>
-            </div>
-
-            <hr style="border:0; border-top:1px solid var(--brd); margin:15px 0;">
-
-            <button class="btn-full" style="background:var(--card-bg); color:var(--text); border:1px solid var(--brd); margin-bottom:10px; display:flex; align-items:center; justify-content:center; gap:10px;" onclick="openRSSManager()">
-                📡 RSS KAYNAKLARINI YÖNET
-            </button>
-
-            <button class="btn-full" style="background:#ef4444; color:white;" onclick="clearHistory()">
-                🗑️ SOHBETİ SIFIRLA
-            </button>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-full" style="background:#22c55e; color:white;" onclick="closeM()">TAMAM</button>
-        </div>`;
-    document.getElementById('ovl').style.display = 'flex';
+        if(active.source === "KHOJ") { chatHistory.push({role: 'ai', text: ai.innerHTML}); localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory)); }
+    } catch (e) { ai.innerText = "Bağlantı hatası!"; }
 }
 
-
-// --- KAYDEDİLEN HABERLER/GENEL SOHBET İÇİN GEREKENLER (Aynı Kaldı) ---
 function saveNews() {
     let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
     const currentChat = document.getElementById('cBox') ? document.getElementById('cBox').innerHTML : "";
-    const newsToSave = { ...active, savedChat: currentChat, saveDate: new Date().toISOString(), description: active.description }; // Description'ı kaydetmeyi unutma
-    const existingIndex = saved.findIndex(x => x.title === active.title && x.source === active.source);
+    const newsToSave = { ...active, savedChat: currentChat, saveDate: new Date().toISOString() };
+    const existingIndex = saved.findIndex(x => x.title === active.title);
     if(existingIndex !== -1) { saved[existingIndex] = newsToSave; showToast("Güncellendi! 💾"); } 
     else { saved.push(newsToSave); showToast("Kaydedildi! 💾"); }
     localStorage.setItem('khoj_saved_news', JSON.stringify(saved));
 }
 
-// DÜZELTME 1: AI ÖZETLEME (Kısıtlama kaldırıldı, link gizli gidiyor)
-async function askAItoSummarizeActiveNews() {
-    if (!active || !active.link) {
-        showToast("Özetlenecek haber linki bulunamadı ABİ!");
-        return;
-    }
-
-    const box = document.getElementById('cBox');
-    if (!box) return;
-    
-    addChatMsg('user', `Haberin detaylarını bana özetler misin?`);
-    
-    const botDiv = document.createElement('div');
-    botDiv.className = 'msg ai'; 
-    botDiv.innerHTML = '🔹 Haberi inceliyorum ABİ, biraz bekle...'; 
-    box.appendChild(botDiv); 
-    box.scrollTop = box.scrollHeight;
-
-      const grokKey = localStorage.getItem('grok_key');
-    const tavilyKey = localStorage.getItem('tavily_key');
-
-    if (!grokKey) {
-        botDiv.innerHTML = "ABİ! Grok API anahtarı ayarlanmamış.";
-        return;
-    }
-
-let context = "";
-    
-    // Tavily'yi kullanarak linkteki en güncel içeriği çekmeye çalış
-    if (tavily_is_active && tavilyKey) {
-        const enhancedQuery = `${getCurrentDateFormatted()} ${active.title} ${active.link} tam içeriği`; 
-        
-        try {
-            const sRes = await fetch(`${PROXY_URL}?url=https://api.tavily.com/search`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    api_key: tavilyKey, 
-                    query: enhancedQuery,
-                    search_depth: "advanced",
-                    time_range: "day",
-                    include_content: true 
-                })
-            });
-            const sData = await sRes.json();
-            context = sData.results.length > 0 ? sData.results[0].content : "Tavily içerik çekemedi.";
-        } catch (e) {
-            context = "Tavily araması başarısız oldu. Haber linkine güveniyorum.";
-        }
-    }
-
-   try {
-        const summaryRes = await fetch(`${PROXY_URL}?url=https://api.groq.com/openai/v1/chat/completions`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${grokKey}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                model: "llama-3.3-70b-versatile", 
-                messages: [
-                    {
-                        role: "system", 
-                        content: "SSen benim samimi bir arkadaşımsın. Cevabına 'ABİ' diyerek başla. maddeleme yaparken başlarına 🔹 işaretini kullan. Sadece haberin ana fikrini ve önemli noktalarını özetle ve maddeleme yap. Detaylı liste zorunluluğu yok."
-                    },
-                    {role: "user", content: `Haber Başlığı: ${active.title}. ${context ? `Tavily'den Çekilen Güncel Bağlam: ${context}` : ''}. Lütfen SADECE haberin orijinal içeriğini (active.description) kullanmadan, bu güncel bağlama dayanarak detaylı bir özet hazırla.`}
-                ]
-            })
-        });
-        
-               const chatData = await summaryRes.json();
-        let reply = chatData.choices[0].message.content;
-        
-        reply = metniTemizle(reply);
-        if (!reply.startsWith("ABİ")) reply = "ABİ " + reply;
-
-        botDiv.innerHTML = reply;
-        box.scrollTop = box.scrollHeight;
-        
-    } catch(e) { 
-        console.error(e);
-        botDiv.innerHTML = "ABİ, özetleme sunucusuna bağlanırken bir sorun oldu."; 
-    }
-}
-
 function shareNews(title, link) {
+    // Eğer tarayıcı modern paylaşımı destekliyorsa (Mobilde genelde destekler)
     if (navigator.share) {
         navigator.share({
             title: title,
@@ -1466,10 +1101,49 @@ function shareNews(title, link) {
             console.log('Paylaşım iptal edildi veya hata oluştu', error);
         });
     } else {
+        // Eğer tarayıcı desteklemiyorsa (PC gibi), linki panoya kopyalayalım
         navigator.clipboard.writeText(title + " " + link).then(() => {
             alert("Haber linki panoya kopyalandı!");
         });
     }
+}
+
+function openSavedList() {
+    const saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+    const m = document.getElementById('mdl');
+    let html = saved.length ? "" : "<p style='text-align:center; padding:20px;'>Kayıtlı haber yok abi.</p>";
+    saved.forEach((n, i) => {
+        html += `<div class="news-card" style="margin-bottom:10px;">
+            <img src="${getBestImage(n, n.source)}" style="width:40px; height:40px;">
+            <div style="flex:1" onclick="openSavedDetail(${i})"><div class="news-title">${n.title}</div></div>
+            <button onclick="deleteSaved(${i})" style="background:none; border:none; color:red; font-size:1.2rem;">🗑️</button>
+        </div>`;
+    });
+    m.innerHTML = `<div class="modal-header"><h2>💾 KAYDEDİLENLER</h2></div><div class="modal-body">${html}</div><div class="modal-footer"><button class="btn-full" onclick="closeM()">KAPAT</button></div>`;
+    document.getElementById('ovl').style.display = 'flex';
+}
+
+let lastNewsCount = 0;
+
+db.ref('rss_ayarlari').on('value', () => {
+    // Haberler her güncellendiğinde toplam sayıyı kontrol et
+    setTimeout(() => {
+        if (lastNewsCount > 0 && news.length > lastNewsCount) {
+            showNewNewsBadge();
+        }
+        lastNewsCount = news.length;
+    }, 2000); 
+});
+
+function showNewNewsBadge() {
+    // Eğer zaten bar varsa tekrar ekleme
+    if (document.getElementById('newNewsBadge')) return;
+
+    const badge = document.createElement('div');
+    badge.id = 'newNewsBadge';
+    badge.innerHTML = `🔥 Yeni haberler geldi! <span onclick="softRefresh(); this.parentElement.remove();">Tıkla ve Karıştır</span>`;
+    badge.style = "position:fixed; top:70px; left:50%; transform:translateX(-50%); background:var(--primary); color:#000; padding:10px 20px; border-radius:30px; font-weight:bold; z-index:1000; box-shadow:0 4px 15px rgba(0,0,0,0.3); cursor:pointer; animation: slideDown 0.5s;";
+    document.body.appendChild(badge);
 }
 
 function handleMainInput() {
@@ -1515,7 +1189,22 @@ function openGeneralChatWithText(text) {
 }
 
 
-
+function deleteSaved(i) { let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]'); saved.splice(i, 1); localStorage.setItem('khoj_saved_news', JSON.stringify(saved)); openSavedList(); }
+function openSavedDetail(i) { active = JSON.parse(localStorage.getItem('khoj_saved_news'))[i]; openDetail(-2); }
+function openGeneralChat() { active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." }; openDetail(-1); }
+function clearHistory() { chatHistory = []; localStorage.removeItem('khoj_ai_history'); closeM(); showToast("Sıfırlandı!"); }
+function closeM() { 
+    document.getElementById('ovl').style.display = 'none'; 
+    
+    // Eğer bir haber detay ekranından çıkılıyorsa ve bir arama sorgusu kalmışsa,
+    // sorguyu yeniden tetikle ve arama listesine dön.
+    if (activeSearchQuery) {
+        // Sorguyu yeniden tetikle, bu da yeni modalı açacaktır.
+        performLocalNewsSearch(activeSearchQuery); 
+    }
+    // Eğer activeSearchQuery == null ise, bu normal bir kapatmadır (AI sohbetten çıkma gibi).
+}
+function showToast(m) { const t = document.getElementById('toast'); if(t) { t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); } }
 </script>
 </body>
 </html>
