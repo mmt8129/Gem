@@ -30,6 +30,25 @@
     --news-weight:700;
     --chat-size:15px;
     --chat-weight:500;
+    --content-size:15px; /* YENİ: Haber içerik yazı boyutu */
+    --content-line-height:1.6; /* YENİ: Satır yüksekliği */
+}
+
+/* Haber içerik stilleri */
+.modal-body h2 {
+    font-size: calc(var(--content-size) + 0.4rem) !important;
+    line-height: var(--content-line-height) !important;
+}
+
+#dynamicContent p,
+.modal-body p {
+    font-size: var(--content-size) !important;
+    line-height: var(--content-line-height) !important;
+}
+
+.modal-body .news-meta,
+.modal-body [style*="background:#ef4444"] {
+    font-size: calc(var(--content-size) - 2px) !important;
 }
 
 [data-theme="dark"] {
@@ -175,8 +194,65 @@ body{
     display:flex;
     gap:14px;
     border:1px solid var(--brd);
-    transition:.2s ease;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
 }
+
+.news-card.swiping {
+    opacity: 0.8;
+    transform: scale(0.98);
+}
+
+.news-card.swipe-left {
+    transform: translateX(-20px);
+    background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.1));
+}
+
+.news-card.swipe-right {
+    transform: translateX(20px);
+    background: linear-gradient(90deg, rgba(34, 197, 94, 0.1), transparent);
+}
+
+.reading-time-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(239, 68, 68, 0.1);
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    color: var(--primary);
+    margin-left: 8px;
+}
+
+/* Yükleniyor göstergesi */
+.infinite-scroll-loader {
+    text-align: center;
+    padding: 20px;
+    color: var(--muted);
+}
+
+/* Pull to refresh göstergesi */
+.ptr-indicator {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding: 10px;
+    background: var(--primary);
+    color: white;
+    font-weight: bold;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+    z-index: 2000;
+}
+
+.ptr-indicator.show {
+    transform: translateY(0);
+}
+
 
 .news-card:hover{
     transform:scale(1.01);
@@ -339,6 +415,38 @@ body{
     z-index:9999;
 }
 
+/* Yazıyor animasyonu için stiller */
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px;
+    background: #e9e9eb;
+    border-radius: 20px;
+    width: fit-content;
+    margin: 8px 0;
+}
+
+[data-theme="dark"] .typing-indicator {
+    background: #2c2c2e;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background: #888;
+    border-radius: 50%;
+    animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+    30% { transform: translateY(-10px); opacity: 1; }
+}
+
 /* ⚙️ AYARLAR PANELİ iOS TARZI */
 /* ============================= */
 
@@ -412,6 +520,129 @@ body{
     color:black;
 }
 
+/* Input stilini güncelle */
+.modal-footer textarea {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 2px solid var(--brd);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    resize: none;
+    min-height: 50px;
+    max-height: 120px;
+    overflow-y: auto;
+    font-family: inherit;
+}
+
+/* Yazıyor animasyonu için stiller */
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px;
+    background: #e9e9eb;
+    border-radius: 20px;
+    width: fit-content;
+    margin: 8px 0;
+}
+
+[data-theme="dark"] .typing-indicator {
+    background: #2c2c2e;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background: #888;
+    border-radius: 50%;
+    display: inline-block;
+    animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+    30% { transform: translateY(-10px); opacity: 1; }
+}
+
+.chat-box {
+    scroll-behavior: smooth;
+    overflow-y: auto !important;
+}
+
+/* Tam ekran sohbet modu */
+.modal.fullscreen-chat {
+    width: 100% !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    background: var(--bg);
+}
+
+.modal.fullscreen-chat .modal-body {
+    padding: 0 !important;
+    height: calc(100vh - 130px) !important; /* Header ve footer yüksekliğine göre ayarla */
+    overflow: hidden !important;
+}
+
+.modal.fullscreen-chat .chat-box {
+    border: none !important;
+    border-radius: 0 !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
+    background: transparent !important;
+    padding: 15px !important;
+}
+
+.modal.fullscreen-chat .modal-footer {
+    background: var(--header-bg);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--brd);
+    padding: 12px 16px !important;
+}
+
+.modal.fullscreen-chat .modal-header {
+    background: var(--header-bg);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--brd);
+}
+
+.modal.fullscreen-chat .news-meta,
+.modal.fullscreen-chat h2,
+.modal.fullscreen-chat img:not(.chat-box img) {
+    display: none !important;
+}
+
+/* Sohbet mesajları için tam genişlik */
+.modal.fullscreen-chat .chat-box .msg {
+    max-width: 90%;
+    margin-bottom: 12px;
+}
+
+/* Nokta animasyonu */
+.dot-animation {
+    display: inline-block;
+    animation: dotPulse 1.5s infinite;
+}
+
+@keyframes dotPulse {
+    0% { opacity: 0.2; }
+    20% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+
+newsCard.addEventListener('touchstart', e => {
+    touchstartX = e.changedTouches[0].screenX;
+});
+
+newsCard.addEventListener('touchend', e => {
+    touchendX = e.changedTouches[0].screenX;
+    handleSwipe();
+});
+
     </style>
 </head>
 <body>
@@ -469,31 +700,129 @@ const db = firebase.database();
 // 1. Ayarları yükle, yoksa varsayılanları kur
 let sets = JSON.parse(localStorage.getItem('khoj_sets')) || { size: 13, weight: 600, speed: 20, newsLimit: 10 };
 
-// 2. Başlangıç sayacını ayardan çek (En önemli kısım burası!)
+// 2. Başlangıç sayacını ayardan çek
 let visibleCount = sets.newsLimit || 10;
 let chatHistory = JSON.parse(localStorage.getItem('khoj_ai_history')) || [];
 let news = [];
 let active = null;
+let activeSearchQuery = null;
+let autoScrollEnabled = true; // Otomatik kaydırma kontrolü
 
-let currentNewsLimit = parseInt(localStorage.getItem('news_limit')) || 10; // Varsayılan 10
-let displayedNewsCount = {}; // Her kategori için kaç haber gösterildiğini tutacak
-let allCachedNews = JSON.parse(localStorage.getItem('khoj_cache')) || {}; // Hafızadaki haberler
+let currentNewsLimit = parseInt(localStorage.getItem('news_limit')) || 10;
+let displayedNewsCount = {};
+let allCachedNews = JSON.parse(localStorage.getItem('khoj_cache')) || {};
+let touchstartX = 0;
+let touchendX = 0;
+let touchstartY = 0;
+let isPulling = false;
+newsFeed.addEventListener('touchstart', e => {
+    touchstartY = e.touches[0].clientY;
+});
+
+newsFeed.addEventListener('touchmove', e => {
+    if (newsFeed.scrollTop === 0) {
+        const touchY = e.touches[0].clientY;
+        if (touchY > touchstartY + 100) {
+            // 100px aşağı çekince yenile
+            softRefresh();
+            showToast('🔄 Yenileniyor...');
+        }
+    }
+});
+
+function compareNews(keyword) {
+    const relatedNews = news.filter(n => 
+        n.title.includes(keyword)
+    ).sort((a,b) => new Date(b.pubDate) - new Date(a.pubDate));
+    
+    // Farklı bakış açılarını göster
+}
+
 
 function softRefresh() {
     showToast("Haberler güncelleniyor...");
-    
-    // Sayfayı yenileme, sadece Firebase'den verileri tekrar iste
-    // Bu zaten news dizisini güncelleyip render() yapacaktır.
-    // currentCategory değişkeni değişmediği için hangi sekmedeysen orada kalırsın.
-    
-	// Mevcut news listesini karıştır
     news = news.sort(() => Math.random() - 0.5);
-	
     db.ref('rss_ayarlari').once('value', snap => {
-        // Zaten on('value') kullandığımız için aslında buna bile gerek yok 
-        // ama butona basınca bir 'tetikleme' istersen render'ı zorlayabiliriz.
         render(); 
     });
+}
+
+async function summarizeNews(newsContent) {
+    const prompt = `Bu haber metnini çok kısaca özetle: ${newsContent}`;
+    
+    // Khoj API'ye özet isteği gönder
+    const summary = await askAI(prompt);
+    
+    // Özeti haberin üstünde göster
+    showSummary(summary);
+}
+
+let isLoadingMore = false;
+
+// NewsFeed'e scroll dinleyicisi ekle
+function setupInfiniteScroll() {
+    const newsFeed = document.getElementById('newsFeed');
+    if (!newsFeed) return;
+    
+    newsFeed.addEventListener('scroll', () => {
+        // Aktif kategoriyi bul
+        const activeBtn = document.querySelector('.cat-item.active');
+        const currentCategory = activeBtn ? activeBtn.innerText.trim().toUpperCase() : "TÜMÜ";
+        
+        // Filtrelenmiş haber sayısını hesapla
+        let filteredNews = news.filter(n => {
+            if (currentCategory === "TÜMÜ") return true;
+            const haberKategorisi = n.category ? n.category.trim().toUpperCase() : "";
+            return haberKategorisi === currentCategory;
+        });
+        
+        const scrollTop = newsFeed.scrollTop;
+        const scrollHeight = newsFeed.scrollHeight;
+        const clientHeight = newsFeed.clientHeight;
+        
+        // %80'e geldiğinde yükle (biraz erken başlasın)
+        if ((scrollTop + clientHeight) >= (scrollHeight * 0.8)) {
+            if (!isLoadingMore && filteredNews.length > visibleCount) {
+                isLoadingMore = true;
+                
+                // Yükleniyor göstergesi ekle
+                const loader = document.createElement('div');
+                loader.className = 'infinite-scroll-loader';
+                loader.id = 'infiniteLoader';
+                loader.innerHTML = '⚡ Daha fazla haber yükleniyor...';
+                newsFeed.appendChild(loader);
+                
+                // Biraz bekle sonra yükle (kullanıcı hissetsin)
+                setTimeout(() => {
+                    loadMoreNews();
+                    document.getElementById('infiniteLoader')?.remove();
+                    isLoadingMore = false;
+                }, 800);
+            }
+        }
+    });
+}
+
+
+
+
+function estimateReadingTime(text) {
+    const wordsPerMinute = 200;
+    const wordCount = text.split(/\s+/).length;
+    const minutes = Math.ceil(wordCount / wordsPerMinute);
+    return `${minutes} dk okuma`;
+}
+
+function handleSwipe() {
+    if (touchendX < touchstartX - 50) {
+        // Sola kaydırma -> kaydet
+        saveNews(active);
+        showToast('💾 Kaydedildi!');
+    }
+    if (touchendX > touchstartX + 50) {
+        // Sağa kaydırma -> paylaş
+        shareNews(active.title, active.link);
+    }
 }
 
 // TEMA SİSTEMİ
@@ -505,6 +834,7 @@ function toggleTheme() {
     localStorage.setItem('khoj_theme', next);
     document.getElementById('themeBtn').innerText = next === 'light' ? '🌙' : '☀️';
 }
+
 // Tema Hafızası
 (function() {
     const saved = localStorage.getItem('khoj_theme') || 'light';
@@ -532,29 +862,80 @@ function metniTemizle(hamMetin) {
     return temiz.replace(/\[\d+\]\(.*?\)/g, '').replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>').replace(/^\s*[\-\*]\s+/gm, '🔹 ').replace(/\n/g, '<br>');
 }
 
+// --- YAZIYOR ANİMASYONU VE OTOMATİK KAYDIRMA FONKSİYONLARI ---
+function showTypingIndicator() {
+    const box = document.getElementById('cBox');
+    if (!box) return;
+    
+    hideTypingIndicator();
+    
+    const indicator = document.createElement('div');
+    indicator.id = 'typingIndicator';
+    indicator.className = 'typing-indicator';
+    indicator.innerHTML = '<span></span><span></span><span></span>';
+    box.appendChild(indicator);
+    
+    scrollToBottom('smooth');
+}
+
+function hideTypingIndicator() {
+    const existing = document.getElementById('typingIndicator');
+    if (existing) existing.remove();
+}
+
+function scrollToBottom(behavior = 'smooth') {
+    const box = document.getElementById('cBox');
+    if (!box || !autoScrollEnabled) return;
+    
+    box.scrollTo({
+        top: box.scrollHeight,
+        behavior: behavior
+    });
+}
+
+function focusInput() {
+    const inp = document.getElementById('uInp');
+    if (inp) {
+        inp.focus();
+        setTimeout(() => inp.focus(), 100);
+    }
+}
+
+function setupScrollListener() {
+    const box = document.getElementById('cBox');
+    if (!box) return;
+    
+    box.removeEventListener('scroll', scrollHandler);
+    box.addEventListener('scroll', scrollHandler);
+}
+
+function scrollHandler() {
+    const box = document.getElementById('cBox');
+    if (!box) return;
+    
+    const isAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 50;
+    autoScrollEnabled = isAtBottom;
+}
+
 // --- 2. HABERLER ---
-// --- 2. SİSTEM VE HABER MOTORU ---
 let rssListesi = {};
 
-// 1. CANLI HABER ÇEKME FONKSİYONU
 async function fetchAllNews() {
     news = []; 
     const proxyUrl = "https://wild-sky-08d7.06mmt8129.workers.dev/?url=";
     
-	const cachedData = localStorage.getItem('khoj_news_cache');
+    const cachedData = localStorage.getItem('khoj_news_cache');
     const cacheTime = localStorage.getItem('khoj_news_time');
     const now = new Date().getTime();
-    const birSaat = 60 * 60 * 1000; // Milisaniye cinsinden
+    const birSaat = 60 * 60 * 1000;
 
-    // Eğer haberler varsa ve 1 saatten yeniyse hafızadan yükle
     if (cachedData && cacheTime && (now - cacheTime < birSaat)) {
         console.log("Haberler hafızadan yükleniyor...");
         news = JSON.parse(cachedData);
-        render(); // Haberleri ekrana bas
-        return;   // Fonksiyonun geri kalanını (internet kısmını) çalıştırma
+        render();
+        return;
     }
-	
-    // Ekrana yükleniyor yazalım ki çalıştığını görelim
+    
     document.getElementById('newsFeed').innerHTML = '<div style="text-align:center; padding:50px; color:white;">Haberler Cloudflare hattından geliyor...</div>';
 
     for (const id in rssListesi) {
@@ -565,41 +946,37 @@ async function fetchAllNews() {
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xmlText, "text/xml");
             
-            // Mynet ve diğerleri için hem 'item' hem 'entry' tara
             const items = xmlDoc.querySelectorAll("item, entry");
 
-            // --- SADECE FİREBASE KATEGORİSİNİ KULLANAN YAPI ---
-items.forEach(el => {
-    const title = el.querySelector("title")?.textContent || "";
-    let link = el.querySelector("link")?.textContent || el.querySelector("link")?.getAttribute("href") || "";
-    
-    // TARİHİ BURADA YAKALIYORUZ (Garantili yöntem)
-   const date = el.querySelector("pubDate")?.textContent || 
-             el.querySelector("dc\\:date")?.textContent || // Bazı sistemlerin kullandığı format
-             el.querySelector("date")?.textContent || 
-             el.querySelector("lastBuildDate")?.textContent || 
-             "";
+            items.forEach(el => {
+                const title = el.querySelector("title")?.textContent || "";
+                let link = el.querySelector("link")?.textContent || el.querySelector("link")?.getAttribute("href") || "";
+                
+                const date = el.querySelector("pubDate")?.textContent || 
+                          el.querySelector("dc\\:date")?.textContent ||
+                          el.querySelector("date")?.textContent || 
+                          el.querySelector("lastBuildDate")?.textContent || 
+                          "";
 
-    let img = "";
-    const enclosure = el.querySelector("enclosure");
-    if (enclosure) img = enclosure.getAttribute("url");
+                let img = "";
+                const enclosure = el.querySelector("enclosure");
+                if (enclosure) img = enclosure.getAttribute("url");
 
-    if (title && title.length > 5) {
-        news.push({
-            title: title.trim(),
-            link: link.trim(),
-            source: rss.ad,
-            category: rss.kategori || "GÜNDEM",
-            pubDate: date, // İŞTE EKSİK OLAN BUYDU!
-            thumbnail: img || rss.logo || "varsayilan-logo.png"
-        });
-    }
-});
+                if (title && title.length > 5) {
+                    news.push({
+                        title: title.trim(),
+                        link: link.trim(),
+                        source: rss.ad,
+                        category: rss.kategori || "GÜNDEM",
+                        pubDate: date,
+                        thumbnail: img || rss.logo || "varsayilan-logo.png"
+                    });
+                }
+            });
             
-            // Listeyi karıştır ve ekrana bas
             news.sort(() => Math.random() - 0.5);
-			localStorage.setItem('khoj_news_cache', JSON.stringify(news));
-    localStorage.setItem('khoj_news_time', new Date().getTime());
+            localStorage.setItem('khoj_news_cache', JSON.stringify(news));
+            localStorage.setItem('khoj_news_time', new Date().getTime());
             render(); 
 
         } catch (e) {
@@ -608,7 +985,6 @@ items.forEach(el => {
     }
 }
 
-// 2. ANA DİNLEYİCİ (SAAT VE BUTONLARI KURTARAN KISIM)
 db.ref('rss_ayarlari').on('value', snap => {
     rssListesi = snap.val() || {};
     if (Object.keys(rssListesi).length > 0) {
@@ -616,28 +992,20 @@ db.ref('rss_ayarlari').on('value', snap => {
     }
 });
 
-// Saati tekrar canlandırıyoruz
 setInterval(updateTime, 1000);
 updateTime();
 
-// Kategori Filtreleme Fonksiyonu (Hatalı olanı bununla değiştir abi)
 function filterCat(cat) {
-    // 1. Önce bütün butonlardan 'active' sınıfını siliyoruz
     const items = document.querySelectorAll('.cat-item');
     items.forEach(item => item.classList.remove('active'));
 
-    // 2. Hangi butona tıklandıysa onu bulup 'active' yapıyoruz
-    // Butonun içindeki yazı (innerText) ile gönderilen kategori (cat) aynı olmalı
     items.forEach(item => {
         if (item.innerText.trim() === cat) {
             item.classList.add('active');
         }
     });
 
-    // 3. Konsola yazalım, bakalım buton değişmiş mi?
     console.log("Seçilen yeni kategori:", cat);
-
-    // 4. Listeyi yeni kategoriye göre baştan çizdiriyoruz
     render(); 
 }
 
@@ -645,18 +1013,15 @@ function render() {
     const f = document.getElementById('newsFeed');
     if(!f) return;
 
-    // 1. Aktif kategoriyi belirleyelim 🏷️
     const activeBtn = document.querySelector('.cat-item.active');
     const currentCategory = activeBtn ? activeBtn.innerText.trim().toUpperCase() : "TÜMÜ";
 
-    // 2. Önce tüm haberleri kategoriye göre filtreleyelim 🔍
     let filteredNews = news.filter(n => {
         if (currentCategory === "TÜMÜ") return true;
         const haberKategorisi = n.category ? n.category.trim().toUpperCase() : "";
         return haberKategorisi === currentCategory;
     });
 
-    // 3. Eğer filtrelenmiş haber yoksa mesajı gösterip durduralım 📂
     if (filteredNews.length === 0) {
         f.innerHTML = `
             <div style="text-align:center; padding:50px; color:var(--text);">
@@ -666,15 +1031,13 @@ function render() {
         return;
     }
 
-    // 4. ŞİMDİ "visibleCount" kadarını kesip alalım (Hata buradaydı, artık dışarıda) ✂️
     const displayedNews = filteredNews.slice(0, visibleCount);
 
-    // 5. Kesilen haberleri (displayedNews) ekrana basalım 📺
     f.innerHTML = displayedNews.map((n) => {
         const realIdx = news.findIndex(x => x.title === n.title);
         return `
             <div class="news-card" onclick="openDetail(${realIdx})">
-                <img src="${n.thumbnail || 'logo.png'}" onerror="this.src='logo.png'">
+                <img loading="lazy" src="${n.thumbnail || 'logo.png'}" onerror="this.src='logo.png'">
                 <div style="flex:1">
                     <div class="news-meta">
                         <span style="color:#ffcc00; font-weight:bold;">${n.source}</span> | 
@@ -685,7 +1048,6 @@ function render() {
             </div>`;
     }).join('');
 
-    // 6. Eğer hala gösterilmemiş haber varsa butonu ekleyelim ➕
     if (filteredNews.length > visibleCount) {
         f.innerHTML += `
             <div id="loadMoreArea" style="text-align:center; padding:1px;">
@@ -696,42 +1058,31 @@ function render() {
     }
 }
 
-// Bu fonksiyonu, mevcut diğer fonksiyonların (closeM, saveNews vb.) yanına ekleyin.
-
 function closeSearch() {
-    activeSearchQuery = null; // Sorgu hafızasını temizle!
-    closeM(); // Ardından genel modal kapatma işlevini çağır (ki bu da sadece modalı gizler, sorguyu tetiklemez)
+    activeSearchQuery = null;
+    closeM();
 }
 
 function loadMoreNews() {
-    // Görünür haber sayısını ayardaki limit kadar artır (Ayar yoksa 10 artır)
     const artisMiktari = (sets && sets.newsLimit) ? sets.newsLimit : 10;
     visibleCount += artisMiktari;
-    
-    // Ekranı yeni sayıya göre tekrar çiz
     render();
 }
 
-
 function getBestImage(item, sourceName) {
-    // 1. Haberin kendi resmi varsa kullan
     if (item.enclosure && item.enclosure.link) return item.enclosure.link;
     if (item.thumbnail) return item.thumbnail;
     
-    // 2. Açıklamadan resim ayıkla
     if (item.description && item.description.includes('<img')) {
         const match = /<img[^>]+src="([^">]+)"/g.exec(item.description);
         if (match && match[1]) return match[1];
     }
 
-    // 3. EĞER RESİM YOKSA: Firebase'den gelen logoyu kullan
-    // rssListesi değişkenini bir önceki adımda global yapmıştık hatırlarsan
     let kaynakLogosu = "";
     Object.values(rssListesi).forEach(r => {
         if(r.ad === sourceName) kaynakLogosu = r.logo;
     });
 
-    // Eğer logo adresi varsa onu döndür, yoksa şık bir yer tutucu (placeholder)
     return kaynakLogosu || `https://ui-avatars.com/api/?name=${sourceName}&background=random&color=fff&size=200`;
 }
 
@@ -744,21 +1095,17 @@ function openSettings() {
             <button class="btn-icon" onclick="closeM()" style="color:red;">❌</button>
         </div>
         <div class="modal-body">
-		<div class="set-row">
-                <label class="set-label">HABER SAYISI</label>
+            <div class="set-row">
+                <label class="set-label">HABER SAYISI (ANA EKRAN)</label>
                 <div class="set-ctrl">
-                    <div class="set-row">
-    <label class="set-label">HABER SAYISI</label>
-    <div class="set-ctrl">
-        <button onclick="adjustNewsLimit(-5)">-</button>
-        <span id="newsLimitDisplay" style="min-width:45px; text-align:center; font-weight:bold;">${sets.newsLimit || 10}</span>
-        <button onclick="adjustNewsLimit(5)">+</button>
-    </div>
-</div>
+                    <button onclick="adjustNewsLimit(-5)">-</button>
+                    <span id="newsLimitDisplay" style="min-width:45px; text-align:center; font-weight:bold;">${sets.newsLimit || 10}</span>
+                    <button onclick="adjustNewsLimit(5)">+</button>
                 </div>
             </div>
+            
             <div class="set-row">
-                <label class="set-label">YAZI BOYUTU</label>
+                <label class="set-label">ANA EKRAN HABER BAŞLIK BOYUTU</label>
                 <div class="set-ctrl">
                     <button onclick="adjustSet('size',-1)">-</button>
                     <span style="min-width:45px; text-align:center;">${sets.size}PX</span>
@@ -767,11 +1114,29 @@ function openSettings() {
             </div>
 
             <div class="set-row">
-                <label class="set-label">YAZI KALINLIĞI</label>
+                <label class="set-label">ANA EKRAN HABER BAŞLIK KALINLIĞI</label>
                 <div class="set-ctrl">
                     <button onclick="adjustSet('weight',-100)">-</button>
                     <span style="min-width:45px; text-align:center;">${sets.weight}</span>
                     <button onclick="adjustSet('weight',100)">+</button>
+                </div>
+            </div>
+
+            <div class="set-row">
+                <label class="set-label">HABER İÇERİK YAZI BOYUTU</label>
+                <div class="set-ctrl">
+                    <button onclick="adjustContent('size',-1)">-</button>
+                    <span style="min-width:45px; text-align:center;">${sets.contentSize || 14}PX</span>
+                    <button onclick="adjustContent('size',1)">+</button>
+                </div>
+            </div>
+
+            <div class="set-row">
+                <label class="set-label">HABER İÇERİK SATIR YÜKSEKLİĞİ</label>
+                <div class="set-ctrl">
+                    <button onclick="adjustContent('lineHeight',-0.1)">-</button>
+                    <span style="min-width:45px; text-align:center;">${(sets.contentLineHeight || 1.6).toFixed(1)}</span>
+                    <button onclick="adjustContent('lineHeight',0.1)">+</button>
                 </div>
             </div>
 
@@ -791,23 +1156,30 @@ function openSettings() {
     document.getElementById('ovl').style.display = 'flex';
 }
 
+// Haber içerik boyutu ayarı
+function adjustContent(type, val) {
+    if(type === 'size') {
+        sets.contentSize = Math.max(10, Math.min(24, (sets.contentSize || 14) + val));
+    } else if(type === 'lineHeight') {
+        sets.contentLineHeight = Math.max(1.2, Math.min(2.5, (sets.contentLineHeight || 1.6) + val));
+    }
+    applySets();
+    openSettings(); // Ayarları güncelle
+}
+
+
 function adjustNewsLimit(amount) {
     if(!sets.newsLimit) sets.newsLimit = 10;
     let newLimit = sets.newsLimit + amount;
 
     if (newLimit >= 5 && newLimit <= 20) {
         sets.newsLimit = newLimit;
-        
-        // KRİTİK EKLEME: Ekrandaki canlı sayacı da hemen güncelle! 🎯
         visibleCount = newLimit; 
         
         const display = document.getElementById('newsLimitDisplay');
         if (display) display.innerText = newLimit;
         
         saveSets();
-        
-        // Opsiyonel: Değişikliği anında ekranda görmek istersen:
-        // render(); 
     }
 }
 
@@ -815,11 +1187,9 @@ function saveSets() {
     localStorage.setItem('khoj_sets', JSON.stringify(sets));
 }
 
-// 📡 RSS Listesini Firebase'den çekip gösteren dinamik fonksiyon
 function openRSSManager() {
     const m = document.getElementById('mdl');
     
-    // Önce "Yükleniyor..." ekranı gösterelim
     m.innerHTML = `
         <div class="modal-header">
             <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
@@ -836,7 +1206,6 @@ function openRSSManager() {
     `;
     document.getElementById('ovl').style.display = 'flex';
 
-    // Firebase'den verileri çekiyoruz
     db.ref('rss_ayarlari').on('value', snap => {
         const container = document.getElementById('rssListContainer');
         if(!container) return;
@@ -849,7 +1218,6 @@ function openRSSManager() {
 
         let html = `<p style="font-size:11px; color:#888; font-weight:800; text-transform:uppercase; margin-bottom:10px;">Ekli Kaynaklar</p>`;
         
-        // Verileri döngüye sokup ekrana basıyoruz
         Object.keys(data).forEach(key => {
             const rss = data[key];
             html += `
@@ -858,7 +1226,7 @@ function openRSSManager() {
                         <span style="font-weight:bold; font-size:14px;">${rss.ad}</span>
                         <span style="font-size:10px; color:var(--primary); font-weight:800;">${rss.kategori}</span>
                     </div>
-					<span onclick="editRSS('${key}')" style="cursor:pointer; font-size:1.2rem;">✏️</span>
+                    <span onclick="editRSS('${key}')" style="cursor:pointer; font-size:1.2rem;">✏️</span>
                     <span onclick="confirmDeleteRSS('${key}')" style="color:#ef4444; cursor:pointer; font-size:1.2rem; padding:5px;">🗑️</span>
                 </div>
             `;
@@ -920,16 +1288,15 @@ function updateRSS(key) {
         logo: logo
     }).then(() => {
         showToast("Güncellendi! ✅");
-        openRSSManager(); // Listeye geri dön
+        openRSSManager();
     }).catch(e => alert("Hata: " + e.message));
 }
 
-// Asıl silme işlemini yapan fonksiyon (Firebase bağlantılı)
 function executeDeleteRSS(key) {
     db.ref('rss_ayarlari/' + key).remove()
         .then(() => {
             showToast("Kaynak Silindi 🗑️");
-            openRSSManager(); // Listeyi yenilemek için geri dön
+            openRSSManager();
         })
         .catch(e => alert("Hata: " + e.message));
 }
@@ -951,26 +1318,6 @@ function confirmDeleteRSS(key) {
     `;
 }
 
-
-// Kategorileri filtrelemek için (Şimdilik sadece tıklama efekti verir)
-function filterCat(cat) {
-    // 1. Seçilen kategoriyi ana değişkene ata (En önemli kısım burasıydı)
-    currentCategory = cat; 
-    
-    // 2. Görsel olarak butonun rengini değiştir
-    document.querySelectorAll('.cat-item').forEach(el => {
-        el.classList.remove('active');
-        if(el.innerText === cat) el.classList.add('active');
-    });
-
-    // 3. Konsola bilgi yaz (Teyit için)
-    console.log("Sistem Kategorisi Değişti: ", currentCategory);
-
-    // 4. Haberleri yeni kategoriye göre tekrar dök
-    render(); 
-}
-
-// "+" Butonuna basınca açılacak "Ekleme" formu
 function openAddRSS() {
     const m = document.getElementById('mdl');
     m.innerHTML = `
@@ -980,7 +1327,7 @@ function openAddRSS() {
                 <h2 style="font-size:1.1rem; font-weight:900;">YENİ RSS EKLE</h2>
             </div>
         </div>
-		
+        
         <div class="modal-body">
             <div class="set-row">
                 <label class="set-label">RSS ADI</label>
@@ -990,10 +1337,10 @@ function openAddRSS() {
                 <label class="set-label">RSS KAYNAĞI (URL)</label>
                 <input type="text" id="rssUrl" placeholder="https://..." style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:14px;">
             </div>
-			<div class="set-row">
-    <label class="set-label">LOGO URL (İsteğe bağlı)</label>
-    <input type="text" id="rssLogo" placeholder="https://...png" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:14px;">
-</div>
+            <div class="set-row">
+                <label class="set-label">LOGO URL (İsteğe bağlı)</label>
+                <input type="text" id="rssLogo" placeholder="https://...png" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:14px;">
+            </div>
             <div class="set-row">
                 <label class="set-label">KATEGORİ</label>
                 <select id="rssCat" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-weight:bold; font-size:14px;">
@@ -1014,25 +1361,24 @@ function openAddRSS() {
     `;
 }
 
-// Formdaki verileri Firebase'e gönderir
 function saveNewRSS() {
     const ad = document.getElementById('rssName').value;
     const url = document.getElementById('rssUrl').value;
     const kat = document.getElementById('rssCat').value;
-	const logo = document.getElementById('rssLogo').value; // Yeni alan
+    const logo = document.getElementById('rssLogo').value;
 
     if(!ad || !url) { alert("Lütfen tüm alanları doldur abi!"); return; }
 
-    // Firebase'e "rss_ayarlari" adında yeni bir tabloya yazıyoruz
     const newRssRef = db.ref('rss_ayarlari').push();
     newRssRef.set({
         ad: ad,
         url: url,
         kategori: kat,
+        logo: logo,
         eklenmeTarihi: firebase.database.ServerValue.TIMESTAMP
     }).then(() => {
         showToast("RSS Başarıyla Eklendi! 🚀");
-        openRSSManager(); // Kayıttan sonra listeye geri dön
+        openRSSManager();
     }).catch((e) => {
         alert("Hata oluştu abi: " + e.message);
     });
@@ -1046,13 +1392,11 @@ function adjustSet(k, v) {
 }
 
 function applySets() {
-    // Ana ekran değişkenlerini güncelle
     document.documentElement.style.setProperty('--news-size', sets.size + 'px');
     document.documentElement.style.setProperty('--news-weight', sets.weight);
     localStorage.setItem('khoj_sets', JSON.stringify(sets));
 }
 
-// Pencere içi (Chat/Detay) anlık değişim fonksiyonu
 function quickAdjust(type, val) {
     if(type === 'size') {
         sets.chatSize = (sets.chatSize || 13) + val;
@@ -1064,100 +1408,145 @@ function quickAdjust(type, val) {
     localStorage.setItem('khoj_sets', JSON.stringify(sets));
 }
 
+// --- GÜNCELLENMİŞ openDetail FONKSİYONU ---
+// --- GÜNCELLENMİŞ openDetail FONKSİYONU (Tam Ekran Destekli) ---
 function openDetail(idx) {
     
-	if (idx !== -1 && idx !== -2) { active = news[idx]; }
-	
-	console.log("Haber Verisi:", active);
+    if (idx !== -1 && idx !== -2) { active = news[idx]; }
+    
+    console.log("Haber Verisi:", active);
     console.log("Tarih Alanı:", active.pubDate);
-	
+    
     const m = document.getElementById('mdl');
-    const img = getBestImage(active, active.source);
-	
-    // Hangi isimle gelirse gelsin tarihi yakalamaya çalışalım
-const hamTarih = active.pubDate || active.date || active.time || "";
-console.log("Yakalanan Tarih:", hamTarih); // F12'de bunu da göreceksin
-
-    // --- TARİH VE SAATİ GÜVENLİ FORMATLA ---
-    let displayDate = "";
-if (active.pubDate) {
-    const d = new Date(active.pubDate);
-    if (!isNaN(d.getTime())) {
-        displayDate = d.toLocaleString('tr-TR', {
-            day: 'numeric', 
-            month: 'long', 
-            hour: '2-digit', 
-            minute: '2-digit'
-        });
+    const isGeneralChat = (active && active.source === "KHOJ");
+    
+    // Tam ekran modu için class ekle/kaldır
+    if (isGeneralChat) {
+        m.classList.add('fullscreen-chat');
     } else {
-        // Eğer tarih formatı garip gelirse (NTV bazen yapar), ilk kısmını al
-        displayDate = active.pubDate.split(' +')[0]; 
+        m.classList.remove('fullscreen-chat');
     }
-}
+    
+    const img = getBestImage(active, active.source);
+    
+    const hamTarih = active.pubDate || active.date || active.time || "";
+    console.log("Yakalanan Tarih:", hamTarih);
+
+    let displayDate = "";
+    if (active.pubDate) {
+        const d = new Date(active.pubDate);
+        if (!isNaN(d.getTime())) {
+            displayDate = d.toLocaleString('tr-TR', {
+                day: 'numeric', 
+                month: 'long', 
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+        } else {
+            displayDate = active.pubDate.split(' +')[0]; 
+        }
+    }
 
     const cleanDesc = active.description ? active.description.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim().substring(0, 1000) + "..." : "Haber içeriği yükleniyor...";
 
     if (document.activeElement) { document.activeElement.blur(); }
 
-    m.innerHTML = `
-       
-    <span style="background:#ef4444; color:white; padding:10px 15px; border-radius:4px; font-size:11px; font-weight:800; letter-spacing:0.5px;">${active.source}</span>
-    <span style="font-size:11px; color:var(--text); opacity:0.5; font-weight:400; border-left:1px solid var(--brd); padding-left:8px;">${displayDate}</span>
-</div>
-               <div class="modal-header" style="padding: 10px 15px;">
-    <div style="display:flex; justify-content: space-between; align-items:center; width:100%;">
-        <div style="font-weight: 800; font-size: 0.9rem; color: var(--primary); font-family: 'Orbitron';">
-            ${active.source === "KHOJ" ? "✨ GENEL SOHBET" : " "}
-        </div>
-
-        <div style="display:flex; align-items:center; gap:5px;">
-         
-                    <button class="btn-icon" style="font-size:10px; width:32px;color:var(--text); height:32px; font-weight:bold;" onclick="quickAdjust('size', 1)">Y+</button>
-                    <button class="btn-icon" style="font-size:10px; width:32px;color:var(--text); height:32px; font-weight:bold;" onclick="quickAdjust('size', -1)">Y-</button>
-                    <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;color:var(--text); margin-left:2px;" onclick="quickAdjust('weight', 100)">K+</button>
-                    <button class="btn-icon" style="font-size:10px; width:32px;color:var(--text); height:32px; font-weight:bold;" onclick="quickAdjust('weight', -100)">K-</button>
-                    <div style="width:1px; height:20px; background:var(--brd); margin:0 5px;"></div>
-                    ${active.link ? `<button class="btn-icon" style="width:32px; height:32px;" onclick="openFullNews('${active.link}')">🔗</button>` : ''}
-                    <button class="btn-icon" style="width:32px; height:32px;" onclick="shareNews(active.title.replace(/'/g, ''), active.link)">📤</button>
-                    <button class="btn-icon" style="width:32px; height:32px;" onclick="saveNews()">💾</button>
-                    <button class="btn-icon" style="width:32px; height:32px; color:red;" onclick="closeM()">❌</button>
+    // Genel sohbet için tam ekran içerik
+    if (isGeneralChat) {
+        m.innerHTML = `
+            <div class="modal-header" style="padding: 10px 16px;">
+                <div style="display:flex; justify-content: space-between; align-items:center; width:100%;">
+                    <div style="font-weight: 800; font-size: 1rem; color: var(--primary); font-family: 'Orbitron'; display: flex; align-items: center; gap: 8px;">
+                        <span>✨ GENEL SOHBET</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:5px;">
+	                        <button class="btn-icon" style="font-size:10px; width:32px;color:var(--text); height:32px; font-weight:bold;" onclick="quickAdjust('size', 1)">Y+</button>
+                        <button class="btn-icon" style="font-size:10px; width:32px;color:var(--text); height:32px; font-weight:bold;" onclick="quickAdjust('size', -1)">Y-</button>
+                        <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;color:var(--text); margin-left:2px;" onclick="quickAdjust('weight', 100)">K+</button>
+                        <button class="btn-icon" style="font-size:10px; width:32px;color:var(--text); height:32px; font-weight:bold;" onclick="quickAdjust('weight', -100)">K-</button>
+                        <div style="width:1px; height:20px; background:var(--brd); margin:0 5px;"></div>
+                        <button class="btn-icon" style="width:32px; height:32px;" onclick="shareNews(active.title.replace(/'/g, ''), active.link)">📤</button>
+                        <button class="btn-icon" style="width:32px; height:32px;" onclick="saveNews()">💾</button>
+                        <button class="btn-icon" style="width:32px; height:32px; color:red;" onclick="closeM()">❌</button>
+                    </div>
                 </div>
             </div>
-        </div>
-       <div class="modal-body">
-            ${active.source !== "KHOJ" ? `
+            <div class="modal-body" style="padding: 0; overflow: hidden;">
+                <div style="background:var(--card-bg); height: 100%; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="chat-box" id="cBox" style="flex: 1; overflow-y: auto; border: none; border-radius: 0; min-height: auto; max-height: none; padding: 16px;">
+                        ${active.savedChat || chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('')}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 12px 16px;">
+                <div style="display:flex; gap:10px; width:100%;">
+                    <input type="text" id="uInp" 
+                        placeholder="Bir şeyler sor veya sohbet et..." 
+                        style="flex:1; padding:14px 18px; border-radius: 30px; border: 2px solid var(--brd); background: var(--bg); color: var(--text); font-size: 16px;">
+                    <button class="btn-icon btn-save" id="sendBtn" style="width: 50px; height: 50px; border-radius: 50%;">➤</button>
+                </div>
+            </div>`;
+    } else {
+        // Normal haber detayı (eski hali)
+        m.innerHTML = `
+            <div class="modal-header" style="padding: 10px 15px;">
+                <div style="display:flex; justify-content: space-between; align-items:center; width:100%;">
+                    <div style="font-weight: 800; font-size: 0.9rem; color: var(--primary); font-family: 'Orbitron';">
+                        ${active.source === "KHOJ" ? "✨ GENEL SOHBET" : ""}
+                    </div>
+                    <div style="display:flex; align-items:center; gap:5px;">
+						<button class="btn-icon" style="font-size:10px; width:32px;color:var(--text); height:32px; font-weight:bold;" onclick="quickAdjustContent('size', 1)">İ+</button>
+						<button class="btn-icon" style="font-size:10px; width:32px;color:var(--text); height:32px; font-weight:bold;" onclick="quickAdjustContent('size', -1)">İ-</button>
+                        <button class="btn-icon" style="font-size:10px; width:32px;color:var(--text); height:32px; font-weight:bold;" onclick="quickAdjust('size', 1)">Y+</button>
+                        <button class="btn-icon" style="font-size:10px; width:32px;color:var(--text); height:32px; font-weight:bold;" onclick="quickAdjust('size', -1)">Y-</button>
+                        <button class="btn-icon" style="font-size:10px; width:32px; height:32px; font-weight:bold;color:var(--text); margin-left:2px;" onclick="quickAdjust('weight', 100)">K+</button>
+                        <button class="btn-icon" style="font-size:10px; width:32px;color:var(--text); height:32px; font-weight:bold;" onclick="quickAdjust('weight', -100)">K-</button>
+                        <div style="width:1px; height:20px; background:var(--brd); margin:0 5px;"></div>
+                        ${active.link ? `<button class="btn-icon" style="width:32px; height:32px;" onclick="openFullNews('${active.link}')">🔗</button>` : ''}
+                        <button class="btn-icon" style="width:32px; height:32px;" onclick="shareNews(active.title.replace(/'/g, ''), active.link)">📤</button>
+                        <button class="btn-icon" style="width:32px; height:32px;" onclick="saveNews()">💾</button>
+                        <button class="btn-icon" style="width:32px; height:32px; color:red;" onclick="closeM()">❌</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
                 <h2 style="margin-bottom:15px; line-height:1.3; font-size:1.4em;">${active.title}</h2>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                    <span style="background:#ef4444; color:white; padding:10px 15px; border-radius:4px; font-size:11px; font-weight:800; letter-spacing:0.5px;">${active.source}</span>
+                    <span style="font-size:11px; color:var(--text); opacity:0.5; font-weight:400; border-left:1px solid var(--brd); padding-left:8px;">${displayDate}</span>
+                </div>
                 <div id="dynamicContent" style="background:rgba(239, 68, 68, 0.1); border-left:4px solid #ef4444; padding:15px; margin-bottom:20px; border-radius:0 10px 10px 0;">
                     <p style="font-size:14px; line-height:1.6; margin:0;">${cleanDesc}</p>
                 </div>
                 <img src="${img}" style="width:100%; border-radius:15px; margin-bottom:20px;">
-            ` : ''}
-            
-            <div style="background:var(--card-bg); border:1px solid var(--brd); border-radius:12px; overflow:hidden;">
-                ${active.source !== "KHOJ" ? `
-                <div style="background:var(--brd); padding:8px 15px; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:11px; font-weight:bold; color:var(--text); opacity:0.7;">YAPAY ZEKA ANALİZİ</span>
-                    <button onclick="document.getElementById('uInp').value='Bu haberi özetle'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:4px;">
-                        ✨ AI ile Özetle
-                    </button>
-                </div>` : ''}
-                <div class="chat-box" id="cBox" style="min-height:300px;">
-                    ${active.savedChat || (active.source === "KHOJ" ? chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('') : `<div class="msg ai">Haber Hakkında Bilgiler Sor...</div>`)}
+                
+                <div style="background:var(--card-bg); border:1px solid var(--brd); border-radius:12px; overflow:hidden;">
+                    <div style="background:var(--brd); padding:8px 15px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:11px; font-weight:bold; color:var(--text); opacity:0.7;">YAPAY ZEKA ANALİZİ</span>
+                        <button onclick="document.getElementById('uInp').value='Bu haberi özetle'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                            ✨ AI ile Özetle
+                        </button>
+                    </div>
+                    <div class="chat-box" id="cBox" style="min-height:300px; max-height:400px; overflow-y:auto; padding:10px;">
+                        <div class="msg ai">Haber Hakkında Bilgiler Sor...</div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="modal-footer">
-            <div style="display:flex; gap:10px; width:100%;">
-                <input type="text" id="uInp" 
-    placeholder="${active.source === 'KHOJ' ? 'Bir şeyler sor veya sohbet et...' : 'Bu haberi analiz et...'}" 
-    style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:16px;">
-                <button class="btn-icon btn-save" id="sendBtn" style="width:50px;">➤</button>
-            </div>
-        </div>`;
+            <div class="modal-footer">
+                <div style="display:flex; gap:10px; width:100%;">
+                    <input type="text" id="uInp" 
+                        placeholder="Bu haberi analiz et..." 
+                        style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:16px;">
+                    <button class="btn-icon btn-save" id="sendBtn" style="width:50px;">➤</button>
+                </div>
+				<span class="reading-time">📖 ${estimateReadingTime(cleanDesc)}</span>
+            </div>`;
+			
+    }
 
-    // Haber İçeriği Çekme (Cloudflare Üzerinden)
-    const myProxy = "https://wild-sky-08d7.06mmt8129.workers.dev/?url=";
-    if (active.link && active.source !== "KHOJ") {
+    // İçerik çekme işlemi (sadece haberler için)
+    if (!isGeneralChat && active.link) {
+        const myProxy = "https://wild-sky-08d7.06mmt8129.workers.dev/?url=";
         fetch(myProxy + encodeURIComponent(active.link))
             .then(res => res.text())
             .then(html => {
@@ -1165,34 +1554,153 @@ if (active.pubDate) {
                 const paragraphs = Array.from(doc.querySelectorAll('p'))
                     .map(p => p.textContent.trim())
                     .filter(t => t.length > 40).slice(0, 5).join('<br><br>');
-                if (paragraphs) { document.getElementById('dynamicContent').innerHTML = `<p style="font-size:14px; line-height:1.6; margin:0;">${paragraphs}</p>`; }
+                if (paragraphs) { 
+                    document.getElementById('dynamicContent').innerHTML = `<p style="font-size:14px; line-height:1.6; margin:0;">${paragraphs}</p>`; 
+                }
             }).catch(e => console.log("İçerik çekilemedi."));
     }
 
     document.getElementById('ovl').style.display = 'flex';
-    const box = document.getElementById('cBox');
-    box.scrollTop = box.scrollHeight;
-    const inp = document.getElementById('uInp');
     
-    inp.addEventListener('keypress', (e) => { if (e.key === 'Enter') ask(); });
+    // Scroll listener'ı kur
+    const box = document.getElementById('cBox');
+    if (box) {
+        setupScrollListener();
+        setTimeout(() => scrollToBottom('auto'), 100);
+    }
+    
+    const inp = document.getElementById('uInp');
+    inp.addEventListener('keypress', (e) => { 
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            ask();
+        }
+    });
     document.getElementById('sendBtn').onclick = ask;
+    
+    setTimeout(focusInput, 300);
 }
-// Yardımcı Fonksiyon (Özetleme butonuna basınca çalışması için)
+
+// Haber detayında hızlı içerik boyutu ayarı
+function quickAdjustContent(type, val) {
+    if(type === 'size') {
+        sets.contentSize = Math.max(10, Math.min(24, (sets.contentSize || 14) + val));
+        document.documentElement.style.setProperty('--content-size', sets.contentSize + 'px');
+    }
+    localStorage.setItem('khoj_sets', JSON.stringify(sets));
+    
+    // Toast ile bildir
+    showToast(`İçerik boyutu: ${sets.contentSize}px`);
+}
+
+
+// --- GÜNCELLENMİŞ ask FONKSİYONU ---
+// Promise.race ile timeout eklenmiş versiyon
+async function ask() {
+    const inp = document.getElementById('uInp');
+    const box = document.getElementById('cBox');
+    
+    if(!inp || !inp.value.trim()) return;
+    
+    const q = inp.value.trim();
+    inp.value = '';
+	
+	    
+    // Kullanıcı mesajını ekle
+    const userMsg = document.createElement('div');
+    userMsg.className = 'msg user';
+    userMsg.textContent = q;
+    box.appendChild(userMsg);
+    
+    scrollToBottom('smooth');
+    focusInput();
+    
+    if(active && active.source === "KHOJ") {
+        chatHistory.push({role: 'user', text: q});
+    }
+    
+    // AI mesajı container
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'msg ai';
+    aiMsg.id = 'currentAiResponse';
+    aiMsg.innerHTML = '<span style="opacity:0.7;">Yanıt bekleniyor<span class="dot-animation">...</span></span>';
+    box.appendChild(aiMsg);
+    
+    scrollToBottom('smooth');
+    
+    let finalQuery = (active && active.source !== "KHOJ") ? 
+        `Haber: ${active.title}. Soru: ${q}` : q;
+
+    try {
+        // Timeout promise
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('timeout')), 5000) // 5 saniye timeout
+        );
+        
+        const fetchPromise = fetch(KHOJ_URL, { 
+            method: 'POST', 
+            headers: { 
+                'Authorization': `Bearer ${KHOJ_KEY}`, 
+                'Content-Type': 'application/json' 
+            }, 
+            body: JSON.stringify({ q: finalQuery, stream: true }) 
+        });
+        
+        // Race: ya fetch bitecek ya da timeout
+        const res = await Promise.race([fetchPromise, timeoutPromise]);
+        
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let fullText = "";
+        
+        // İlk chunk gelene kadar bekleme mesajı
+        aiMsg.innerHTML = '<span style="opacity:0.7;">Yazıyor<span class="dot-animation">...</span></span>';
+        
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            fullText += decoder.decode(value);
+            const cleanText = metniTemizle(fullText);
+            
+            // Her chunk'ta güncelle
+            aiMsg.innerHTML = cleanText + ' <span style="opacity:0.5;">▋</span>';
+            scrollToBottom('smooth');
+        }
+        
+        aiMsg.innerHTML = metniTemizle(fullText);
+        scrollToBottom('smooth');
+        
+        if(active && active.source === "KHOJ") { 
+            chatHistory.push({role: 'ai', text: aiMsg.innerHTML}); 
+            localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory)); 
+        }
+        
+    } catch (e) {
+        if (e.message === 'timeout') {
+            aiMsg.innerHTML = 'Yanıt gelmedi. Lütfen tekrar dene. ⏱️';
+        } else {
+            aiMsg.innerHTML = 'Bağlantı hatası! 😕';
+        }
+        scrollToBottom('smooth');
+    }
+    
+    focusInput();
+}
+
 function askAI(prompt) {
     const inp = document.getElementById('uInp');
     if(inp) {
         inp.value = prompt;
-        ask(); // Mevcut ask() fonksiyonunu tetikler
+        ask();
     }
 }
 
 function openFullNews(url) {
     const fullView = document.createElement('div');
     fullView.id = 'fullNewsView';
-    // Burası çok önemli: Arka planı her zaman beyaz (white) yapıyoruz ki site orijinal kalsın
     fullView.style = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; flex-direction: column;`;
     
-    // Üst barın rengi yine bizim temaya uysun ama içerik (iframe) her zaman aydınlık kalsın
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const headerBg = isDark ? '#1e293b' : '#f8f9fa';
     const textColor = isDark ? '#f1f5f9' : '#1a1a1a';
@@ -1218,25 +1726,6 @@ function triggerSummaryFromFull() {
     if(inp) { inp.value = "Bu haberi çok kısa şekilde özetle."; ask(); }
 }
 
-async function ask() {
-    const inp = document.getElementById('uInp'); const box = document.getElementById('cBox');
-    if(!inp.value) return; const q = inp.value; inp.value = '';
-    box.innerHTML += `<div class="msg user">${q}</div>`; box.scrollTop = box.scrollHeight;
-    if(active.source === "KHOJ") chatHistory.push({role: 'user', text: q});
-    const ai = document.createElement('div'); ai.className = 'msg ai'; ai.innerHTML = '...'; box.appendChild(ai);
-    let finalQuery = (active && active.source !== "KHOJ") ? `Haber: ${active.title}. Soru: ${q}` : q;
-
-    try {
-        const res = await fetch(KHOJ_URL, { method: 'POST', headers: { 'Authorization': `Bearer ${KHOJ_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ q: finalQuery, stream: true }) });
-        const reader = res.body.getReader(); const decoder = new TextDecoder(); let fullText = "";
-        while (true) {
-            const { done, value } = await reader.read(); if (done) break;
-            fullText += decoder.decode(value); ai.innerHTML = metniTemizle(fullText); box.scrollTop = box.scrollHeight;
-        }
-        if(active.source === "KHOJ") { chatHistory.push({role: 'ai', text: ai.innerHTML}); localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory)); }
-    } catch (e) { ai.innerText = "Bağlantı hatası!"; }
-}
-
 function saveNews() {
     let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
     const currentChat = document.getElementById('cBox') ? document.getElementById('cBox').innerHTML : "";
@@ -1248,7 +1737,6 @@ function saveNews() {
 }
 
 function shareNews(title, link) {
-    // Eğer tarayıcı modern paylaşımı destekliyorsa (Mobilde genelde destekler)
     if (navigator.share) {
         navigator.share({
             title: title,
@@ -1260,7 +1748,6 @@ function shareNews(title, link) {
             console.log('Paylaşım iptal edildi veya hata oluştu', error);
         });
     } else {
-        // Eğer tarayıcı desteklemiyorsa (PC gibi), linki panoya kopyalayalım
         navigator.clipboard.writeText(title + " " + link).then(() => {
             alert("Haber linki panoya kopyalandı!");
         });
@@ -1285,7 +1772,6 @@ function openSavedList() {
 let lastNewsCount = 0;
 
 db.ref('rss_ayarlari').on('value', () => {
-    // Haberler her güncellendiğinde toplam sayıyı kontrol et
     setTimeout(() => {
         if (lastNewsCount > 0 && news.length > lastNewsCount) {
             showNewNewsBadge();
@@ -1295,7 +1781,6 @@ db.ref('rss_ayarlari').on('value', () => {
 });
 
 function showNewNewsBadge() {
-    // Eğer zaten bar varsa tekrar ekleme
     if (document.getElementById('newNewsBadge')) return;
 
     const badge = document.createElement('div');
@@ -1311,22 +1796,18 @@ function handleMainInput() {
 
     const val = inp.value.trim();
     
-    // Regex: * kelime * formatını kontrol et
     const searchRegex = /\*(.*?)\*/; 
     const match = val.match(searchRegex);
 
     if (match) {
-        // ARAMA MODU: * işaretleri arasındaki kelimeyi al
         const query = match[1].trim();
         performLocalNewsSearch(query);
     } else {
-        // SOHBET MODU: Normal metni genel sohbete gönder
         openGeneralChatWithText(val);
     }
-    inp.value = ''; // Kutuyu temizle
+    inp.value = '';
 }
 
-// Haberler İçinde Arama Yapma
 function performLocalNewsSearch(q) {
     const results = news.filter(n => n.title.toLowerCase().includes(q.toLowerCase()) || (n.description && n.description.toLowerCase().includes(q.toLowerCase())) );
     activeSearchQuery = q; 
@@ -1338,7 +1819,6 @@ function performLocalNewsSearch(q) {
     m.innerHTML = html; document.getElementById('ovl').style.display = 'flex';
 } 
 
-// Genel Sohbeti Metinle Başlatma
 function openGeneralChatWithText(text) { 
     openGeneralChat(); 
     setTimeout(() => { 
@@ -1347,21 +1827,17 @@ function openGeneralChatWithText(text) {
     }, 300);
 }
 
-
 function deleteSaved(i) { let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]'); saved.splice(i, 1); localStorage.setItem('khoj_saved_news', JSON.stringify(saved)); openSavedList(); }
 function openSavedDetail(i) { active = JSON.parse(localStorage.getItem('khoj_saved_news'))[i]; openDetail(-2); }
 function openGeneralChat() { active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." }; openDetail(-1); }
 function clearHistory() { chatHistory = []; localStorage.removeItem('khoj_ai_history'); closeM(); showToast("Sıfırlandı!"); }
 function closeM() { 
     document.getElementById('ovl').style.display = 'none'; 
-    
-    // Eğer bir haber detay ekranından çıkılıyorsa ve bir arama sorgusu kalmışsa,
-    // sorguyu yeniden tetikle ve arama listesine dön.
+    document.getElementById('mdl').classList.remove('fullscreen-chat'); // Tam ekran class'ını kaldır
+    autoScrollEnabled = true;
     if (activeSearchQuery) {
-        // Sorguyu yeniden tetikle, bu da yeni modalı açacaktır.
         performLocalNewsSearch(activeSearchQuery); 
     }
-    // Eğer activeSearchQuery == null ise, bu normal bir kapatmadır (AI sohbetten çıkma gibi).
 }
 function showToast(m) { const t = document.getElementById('toast'); if(t) { t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); } }
 </script>
