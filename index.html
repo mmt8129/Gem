@@ -194,65 +194,8 @@ body{
     display:flex;
     gap:14px;
     border:1px solid var(--brd);
-    transition: transform 0.2s ease, opacity 0.2s ease;
-    user-select: none;
-    -webkit-user-select: none;
+    transition:.2s ease;
 }
-
-.news-card.swiping {
-    opacity: 0.8;
-    transform: scale(0.98);
-}
-
-.news-card.swipe-left {
-    transform: translateX(-20px);
-    background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.1));
-}
-
-.news-card.swipe-right {
-    transform: translateX(20px);
-    background: linear-gradient(90deg, rgba(34, 197, 94, 0.1), transparent);
-}
-
-.reading-time-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: rgba(239, 68, 68, 0.1);
-    padding: 4px 8px;
-    border-radius: 20px;
-    font-size: 10px;
-    color: var(--primary);
-    margin-left: 8px;
-}
-
-/* Yükleniyor göstergesi */
-.infinite-scroll-loader {
-    text-align: center;
-    padding: 20px;
-    color: var(--muted);
-}
-
-/* Pull to refresh göstergesi */
-.ptr-indicator {
-    position: fixed;
-    top: 70px;
-    left: 0;
-    right: 0;
-    text-align: center;
-    padding: 10px;
-    background: var(--primary);
-    color: white;
-    font-weight: bold;
-    transform: translateY(-100%);
-    transition: transform 0.3s ease;
-    z-index: 2000;
-}
-
-.ptr-indicator.show {
-    transform: translateY(0);
-}
-
 
 .news-card:hover{
     transform:scale(1.01);
@@ -343,6 +286,43 @@ body{
 .modal-header{
     padding:18px;
     border-bottom:1px solid var(--brd);
+}
+
+/* Haber detay üst butonları için düzenleme */
+.modal-header .btn-icon {
+    width: 28px !important;  /* Daha küçük butonlar */
+    height: 28px !important;
+    font-size: 0.9rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.modal-header .btn-icon-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;  /* Butonlar arası minimum boşluk */
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.modal-header .btn-icon-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--brd);
+    margin: 0 2px;
+}
+
+/* Mobil için ek düzenleme */
+@media (max-width: 480px) {
+    .modal-header .btn-icon {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .modal-header h2 {
+        font-size: 0.9rem !important;
+    }
 }
 
 .modal-body{
@@ -634,15 +614,6 @@ body{
     100% { opacity: 0.2; }
 }
 
-newsCard.addEventListener('touchstart', e => {
-    touchstartX = e.changedTouches[0].screenX;
-});
-
-newsCard.addEventListener('touchend', e => {
-    touchendX = e.changedTouches[0].screenX;
-    handleSwipe();
-});
-
     </style>
 </head>
 <body>
@@ -711,33 +682,6 @@ let autoScrollEnabled = true; // Otomatik kaydırma kontrolü
 let currentNewsLimit = parseInt(localStorage.getItem('news_limit')) || 10;
 let displayedNewsCount = {};
 let allCachedNews = JSON.parse(localStorage.getItem('khoj_cache')) || {};
-let touchstartX = 0;
-let touchendX = 0;
-let touchstartY = 0;
-let isPulling = false;
-newsFeed.addEventListener('touchstart', e => {
-    touchstartY = e.touches[0].clientY;
-});
-
-newsFeed.addEventListener('touchmove', e => {
-    if (newsFeed.scrollTop === 0) {
-        const touchY = e.touches[0].clientY;
-        if (touchY > touchstartY + 100) {
-            // 100px aşağı çekince yenile
-            softRefresh();
-            showToast('🔄 Yenileniyor...');
-        }
-    }
-});
-
-function compareNews(keyword) {
-    const relatedNews = news.filter(n => 
-        n.title.includes(keyword)
-    ).sort((a,b) => new Date(b.pubDate) - new Date(a.pubDate));
-    
-    // Farklı bakış açılarını göster
-}
-
 
 function softRefresh() {
     showToast("Haberler güncelleniyor...");
@@ -745,84 +689,6 @@ function softRefresh() {
     db.ref('rss_ayarlari').once('value', snap => {
         render(); 
     });
-}
-
-async function summarizeNews(newsContent) {
-    const prompt = `Bu haber metnini çok kısaca özetle: ${newsContent}`;
-    
-    // Khoj API'ye özet isteği gönder
-    const summary = await askAI(prompt);
-    
-    // Özeti haberin üstünde göster
-    showSummary(summary);
-}
-
-let isLoadingMore = false;
-
-// NewsFeed'e scroll dinleyicisi ekle
-function setupInfiniteScroll() {
-    const newsFeed = document.getElementById('newsFeed');
-    if (!newsFeed) return;
-    
-    newsFeed.addEventListener('scroll', () => {
-        // Aktif kategoriyi bul
-        const activeBtn = document.querySelector('.cat-item.active');
-        const currentCategory = activeBtn ? activeBtn.innerText.trim().toUpperCase() : "TÜMÜ";
-        
-        // Filtrelenmiş haber sayısını hesapla
-        let filteredNews = news.filter(n => {
-            if (currentCategory === "TÜMÜ") return true;
-            const haberKategorisi = n.category ? n.category.trim().toUpperCase() : "";
-            return haberKategorisi === currentCategory;
-        });
-        
-        const scrollTop = newsFeed.scrollTop;
-        const scrollHeight = newsFeed.scrollHeight;
-        const clientHeight = newsFeed.clientHeight;
-        
-        // %80'e geldiğinde yükle (biraz erken başlasın)
-        if ((scrollTop + clientHeight) >= (scrollHeight * 0.8)) {
-            if (!isLoadingMore && filteredNews.length > visibleCount) {
-                isLoadingMore = true;
-                
-                // Yükleniyor göstergesi ekle
-                const loader = document.createElement('div');
-                loader.className = 'infinite-scroll-loader';
-                loader.id = 'infiniteLoader';
-                loader.innerHTML = '⚡ Daha fazla haber yükleniyor...';
-                newsFeed.appendChild(loader);
-                
-                // Biraz bekle sonra yükle (kullanıcı hissetsin)
-                setTimeout(() => {
-                    loadMoreNews();
-                    document.getElementById('infiniteLoader')?.remove();
-                    isLoadingMore = false;
-                }, 800);
-            }
-        }
-    });
-}
-
-
-
-
-function estimateReadingTime(text) {
-    const wordsPerMinute = 200;
-    const wordCount = text.split(/\s+/).length;
-    const minutes = Math.ceil(wordCount / wordsPerMinute);
-    return `${minutes} dk okuma`;
-}
-
-function handleSwipe() {
-    if (touchendX < touchstartX - 50) {
-        // Sola kaydırma -> kaydet
-        saveNews(active);
-        showToast('💾 Kaydedildi!');
-    }
-    if (touchendX > touchstartX + 50) {
-        // Sağa kaydırma -> paylaş
-        shareNews(active.title, active.link);
-    }
 }
 
 // TEMA SİSTEMİ
@@ -1037,7 +903,7 @@ function render() {
         const realIdx = news.findIndex(x => x.title === n.title);
         return `
             <div class="news-card" onclick="openDetail(${realIdx})">
-                <img loading="lazy" src="${n.thumbnail || 'logo.png'}" onerror="this.src='logo.png'">
+                <img src="${n.thumbnail || 'logo.png'}" onerror="this.src='logo.png'">
                 <div style="flex:1">
                     <div class="news-meta">
                         <span style="color:#ffcc00; font-weight:bold;">${n.source}</span> | 
@@ -1539,9 +1405,7 @@ function openDetail(idx) {
                         style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:16px;">
                     <button class="btn-icon btn-save" id="sendBtn" style="width:50px;">➤</button>
                 </div>
-				<span class="reading-time">📖 ${estimateReadingTime(cleanDesc)}</span>
             </div>`;
-			
     }
 
     // İçerik çekme işlemi (sadece haberler için)
