@@ -488,8 +488,27 @@ body{
     align-self:flex-end;
 }
 
+/* Yazıyor imleci animasyonu */
+.typing-cursor {
+    display: inline-block;
+    width: 4px;
+    height: 18px;
+    background: var(--primary);
+    margin-left: 2px;
+    animation: blink 1s infinite;
+    vertical-align: middle;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
 .msg.ai{
     background:#ededf0;
+	 white-space: pre-wrap;
+    word-break: break-word;
+	
 }
 
 [data-theme="dark"] .msg.ai{
@@ -2037,7 +2056,7 @@ function openDetail(idx) {
     });
     document.getElementById('sendBtn').onclick = ask;
     
-   // setTimeout(focusInput, 300);
+    setTimeout(focusInput, 300);
 }
 
 // Haber detayında resimleri bul
@@ -2264,8 +2283,7 @@ function quickAdjustContent(type, val) {
 }
 
 
-// --- GÜNCELLENMİŞ ask FONKSİYONU ---
-// Promise.race ile timeout eklenmiş versiyon
+// --- HIZLANDIRILMIŞ VE ANLIK YAZMA EFEKTLİ ask FONKSİYONU ---
 async function ask() {
     const inp = document.getElementById('uInp');
     const box = document.getElementById('cBox');
@@ -2274,40 +2292,31 @@ async function ask() {
     
     const q = inp.value.trim();
     inp.value = '';
-	
-	    
+    
     // Kullanıcı mesajını ekle
     const userMsg = document.createElement('div');
     userMsg.className = 'msg user';
     userMsg.textContent = q;
     box.appendChild(userMsg);
-    
     scrollToBottom('smooth');
-   // focusInput();
     
     if(active && active.source === "KHOJ") {
         chatHistory.push({role: 'user', text: q});
     }
     
-    // AI mesajı container
+    // AI mesajı için container oluştur (hemen göster)
     const aiMsg = document.createElement('div');
     aiMsg.className = 'msg ai';
     aiMsg.id = 'currentAiResponse';
-    aiMsg.innerHTML = '<span style="opacity:0.7;">Yanıt bekleniyor<span class="dot-animation">...</span></span>';
+    aiMsg.innerHTML = '<span class="typing-cursor">▋</span>'; // İmleç efekti
     box.appendChild(aiMsg);
-    
     scrollToBottom('smooth');
     
     let finalQuery = (active && active.source !== "KHOJ") ? 
         `Haber: ${active.title}. Soru: ${q}` : q;
 
     try {
-        // Timeout promise
-        const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('timeout')), 5000) // 5 saniye timeout
-        );
-        
-        const fetchPromise = fetch(KHOJ_URL, { 
+        const res = await fetch(KHOJ_URL, { 
             method: 'POST', 
             headers: { 
                 'Authorization': `Bearer ${KHOJ_KEY}`, 
@@ -2316,46 +2325,51 @@ async function ask() {
             body: JSON.stringify({ q: finalQuery, stream: true }) 
         });
         
-        // Race: ya fetch bitecek ya da timeout
-        const res = await Promise.race([fetchPromise, timeoutPromise]);
-        
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         let fullText = "";
+        let tempText = "";
+        let lastUpdate = Date.now();
         
-        // İlk chunk gelene kadar bekleme mesajı
-        aiMsg.innerHTML = '<span style="opacity:0.7;">Yazıyor<span class="dot-animation">...</span></span>';
-        
+        // Her chunk geldikçe ANINDA göster
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
             
-            fullText += decoder.decode(value);
-            const cleanText = metniTemizle(fullText);
+            // Gelen veriyi decode et
+            const chunk = decoder.decode(value, { stream: true });
+            tempText += chunk;
             
-            // Her chunk'ta güncelle
-            aiMsg.innerHTML = cleanText + ' <span style="opacity:0.5;">▋</span>';
-            scrollToBottom('smooth');
+            // Her chunk'ta ekranı güncelle (çok sık güncelleme yapma ama hissettir)
+            const now = Date.now();
+            if (now - lastUpdate > 30 || chunk.includes('\n')) {
+                // Metni temizle ve göster (ama imleçle birlikte)
+                const cleanChunk = metniTemizle(tempText);
+                aiMsg.innerHTML = cleanChunk + ' <span class="typing-cursor">▋</span>';
+                scrollToBottom('smooth');
+                lastUpdate = now;
+                
+                // Küçük bir gecikme ile UI'ın güncellenmesine izin ver
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
         }
         
-        aiMsg.innerHTML = metniTemizle(fullText);
+        // Son metni temizle ve imleç olmadan göster
+        const finalText = metniTemizle(tempText);
+        aiMsg.innerHTML = finalText;
         scrollToBottom('smooth');
         
+        // AI geçmişine ekle
         if(active && active.source === "KHOJ") { 
-            chatHistory.push({role: 'ai', text: aiMsg.innerHTML}); 
+            chatHistory.push({role: 'ai', text: finalText}); 
             localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory)); 
         }
         
-    } catch (e) {
-        if (e.message === 'timeout') {
-            aiMsg.innerHTML = 'Yanıt gelmedi. Lütfen tekrar dene. ⏱️';
-        } else {
-            aiMsg.innerHTML = 'Bağlantı hatası! 😕';
-        }
+    } catch (e) { 
+        console.error("AI hatası:", e);
+        aiMsg.innerHTML = 'Bağlantı hatası! 😕';
         scrollToBottom('smooth');
     }
-    
-   // focusInput();
 }
 
 function askAI(prompt) {
