@@ -798,61 +798,85 @@ body{
     object-fit: cover;
 }
 
+/* Resim görüntüleyici - güncel versiyon */
 .image-viewer {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     z-index: 10000;
     display: none;
     justify-content: center;
     align-items: center;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    animation: fadeIn 0.2s ease;
 }
 
 .image-viewer.show {
     display: flex;
 }
 
-/* Galeri görüntüleyici */
 .image-viewer .gallery-container {
     position: relative;
-    width: 100%;
-    height: 100%;
+    width: 90%;
+    height: 80%;  /* Ekranın %80'i kadar yükseklik */
+    max-width: 1200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    background: rgba(20, 20, 20, 0.3);
+    border-radius: 24px;
+    padding: 10px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .image-viewer .main-viewer-image {
     max-width: 100%;
-    max-height: 80vh;
+    max-height: 70vh;  /* Ekran yüksekliğinin %70'i */
     object-fit: contain;
-    border-radius: 12px;
+    border-radius: 16px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     animation: zoomIn 0.2s ease;
-    transition: transform 0.1s ease;
     cursor: grab;
+    transition: transform 0.1s ease;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
+.image-viewer .main-viewer-image:active {
+    cursor: grabbing;
+}
+
+/* Yakınlaştırma için gerekli */
+.image-viewer .main-viewer-image.zoomed {
+    transform: scale(var(--zoom-scale, 1.5));
+}
+
+/* Alt küçük resim şeridi */
 .image-viewer .thumbnail-strip {
     position: absolute;
-    bottom: 20px;
+    bottom: -60px;  /* Container'ın dışında */
     left: 0;
     right: 0;
     display: flex;
-    gap: 10px;
+    gap: 8px;
     overflow-x: auto;
-    padding: 10px 20px;
+    padding: 8px;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    z-index: 10002;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 30px;
+    margin: 10px auto;
+    width: fit-content;
+    max-width: 90%;
     scrollbar-width: thin;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .image-viewer .thumbnail-strip::-webkit-scrollbar {
@@ -883,16 +907,17 @@ body{
     transform: scale(1.05);
 }
 
+/* Navigasyon butonları - container içinde */
 .image-viewer .nav-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 50px;
-    height: 50px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
     font-size: 1.5rem;
     cursor: pointer;
@@ -900,34 +925,116 @@ body{
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    z-index: 10003;
+    z-index: 10001;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .image-viewer .nav-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.2);
     transform: translateY(-50%) scale(1.1);
 }
 
 .image-viewer .nav-btn.prev {
-    left: 20px;
+    left: 10px;
 }
+
 
 .image-viewer .nav-btn.next {
-    right: 20px;
+    right: 10px;
 }
 
+/* Sayaç */
 .image-viewer .counter {
     position: absolute;
-    top: 20px;
-    left: 20px;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
     color: white;
     padding: 6px 12px;
-    border-radius: 20px;
+    border-radius: 30px;
     font-size: 12px;
     font-weight: 600;
-    z-index: 10003;
+    z-index: 10001;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* İndirme butonu */
+.image-viewer .download-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;  /* Sağda kalsın */
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10001;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Kapatma ipucu */
+.image-viewer .close-hint {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    white-space: nowrap;
+}
+
+/* Kapat butonu */
+.image-viewer .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 60px;  /* Download butonunun yanında */
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 59, 48, 0.8);  /* Kırmızımsı */
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10001;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.image-viewer .close-btn:hover,
+.image-viewer .close-btn:active {
+    background: rgb(255, 59, 48);
+    transform: scale(1.1);
+}
+
+/* Animasyonlar */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
     </style>
@@ -970,18 +1077,36 @@ body{
         <button onclick="handleMainInput()">➤</button>
     </div>
 	
-  <!-- Resim Görüntüleyici -->
+  <!-- Resim <!-- Resim Görüntüleyici - güncel HTML -->
 <div class="image-viewer" id="imageViewer" onclick="closeImageViewer(event)">
     <div class="gallery-container">
+        <!-- Kapat butonu (sağ üstte) -->
+        <button class="close-btn" onclick="closeViewer(); event.stopPropagation();" title="Kapat">✕</button>
+        
+        <!-- Önceki buton -->
         <button class="nav-btn prev" id="prevImageBtn" onclick="navigateGallery(-1); event.stopPropagation();">◀</button>
+        
+        <!-- Ana resim -->
         <img id="viewerImage" class="main-viewer-image" src="" alt="Haber Resmi" draggable="false">
+        
+        <!-- Sonraki buton -->
         <button class="nav-btn next" id="nextImageBtn" onclick="navigateGallery(1); event.stopPropagation();">▶</button>
+        
+        <!-- Sayaç -->
         <div class="counter" id="imageCounter">1/1</div>
+        
+        <!-- İndirme butonu -->
         <button class="download-btn" id="downloadImageBtn" onclick="downloadCurrentImage(event)" title="Resmi Kaydet">⬇️</button>
+        
+        <!-- Alt küçük resimler -->
         <div class="thumbnail-strip" id="thumbnailStrip"></div>
-        <div class="close-hint">⬅️ Geri dönmek için dışarıya tıkla</div>
+        
+        <!-- Kapatma ipucu -->
+        <div class="close-hint">⬅️ Resmin dışına tıkla veya ESC'ye bas</div>
     </div>
 </div>
+
+
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -1945,9 +2070,23 @@ function extractImagesFromNews(newsItem) {
 
 
 
-// Galeriyi aç
+// openGallery fonksiyonunu güncelle
 function openGallery(images, startIndex) {
-    if (!images || images.length === 0) return;
+    console.log("openGallery çağrıldı:", images, startIndex);
+    
+    if (!images || images.length === 0) {
+        console.log("Resim yok");
+        return;
+    }
+    
+    if (typeof images === 'string') {
+        try {
+            images = JSON.parse(images);
+        } catch (e) {
+            console.log("JSON parse hatası:", e);
+            return;
+        }
+    }
     
     currentImages = images;
     currentImageIndex = startIndex;
@@ -1959,33 +2098,56 @@ function openGallery(images, startIndex) {
     const prevBtn = document.getElementById('prevImageBtn');
     const nextBtn = document.getElementById('nextImageBtn');
     
+    if (!viewer || !viewerImage) {
+        console.log("Görüntüleyici elemanları bulunamadı!");
+        return;
+    }
+    
+    // Zoom'u sıfırla
+    viewerImage.style.transform = 'scale(1)';
+    viewerImage.style.transition = 'transform 0.2s ease';
+    currentScale = 1;
+    initialDistance = 0;
+    
     // Ana resmi göster
     viewerImage.src = images[startIndex];
     
+    // Pinch zoom'u ayarla
+    setTimeout(() => {
+        setupPinchZoom();
+    }, 100);
+    
     // Sayaçı güncelle
-    counter.textContent = `${startIndex + 1}/${images.length}`;
+    if (counter) {
+        counter.textContent = `${startIndex + 1}/${images.length}`;
+    }
     
     // Önceki/sonraki butonlarını göster/gizle
-    if (images.length <= 1) {
-        prevBtn.style.display = 'none';
-        nextBtn.style.display = 'none';
-    } else {
-        prevBtn.style.display = 'flex';
-        nextBtn.style.display = 'flex';
+    if (prevBtn && nextBtn) {
+        if (images.length <= 1) {
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+        } else {
+            prevBtn.style.display = 'flex';
+            nextBtn.style.display = 'flex';
+        }
     }
     
     // Küçük resimleri oluştur
-    thumbnailStrip.innerHTML = '';
-    images.forEach((img, idx) => {
-        const thumb = document.createElement('img');
-        thumb.src = img;
-        thumb.className = `thumb-img ${idx === startIndex ? 'active' : ''}`;
-        thumb.onclick = (e) => {
-            e.stopPropagation();
-            navigateToImage(idx);
-        };
-        thumbnailStrip.appendChild(thumb);
-    });
+    if (thumbnailStrip) {
+        thumbnailStrip.innerHTML = '';
+        images.forEach((img, idx) => {
+            const thumb = document.createElement('img');
+            thumb.src = img;
+            thumb.className = `thumb-img ${idx === startIndex ? 'active' : ''}`;
+            thumb.onclick = (e) => {
+                e.stopPropagation();
+                navigateToImage(idx);
+            };
+            thumb.onerror = () => { thumb.src = 'logo.png'; };
+            thumbnailStrip.appendChild(thumb);
+        });
+    }
     
     viewer.classList.add('show');
 }
@@ -2007,6 +2169,7 @@ function navigateGallery(direction) {
     navigateToImage(currentImageIndex);
 }
 
+// navigateToImage fonksiyonunu güncelle (zoom'u sıfırla)
 function navigateToImage(index) {
     if (index < 0 || index >= currentImages.length) return;
     
@@ -2016,41 +2179,31 @@ function navigateToImage(index) {
     const counter = document.getElementById('imageCounter');
     const thumbnails = document.querySelectorAll('.thumb-img');
     
+    if (!viewerImage) return;
+    
+    // Zoom'u sıfırla
+    viewerImage.style.transform = 'scale(1)';
+    viewerImage.style.transition = 'transform 0.2s ease';
+    currentScale = 1;
+    initialDistance = 0;
+    
     // Resmi güncelle
     viewerImage.src = currentImages[index];
-    viewerImage.style.transform = 'scale(1)'; // Zoom'u sıfırla
     
     // Sayaçı güncelle
-    counter.textContent = `${index + 1}/${currentImages.length}`;
+    if (counter) {
+        counter.textContent = `${index + 1}/${currentImages.length}`;
+    }
     
     // Küçük resimleri güncelle
     thumbnails.forEach((thumb, idx) => {
         if (idx === index) {
             thumb.classList.add('active');
-            // Aktif küçük resme kaydır
             thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         } else {
             thumb.classList.remove('active');
         }
     });
-}
-
-// Resim görüntüleyiciyi kapat (güncellenmiş)
-function closeImageViewer(event) {
-    if (event.target === document.getElementById('imageViewer') || 
-        event.target.classList.contains('gallery-container')) {
-        
-        const viewer = document.getElementById('imageViewer');
-        viewer.classList.remove('show');
-        
-        // Resmi sıfırla
-        const viewerImage = document.getElementById('viewerImage');
-        viewerImage.style.transform = 'scale(1)';
-        
-        // Temizlik
-        currentImages = [];
-        currentImageIndex = 0;
-    }
 }
 
 // Resmi kaydet (güncellenmiş)
@@ -2557,19 +2710,37 @@ function openImageViewer(imageSrc) {
     setupPinchZoom();
 }
 
-// Resim görüntüleyiciyi kapat
 function closeImageViewer(event) {
-    // Eğer tıklanan öğe resmin kendisi değilse (yani arkaplan veya container) kapat
-    if (event.target === document.getElementById('imageViewer') || 
-        event.target.classList.contains('image-container')) {
+    // Eğer tıklanan öğe image-viewer'ın kendisi veya gallery-container ise kapat
+    // (yani resmin dışındaki alan)
+    if (event.target.classList.contains('image-viewer') || 
+        event.target.classList.contains('gallery-container')) {
         
-        const viewer = document.getElementById('imageViewer');
-        viewer.classList.remove('show');
-        
-        // Resmi sıfırla
-        const viewerImage = document.getElementById('viewerImage');
-        viewerImage.style.transform = 'scale(1)';
+        closeViewer();
     }
+}
+
+// Yardımcı fonksiyon - viewer'ı kapat
+function closeViewer() {
+    const viewer = document.getElementById('imageViewer');
+    if (!viewer) return;
+    
+    viewer.classList.remove('show');
+    
+    // Zoom'u sıfırla
+    const viewerImage = document.getElementById('viewerImage');
+    if (viewerImage) {
+        viewerImage.style.transform = 'scale(1)';
+        viewerImage.style.transition = 'transform 0.2s ease';
+    }
+    
+    // Değişkenleri sıfırla
+    currentScale = 1;
+    initialDistance = 0;
+    currentImages = [];
+    currentImageIndex = 0;
+    
+    console.log("Galeri kapatıldı");
 }
 
 // Resmi kaydet
@@ -2630,23 +2801,38 @@ async function downloadCurrentImage(event) {
     }
 }
 
-// Yakınlaştırma/uzaklaştırma için pinch zoom
+// ==================== YAKINLAŞTIRMA/UZAKLAŞTIRMA FONKSİYONLARI ====================
 let initialDistance = 0;
 let currentScale = 1;
+let lastTouchX = 0;
+let lastTouchY = 0;
+let isDragging = false;
 
 function setupPinchZoom() {
     const viewerImage = document.getElementById('viewerImage');
+    if (!viewerImage) return;
     
+    // Touch başlangıcı
     viewerImage.addEventListener('touchstart', (e) => {
         if (e.touches.length === 2) {
+            // İki parmakla dokunma - YAKINLAŞTIRMA
+            e.preventDefault();
             const dx = e.touches[0].clientX - e.touches[1].clientX;
             const dy = e.touches[0].clientY - e.touches[1].clientY;
             initialDistance = Math.sqrt(dx * dx + dy * dy);
+            currentScale = parseFloat(viewerImage.style.transform.replace('scale(', '').replace(')', '')) || 1;
+        } else if (e.touches.length === 1) {
+            // Tek parmakla dokunma - KAYDIRMA
+            lastTouchX = e.touches[0].clientX;
+            lastTouchY = e.touches[0].clientY;
+            isDragging = true;
         }
-    }, { passive: true });
+    }, { passive: false });
     
+    // Touch hareketi
     viewerImage.addEventListener('touchmove', (e) => {
         if (e.touches.length === 2) {
+            // İki parmak - YAKINLAŞTIRMA/UZAKLAŞTIRMA
             e.preventDefault();
             
             const dx = e.touches[0].clientX - e.touches[1].clientX;
@@ -2654,23 +2840,82 @@ function setupPinchZoom() {
             const currentDistance = Math.sqrt(dx * dx + dy * dy);
             
             if (initialDistance > 0) {
-                const scale = currentDistance / initialDistance;
-                currentScale = Math.max(1, Math.min(3, scale)); // Min 1x, max 3x
-                viewerImage.style.transform = `scale(${currentScale})`;
+                // Scale hesapla: 1x ile 3x arası
+                let scale = (currentDistance / initialDistance) * currentScale;
+                scale = Math.max(1, Math.min(3, scale)); // Min 1x, max 3x
+                
+                // Scale'i uygula
+                viewerImage.style.transform = `scale(${scale})`;
+                viewerImage.style.transition = 'none'; // Anında zoom
             }
+        } else if (e.touches.length === 1 && isDragging && currentScale > 1) {
+            // Tek parmak - KAYDIRMA (sadece zoom yapıldıysa)
+            e.preventDefault();
+            
+            const touchX = e.touches[0].clientX;
+            const touchY = e.touches[0].clientY;
+            
+            const deltaX = touchX - lastTouchX;
+            const deltaY = touchY - lastTouchY;
+            
+            // Mevcut transform'u al
+            let transform = viewerImage.style.transform;
+            let translateX = 0, translateY = 0;
+            
+            if (transform.includes('translate')) {
+                const matches = transform.match(/translate\(([^,]+)px,\s*([^)]+)px\)/);
+                if (matches) {
+                    translateX = parseFloat(matches[1]) || 0;
+                    translateY = parseFloat(matches[2]) || 0;
+                }
+            }
+            
+            // Yeni pozisyon
+            translateX += deltaX;
+            translateY += deltaY;
+            
+            viewerImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
+            
+            lastTouchX = touchX;
+            lastTouchY = touchY;
         }
     }, { passive: false });
     
-    viewerImage.addEventListener('touchend', () => {
-        initialDistance = 0;
+    // Touch bitişi
+    viewerImage.addEventListener('touchend', (e) => {
+        if (e.touches.length === 0) {
+            initialDistance = 0;
+            isDragging = false;
+            
+            // Eğer scale 1 ise transform'u sıfırla
+            if (currentScale <= 1.05) {
+                viewerImage.style.transform = 'scale(1)';
+                viewerImage.style.transition = 'transform 0.2s ease';
+                currentScale = 1;
+            } else {
+                viewerImage.style.transition = 'transform 0.2s ease';
+            }
+        }
     }, { passive: true });
     
-    // Çift tıklama ile sıfırlama
-    viewerImage.addEventListener('dblclick', () => {
-        currentScale = 1;
+    // Çift tıklama ile zoom sıfırlama
+    viewerImage.addEventListener('dblclick', (e) => {
+        e.preventDefault();
         viewerImage.style.transform = 'scale(1)';
+        viewerImage.style.transition = 'transform 0.3s ease';
+        currentScale = 1;
+        initialDistance = 0;
     });
+    
+    // Tek tıklama ile (opsiyonel - galeride gezinmeyi engellememek için yorumda)
+    // viewerImage.addEventListener('click', (e) => {
+    //     if (currentScale <= 1) {
+    //         // Galeride sonraki resme geç
+    //         navigateGallery(1);
+    //     }
+    // });
 }
+
 
 // ESC tuşu ile kapatma
 document.addEventListener('keydown', (e) => {
