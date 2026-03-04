@@ -486,36 +486,10 @@ body{
     background:var(--primary);
     color:#fff;
     align-self:flex-end;
-	line-height: 1.5 !important;  /* Kullanıcı mesajları */
-    margin-bottom: 12px !important;
-}
-
-/* Veya TEK BİR SATIRLA tüm mesajları ayarla */
-.chat-box .msg {
-    line-height: 1.7 !important;  /* İstersen daha da aç */
-    margin-bottom: 20px !important;
-
-/* Yazıyor imleci animasyonu */
-.typing-cursor {
-    display: inline-block;
-    width: 4px;
-    height: 18px;
-    background: var(--primary);
-    margin-left: 2px;
-    animation: blink 1s infinite;
-    vertical-align: middle;
-}
-
-@keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
 }
 
 .msg.ai{
     background:#ededf0;
-	 white-space: pre-wrap;
-    word-break: break-word;
-	
 }
 
 [data-theme="dark"] .msg.ai{
@@ -1063,30 +1037,6 @@ body{
     to { transform: scale(1); opacity: 1; }
 }
 
-.msg.notification {
-    background: rgba(239, 68, 68, 0.1) !important;
-    border-left: 4px solid #ef4444 !important;
-    border-radius: 12px !important;
-    padding: 16px !important;
-    margin-bottom: 20px !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.msg.notification button {
-    transition: all 0.2s ease;
-}
-
-.msg.notification button:hover {
-    background: #dc2626 !important;
-    transform: scale(1.02);
-}
-
-.msg.notification button:disabled {
-    background: #22c55e !important;
-    cursor: default;
-    transform: none;
-}
-
     </style>
 </head>
 <body>   
@@ -1514,7 +1464,6 @@ function getBestImage(item, sourceName) {
     return kaynakLogosu || `https://ui-avatars.com/api/?name=${sourceName}&background=random&color=fff&size=200`;
 }
 
-// --- 3. MODAL FONKSİYONLARI ---
 function openSettings() {
     const m = document.getElementById('mdl');
     m.innerHTML = `
@@ -1527,7 +1476,7 @@ function openSettings() {
                 <label class="set-label">HABER SAYISI (ANA EKRAN)</label>
                 <div class="set-ctrl">
                     <button onclick="adjustNewsLimit(-5)">-</button>
-                    <span id="newsLimitDisplay" style="min-width:45px; text-align:center; font-weight:bold;">${sets.newsLimit || 10}</span>
+                    <span id="newsLimitDisplay" style="min-width:45px; text-align:center; font-weight:bold; color:var(--text);">${sets.newsLimit || 10}</span>
                     <button onclick="adjustNewsLimit(5)">+</button>
                 </div>
             </div>
@@ -1536,7 +1485,7 @@ function openSettings() {
                 <label class="set-label">ANA EKRAN HABER BAŞLIK BOYUTU</label>
                 <div class="set-ctrl">
                     <button onclick="adjustSet('size',-1)">-</button>
-                    <span style="min-width:45px; text-align:center;">${sets.size}PX</span>
+                    <span style="min-width:45px; text-align:center; color:var(--text);">${sets.size}PX</span>
                     <button onclick="adjustSet('size',1)">+</button>
                 </div>
             </div>
@@ -1545,7 +1494,7 @@ function openSettings() {
                 <label class="set-label">ANA EKRAN HABER BAŞLIK KALINLIĞI</label>
                 <div class="set-ctrl">
                     <button onclick="adjustSet('weight',-100)">-</button>
-                    <span style="min-width:45px; text-align:center;">${sets.weight}</span>
+                    <span style="min-width:45px; text-align:center; color:var(--text);">${sets.weight}</span>
                     <button onclick="adjustSet('weight',100)">+</button>
                 </div>
             </div>
@@ -1554,7 +1503,7 @@ function openSettings() {
                 <label class="set-label">HABER İÇERİK YAZI BOYUTU</label>
                 <div class="set-ctrl">
                     <button onclick="adjustContent('size',-1)">-</button>
-                    <span style="min-width:45px; text-align:center;">${sets.contentSize || 14}PX</span>
+                    <span style="min-width:45px; text-align:center; color:var(--text);">${sets.contentSize || 14}PX</span>
                     <button onclick="adjustContent('size',1)">+</button>
                 </div>
             </div>
@@ -1563,7 +1512,7 @@ function openSettings() {
                 <label class="set-label">HABER İÇERİK SATIR YÜKSEKLİĞİ</label>
                 <div class="set-ctrl">
                     <button onclick="adjustContent('lineHeight',-0.1)">-</button>
-                    <span style="min-width:45px; text-align:center;">${(sets.contentLineHeight || 1.6).toFixed(1)}</span>
+                    <span style="min-width:45px; text-align:center; color:var(--text);">${(sets.contentLineHeight || 1.6).toFixed(1)}</span>
                     <button onclick="adjustContent('lineHeight',0.1)">+</button>
                 </div>
             </div>
@@ -1583,7 +1532,6 @@ function openSettings() {
         </div>`;
     document.getElementById('ovl').style.display = 'flex';
 }
-
 // Haber içerik boyutu ayarı
 function adjustContent(type, val) {
     if(type === 'size') {
@@ -2463,6 +2411,7 @@ let pendingRequest = null;
 let pendingAiMsg = null;
 let pendingQ = null;
 
+// --- BASİT SOHBET ASK FONKSİYONU (ESKİ HALİ) ---
 async function ask() {
     console.time('🤖 Gemini Cevap Süresi');
     
@@ -2474,7 +2423,7 @@ async function ask() {
     const q = inp.value.trim();
     inp.value = '';
     
-    // Kullanıcı mesajını ekle
+    // Kullanıcı mesajını ekle (sağda)
     const userMsg = document.createElement('div');
     userMsg.className = 'msg user';
     userMsg.textContent = q;
@@ -2485,45 +2434,19 @@ async function ask() {
         chatHistory.push({role: 'user', text: q});
     }
     
-    // "Yazıyor..." mesajı
+    // AI mesajı (solda)
     const aiMsg = document.createElement('div');
     aiMsg.className = 'msg ai';
     aiMsg.id = 'currentAiResponse';
-    aiMsg.innerHTML = '🔍 Araştırıyorum...';
+    aiMsg.innerHTML = '<span class="typing-cursor">▋</span>';
     box.appendChild(aiMsg);
     scrollToBottom('smooth');
     
-    // --- BEKLEYEN İSTEĞİ KAYDET ---
-    pendingAiMsg = aiMsg;
-    pendingQ = q;
-    
-    // --- SON 5 MESAJI AL ---
-    let lastMessages = [];
-    if (active && active.source === "KHOJ" && chatHistory.length > 0) {
-        lastMessages = chatHistory.slice(-5);
-    }
-    
-    // --- KONUŞMA GEÇMİŞİNİ HAZIRLA ---
-    let contents = [];
-    
-    let userMessage = q;
+    // Haber detayındaysa haber bağlamını ekle
+    let prompt = q;
     if (active && active.source !== "KHOJ" && active.title) {
-        userMessage = `Haber: ${active.title}\n\n${active.description || ''}\n\nSoru: ${q}`;
+        prompt = `Haber: ${active.title}\n\n${active.description || ''}\n\nSoru: ${q}`;
     }
-    
-    if (lastMessages.length > 0) {
-        lastMessages.forEach(msg => {
-            contents.push({
-                role: msg.role === 'user' ? 'user' : 'model',
-                parts: [{ text: msg.text }]
-            });
-        });
-    }
-    
-    contents.push({
-        role: "user",
-        parts: [{ text: userMessage }]
-    });
     
     try {
         const response = await fetch(`${GEMINI_URL}?key=${decryptAPIKey(ENCRYPTED_KEY)}`, {
@@ -2532,7 +2455,11 @@ async function ask() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                contents: contents,
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }],
                 tools: [{ googleSearch: {} }],
                 generationConfig: {
                     temperature: 0.7,
@@ -2544,7 +2471,6 @@ async function ask() {
         const data = await response.json();
         
         let cevap = '';
-        
         if (data.candidates && data.candidates[0] && data.candidates[0].content) {
             cevap = data.candidates[0].content.parts[0].text || 'Cevap alınamadı.';
         } else {
@@ -2553,71 +2479,22 @@ async function ask() {
         }
         
         const temizCevap = metniTemizle(cevap);
-        
-        // --- PENCERE KONTROLÜ (SÜRESİZ) ---
-        const modal = document.getElementById('ovl');
-        const isModalOpen = modal.style.display === 'flex';
-        
-        if (isModalOpen) {
-            // Pencere açıksa direkt göster
-            aiMsg.innerHTML = temizCevap;
-            scrollToBottom('smooth');
-            
-            // Geçmişe ekle
-            if(active && active.source === "KHOJ") { 
-                chatHistory.push({role: 'ai', text: temizCevap}); 
-                if (chatHistory.length > 50) chatHistory = chatHistory.slice(-50);
-                localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory)); 
-            }
-            
-} else {
-    // Pencere kapalıysa, sadece bildirim olarak kaydet
-    showToast('💬 Yeni AI cevabı geldi!');
-    
-    // Bildirim listesine ekle
-    let pendingResponses = JSON.parse(localStorage.getItem('pending_ai_responses') || '[]');
-    pendingResponses.push({
-        id: Date.now(),
-        question: pendingQ,
-        answer: temizCevap,
-        timestamp: Date.now(),
-        context: active ? (active.title || 'Genel Sohbet') : 'Genel Sohbet'
-    });
-    
-    // Son 10 cevabı tut
-    if (pendingResponses.length > 10) {
-        pendingResponses = pendingResponses.slice(-10);
-    }
-    
-    localStorage.setItem('pending_ai_responses', JSON.stringify(pendingResponses));
-    
-    // Rozeti güncelle
-    addNotificationBadge(pendingResponses.length);
-}
+        aiMsg.innerHTML = temizCevap;
+        scrollToBottom('smooth');
         
         console.timeEnd('🤖 Gemini Cevap Süresi');
         
-        pendingRequest = null;
-        pendingAiMsg = null;
-        pendingQ = null;
+        if(active && active.source === "KHOJ") { 
+            chatHistory.push({role: 'ai', text: temizCevap}); 
+            if (chatHistory.length > 50) chatHistory = chatHistory.slice(-50);
+            localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory)); 
+        }
         
     } catch (e) {
         console.error('Gemini hatası:', e);
-        
-        const modal = document.getElementById('ovl');
-        const isModalOpen = modal.style.display === 'flex';
-        
-        if (isModalOpen) {
-            aiMsg.innerHTML = 'Bağlantı hatası! 😕';
-            scrollToBottom('smooth');
-        } else {
-            showToast('❌ AI cevabı gelirken hata oluştu');
-        }
-        
+        aiMsg.innerHTML = 'Bağlantı hatası! 😕';
+        scrollToBottom('smooth');
         console.timeEnd('🤖 Gemini Cevap Süresi');
-        pendingRequest = null;
-        pendingAiMsg = null;
-        pendingQ = null;
     }
 }
 
