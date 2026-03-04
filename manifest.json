@@ -1,21 +1,25 @@
 {
-  "name": "Gemini AI Dashboard",
-  "short_name": "GeminiAI",
-  "description": "Profesyonel Haber ve AI Asistanı",
-  "start_url": "index.html",
+  "name": "Gemini Pro Haber",
+  "short_name": "Gemini Haber",
+  "description": "Yapay zeka destekli haber ve sohbet uygulaması",
+  "start_url": "/Gem/",
   "display": "standalone",
-  "background_color": "#FFFFFF",
-  "theme_color": "#4880FF",
+  "background_color": "#000000",
+  "theme_color": "#e11d48",
+  "orientation": "portrait",
+  "scope": "/Gem/",
   "icons": [
     {
-      "src": "icon.png",
+      "src": "/Gem/icon.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-     "src": "icon.png",
+      "src": "/Gem/icon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
