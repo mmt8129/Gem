@@ -313,12 +313,13 @@ body{
 /* ========= NEWS CARD ========= */
 .news-card{
     background:var(--card-bg);
-    border-radius:20px;
-    padding:14px;
+    border-radius:24px;  /* 20px'den 24px'e çıktı */
+    padding:18px;        /* 14px'den 18px'e çıktı */
     display:flex;
-    gap:14px;
+    gap:18px;            /* 14px'den 18px'e çıktı */
     border:1px solid var(--brd);
     transition: all 0.2s ease;
+    margin-bottom:16px;  /* Kartlar arası boşluk eklendi */
 }
 
 .news-card:active {
@@ -330,23 +331,43 @@ body{
 }
 
 .news-card img{
-    width:95px;
-    height:95px;
-    border-radius:14px;
+    width:120px;         /* 95px'den 120px'e çıktı */
+    height:120px;        /* 95px'den 120px'e çıktı */
+    border-radius:18px;  /* 14px'den 18px'e çıktı */
     object-fit:cover;
 }
 
 .news-title{
     font-size:var(--news-size)!important;
     font-weight:var(--news-weight)!important;
-    line-height:1.35;
+    line-height:1.4;     /* 1.35'den 1.4'e çıktı */
+    margin-top:4px;      /* Başlık için üst boşluk */
 }
 
 .news-meta{
-    font-size:0.7rem;
+    font-size:0.8rem;    /* 0.7rem'den 0.8rem'e çıktı */
     color:var(--muted);
     font-weight:600;
-    margin-bottom:6px;
+    margin-bottom:8px;   /* 6px'den 8px'e çıktı */
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.news-source-badge {
+    background:var(--primary);
+    color:white;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:0.7rem;
+    font-weight:700;
+}
+
+.news-date-badge {
+    background:rgba(255,255,255,0.1);
+    padding:4px 8px;
+    border-radius:12px;
+    font-size:0.65rem;
 }
 
 /* ========= ALT ARAMA BAR ========= */
@@ -1037,25 +1058,96 @@ body{
     to { transform: scale(1); opacity: 1; }
 }
 
+/* ========= SIRALAMA MENÜSÜ ========= */
+.sort-menu {
+    position: fixed;
+    top: 70px;
+    right: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--brd);
+    border-radius: 16px;
+    padding: 8px;
+    z-index: 2000;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    min-width: 200px;
+    display: none;
+}
+
+.sort-menu.show {
+    display: block;
+    animation: slideDown 0.2s ease;
+}
+
+.sort-item {
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s;
+    color: var(--text);
+}
+
+.sort-item:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.sort-item.active {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.sort-item span:first-child {
+    font-size: 1.2rem;
+}
+
+.sort-icon {
+    margin-left: auto;
+    color: var(--primary);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Sıralama butonu aktifken */
+.btn-sort.active {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+
     </style>
 </head>
 <body>   
 
-    <header class="header">
-        <div class="header-left">
-            <button class="btn-icon" onclick="openSettings()">⚙️</button>
-            <button class="btn-icon" id="themeBtn" onclick="toggleTheme()">🌙</button>
-        </div>
-        <div class="header-center">
-            <span class="time-text" id="clk">00:00</span>
-            <span class="date-text" id="dt">YÜKLENİYOR</span>
-        </div>
-        <div class="header-right">
-            <button class="btn-icon btn-gemini" onclick="openGeneralChat()">✨</button>
-            <button class="btn-icon btn-save" onclick="openSavedList()">💾</button>
-           <button class="btn-icon" onclick="softRefresh()">🔄</button>
-        </div>
-    </header>
+  <header class="header">
+    <div class="header-left">
+        <button class="btn-icon" onclick="openSettings()">⚙️</button>
+        <button class="btn-icon" id="themeBtn" onclick="toggleTheme()">🌙</button>
+    </div>
+    <div class="header-center">
+        <span class="time-text" id="clk">00:00</span>
+        <span class="date-text" id="dt">YÜKLENİYOR</span>
+    </div>
+    <div class="header-right">
+        <button class="btn-icon btn-sort" onclick="openSortMenu()" title="Sıralama" id="sortBtn">🔽</button>
+        <button class="btn-icon btn-gemini" onclick="openGeneralChat()">✨</button>
+        <button class="btn-icon btn-save" onclick="openSavedList()">💾</button>
+        <button class="btn-icon" onclick="softRefresh()">🔄</button>
+    </div>
+</header>
 
 <div class="category-bar" id="catBar">
     <div class="cat-item active" onclick="filterCat('TÜMÜ')">TÜMÜ</div>
@@ -1230,6 +1322,144 @@ function updateTime() {
     if(dt) dt.innerText = n.toLocaleDateString('tr-TR', {day:'numeric', month:'long'}).toUpperCase();
 }
 setInterval(updateTime, 1000); updateTime(); applySets();
+
+// --- 2.5 SIRALAMA SİSTEMİ ---
+let sortConfig = {
+    type: localStorage.getItem('khoj_sort_type') || 'date', // 'date', 'source', 'title'
+    direction: localStorage.getItem('khoj_sort_dir') || 'desc' // 'asc', 'desc'
+};
+
+// Sıralama menüsünü aç
+function openSortMenu() {
+    // Varolan menüyü kaldır
+    const existingMenu = document.getElementById('sortMenu');
+    if (existingMenu) existingMenu.remove();
+    
+    // Menüyü oluştur
+    const menu = document.createElement('div');
+    menu.id = 'sortMenu';
+    menu.className = 'sort-menu';
+    
+    const sortOptions = [
+        { type: 'date', label: 'Tarihe Göre', icon: '📅', desc: '🔽 Yeniden Eskiye', asc: '🔼 Eskiden Yeniye' },
+        { type: 'source', label: 'Kaynağa Göre', icon: '📰', desc: '🔽 Z\'den A\'ya', asc: '🔼 A\'dan Z\'ye' },
+        { type: 'title', label: 'Başlığa Göre', icon: '📝', desc: '🔽 Z\'den A\'ya', asc: '🔼 A\'dan Z\'ye' }
+    ];
+    
+    let menuHTML = '';
+    sortOptions.forEach(opt => {
+        const isActive = sortConfig.type === opt.type;
+        const currentDir = isActive ? sortConfig.direction : 'desc';
+        
+        menuHTML += `
+            <div class="sort-item ${isActive ? 'active' : ''}" onclick="changeSort('${opt.type}')">
+                <span>${opt.icon}</span>
+                <span style="flex:1;">${opt.label}</span>
+                <span class="sort-icon" onclick="event.stopPropagation(); toggleSortDirection('${opt.type}')">
+                    ${isActive ? (sortConfig.direction === 'desc' ? '🔽' : '🔼') : '🔽'}
+                </span>
+            </div>
+        `;
+    });
+    
+    menu.innerHTML = menuHTML;
+    document.body.appendChild(menu);
+    
+    // Menüyü göster
+    setTimeout(() => menu.classList.add('show'), 10);
+    
+    // Butonu aktif yap
+    const sortBtn = document.getElementById('sortBtn');
+    if (sortBtn) sortBtn.classList.add('active');
+    
+    // Dışarı tıklayınca kapat
+    setTimeout(() => {
+        document.addEventListener('click', function closeSortMenu(e) {
+            if (!menu.contains(e.target) && e.target.id !== 'sortBtn') {
+                menu.classList.remove('show');
+                document.getElementById('sortBtn')?.classList.remove('active');
+                setTimeout(() => menu.remove(), 200);
+                document.removeEventListener('click', closeSortMenu);
+            }
+        });
+    }, 100);
+}
+
+// Sıralama tipini değiştir
+function changeSort(type) {
+    sortConfig.type = type;
+    localStorage.setItem('khoj_sort_type', type);
+    
+    // Menüyü güncelle ve render'ı yenile
+    openSortMenu(); // Menüyü yeniden aç (aktif öğeyi göstermek için)
+    render(); // Haberleri yeniden sırala ve göster
+    
+    showToast(`📊 ${getSortLabel(type)} ile sıralanıyor`);
+}
+
+// Sıralama yönünü değiştir (asc/desc)
+function toggleSortDirection(type) {
+    // Eğer farklı bir tipe tıklandıysa, önce tipi değiştir
+    if (type !== sortConfig.type) {
+        sortConfig.type = type;
+        sortConfig.direction = 'desc'; // Varsayılan
+    } else {
+        // Aynı tip için yönü değiştir
+        sortConfig.direction = sortConfig.direction === 'desc' ? 'asc' : 'desc';
+    }
+    
+    localStorage.setItem('khoj_sort_type', sortConfig.type);
+    localStorage.setItem('khoj_sort_dir', sortConfig.direction);
+    
+    // Menüyü güncelle
+    openSortMenu();
+    render(); // Haberleri yeniden sırala ve göster
+    
+    const dirText = sortConfig.direction === 'desc' ? 'Azalan' : 'Artan';
+    showToast(`📊 ${getSortLabel(sortConfig.type)} (${dirText})`);
+}
+
+// Sıralama etiketini getir
+function getSortLabel(type) {
+    const labels = {
+        'date': 'Tarih',
+        'source': 'Kaynak',
+        'title': 'Başlık'
+    };
+    return labels[type] || type;
+}
+
+// Haberleri sırala (render fonksiyonu içinde kullanılacak)
+function sortNews(newsArray) {
+    return [...newsArray].sort((a, b) => {
+        let comparison = 0;
+        
+        switch(sortConfig.type) {
+            case 'date':
+                // Tarihe göre sırala
+                const dateA = a.pubDate ? new Date(a.pubDate).getTime() : 0;
+                const dateB = b.pubDate ? new Date(b.pubDate).getTime() : 0;
+                comparison = dateA - dateB;
+                break;
+                
+            case 'source':
+                // Kaynağa göre sırala
+                comparison = (a.source || '').localeCompare(b.source || '');
+                break;
+                
+            case 'title':
+                // Başlığa göre sırala
+                comparison = (a.title || '').localeCompare(b.title || '');
+                break;
+                
+            default:
+                return 0;
+        }
+        
+        // Yönü uygula (desc: büyükten küçüğe, asc: küçükten büyüğe)
+        return sortConfig.direction === 'desc' ? -comparison : comparison;
+    });
+}
 
 function metniTemizle(hamMetin) {
     let temiz = hamMetin.replace(/␃🔚␗/g, '').replace(/\{"organic":[\s\S]*?\}\}/g, '').replace(/\{"peopleAlsoAsk":[\s\S]*?\}\}/g, '').replace(/"organic":\s*\[[\s\S]*?\]/g, '').replace(/"codeContext":\s*\{[\s\S]*?\}/g, '').replace(/"position":\s*\d+/g, '').replace(/\{.*?\}/g, '');
@@ -1464,17 +1694,22 @@ function render() {
     const activeBtn = document.querySelector('.cat-item.active');
     const currentCategory = activeBtn ? activeBtn.innerText.trim().toUpperCase() : "TÜMÜ";
 
+    // Kategoriye göre filtrele
     let filteredNews = news.filter(n => {
         if (currentCategory === "TÜMÜ") return true;
         const haberKategorisi = n.category ? n.category.trim().toUpperCase() : "";
         return haberKategorisi === currentCategory;
     });
 
+    // SIRALAMA UYGULA
+    filteredNews = sortNews(filteredNews);
+
     if (filteredNews.length === 0) {
         f.innerHTML = `
             <div style="text-align:center; padding:50px; color:var(--text);">
-                <div style="font-size:30px;">📂</div>
-                <br>${currentCategory} kategorisinde henüz haber yok.
+                <div style="font-size:48px; margin-bottom:20px;">📂</div>
+                <div style="font-size:18px; font-weight:600;">${currentCategory} kategorisinde haber yok</div>
+                <div style="font-size:14px; color:var(--muted); margin-top:10px;">Farklı bir kategori seçmeyi dene</div>
             </div>`;
         return;
     }
@@ -1483,24 +1718,43 @@ function render() {
 
     f.innerHTML = displayedNews.map((n) => {
         const realIdx = news.findIndex(x => x.title === n.title);
+        
+        // Tarihi formatla
+        let displayDate = '';
+        if (n.pubDate) {
+            const d = new Date(n.pubDate);
+            if (!isNaN(d.getTime())) {
+                displayDate = d.toLocaleDateString('tr-TR', { 
+                    day: 'numeric', 
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } else {
+                displayDate = n.pubDate.substring(0, 16);
+            }
+        }
+        
         return `
             <div class="news-card" onclick="openDetail(${realIdx})">
-                <img src="${n.thumbnail || 'logo.png'}" onerror="this.src='logo.png'">
+                <img src="${n.thumbnail || 'logo.png'}" onerror="this.src='logo.png'" loading="lazy">
                 <div style="flex:1">
                     <div class="news-meta">
-                        <span style="color:#ffcc00; font-weight:bold;">${n.source}</span> | 
-                        <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:10px;">${n.category}</span>
+                        <span class="news-source-badge">${n.source}</span>
+                        <span class="news-date-badge">${displayDate || 'Tarih yok'}</span>
+                        <span style="background:rgba(239,68,68,0.2); color:#ef4444; padding:4px 8px; border-radius:12px; font-size:0.65rem; font-weight:700;">${n.category}</span>
                     </div>
                     <div class="news-title">${n.title}</div>
+                    ${n.description ? `<div style="font-size:0.8rem; color:var(--muted); margin-top:8px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${n.description.replace(/<[^>]*>/g, '').substring(0, 100)}...</div>` : ''}
                 </div>
             </div>`;
     }).join('');
 
     if (filteredNews.length > visibleCount) {
         f.innerHTML += `
-            <div id="loadMoreArea" style="text-align:center; padding:1px;">
-                <button class="btn-full" style="background:var(--primary); color:white; font-weight:bold;" onclick="loadMoreNews()">
-                    ➕ DAHA FAZLA GÖSTER
+            <div id="loadMoreArea" style="text-align:center; padding:20px 10px 40px 10px;">
+                <button class="btn-full" style="background:var(--primary); color:white; font-weight:bold; padding:16px; border-radius:30px;" onclick="loadMoreNews()">
+                    ➕ DAHA FAZLA GÖSTER (${filteredNews.length - visibleCount} HABER DAHA)
                 </button>
             </div>`;
     }
@@ -2153,6 +2407,10 @@ function openDetail(idx) {
     } else {
         // Normal haber detayı
         m.innerHTML = `
+		
+<div style="font-size:10px; color:var(--muted); margin-top:4px;">
+    Sıralama: ${getSortLabel(sortConfig.type)} (${sortConfig.direction === 'desc' ? 'Azalan' : 'Artan'})
+</div>
             <div class="modal-header" style="padding: 10px 15px;">
                 <div style="display:flex; justify-content: space-between; align-items:center; width:100%;">
                     <div style="font-weight: 800; font-size: 0.9rem; color: var(--primary); font-family: 'Orbitron';">
