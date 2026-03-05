@@ -1346,21 +1346,29 @@ async function fetchAllNews() {
                           el.querySelector("lastBuildDate")?.textContent || 
                           "";
 
-                let img = "";
-                const enclosure = el.querySelector("enclosure");
-                if (enclosure) img = enclosure.getAttribute("url");
+               // Resim bulma mantığını GENİŞLET:
+let img = "";
 
-                if (title && title.length > 5) {
-                    news.push({
-                        title: title.trim(),
-                        link: link.trim(),
-                        source: rss.ad,
-                        category: rss.kategori || "GÜNDEM",
-                        pubDate: date,
-                        thumbnail: img || rss.logo || "https://mmt8129.github.io/Gem/rsslogo.png"
-                    });
-                }
-            });
+// 1. Önce media:content dene (en yaygın)
+const mediaContent = el.querySelector("media\\:content, content");
+if (mediaContent) img = mediaContent.getAttribute("url");
+
+// 2. O da yoksa media:thumbnail dene
+if (!img) {
+    const mediaThumb = el.querySelector("media\\:thumbnail, thumbnail");
+    if (mediaThumb) img = mediaThumb.getAttribute("url");
+}
+
+// 3. O da yoksa enclosure dene
+if (!img) {
+    const enclosure = el.querySelector("enclosure");
+    if (enclosure) img = enclosure.getAttribute("url");
+}
+
+// 4. Hiçbiri yoksa RSS logosunu veya varsayılanı kullan
+if (!img) {
+    img = rss.logo || "https://mmt8129.github.io/Gem/rsslogo.png";
+}
             
             news.sort(() => Math.random() - 0.5);
             localStorage.setItem('khoj_news_cache', JSON.stringify(news));
