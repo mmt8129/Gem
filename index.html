@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <link rel="manifest" href="/Gem/manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="/Gem/icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gemini Pro Dashboard v7</title>
@@ -1112,16 +1112,6 @@ body{
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/Gem/sw.js')
-      .then(reg => console.log('Service Worker kayıtlı:', reg.scope))
-      .catch(err => console.log('Service Worker hatası:', err));
-  });
-}
-</script>
-	
-<script>
 
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -1346,9 +1336,43 @@ async function fetchAllNews() {
                           el.querySelector("lastBuildDate")?.textContent || 
                           "";
 
+                // === YENİ: Resim bulma mantığı (genişletilmiş) ===
                 let img = "";
-                const enclosure = el.querySelector("enclosure");
-                if (enclosure) img = enclosure.getAttribute("url");
+                
+                // 1. media:content dene (en yaygın)
+                const mediaContent = el.querySelector("media\\:content");
+                if (mediaContent) img = mediaContent.getAttribute("url");
+                
+                // 2. O da yoksa media:thumbnail dene
+                if (!img) {
+                    const mediaThumb = el.querySelector("media\\:thumbnail");
+                    if (mediaThumb) img = mediaThumb.getAttribute("url");
+                }
+                
+                // 3. O da yoksa enclosure dene (eski RSS'ler)
+                if (!img) {
+                    const enclosure = el.querySelector("enclosure");
+                    if (enclosure) img = enclosure.getAttribute("url");
+                }
+                
+				if (!img) {
+    const imageTag = el.querySelector("image");
+    if (imageTag) img = imageTag.textContent || imageTag.getAttribute("url");
+}
+
+if (!img) {
+    const description = el.querySelector("description");
+    if (description) {
+        const descText = description.textContent || "";
+        // <img src="..." yakala
+        const imgMatch = descText.match(/<img[^>]+src="([^">]+)"/);
+        if (imgMatch && imgMatch[1]) {
+            img = imgMatch[1];
+        }
+    }
+}
+                // 4. Hiçbiri yoksa boş bırak (sonra rss.logo veya varsayılan kullanılacak)
+                // === YENİ KISIM BURADA BİTTİ ===
 
                 if (title && title.length > 5) {
                     news.push({
