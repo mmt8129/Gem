@@ -1336,43 +1336,79 @@ async function fetchAllNews() {
                           el.querySelector("lastBuildDate")?.textContent || 
                           "";
 
-                // === YENİ: Resim bulma mantığı (genişletilmiş) ===
+                // === RESİM BULMA MANTIĞI (8 FARKLI FORMAT) ===
                 let img = "";
                 
-                // 1. media:content dene (en yaygın)
+                // 1. media:content dene (CHIP, Webtekno, Onedio, Sordum, GZT, Donanım Günlüğü)
                 const mediaContent = el.querySelector("media\\:content");
                 if (mediaContent) img = mediaContent.getAttribute("url");
                 
-                // 2. O da yoksa media:thumbnail dene
+                // 2. O da yoksa media:thumbnail dene (CHIP, bazı RSS'ler)
                 if (!img) {
                     const mediaThumb = el.querySelector("media\\:thumbnail");
                     if (mediaThumb) img = mediaThumb.getAttribute("url");
                 }
                 
-                // 3. O da yoksa enclosure dene (eski RSS'ler)
+                // 3. O da yoksa enclosure dene (CHIP, DonanımHaber, eski RSS'ler)
                 if (!img) {
                     const enclosure = el.querySelector("enclosure");
                     if (enclosure) img = enclosure.getAttribute("url");
                 }
                 
-				if (!img) {
-    const imageTag = el.querySelector("image");
-    if (imageTag) img = imageTag.textContent || imageTag.getAttribute("url");
-}
-
-if (!img) {
-    const description = el.querySelector("description");
-    if (description) {
-        const descText = description.textContent || "";
-        // <img src="..." yakala
-        const imgMatch = descText.match(/<img[^>]+src="([^">]+)"/);
-        if (imgMatch && imgMatch[1]) {
-            img = imgMatch[1];
-        }
-    }
-}
-                // 4. Hiçbiri yoksa boş bırak (sonra rss.logo veya varsayılan kullanılacak)
-                // === YENİ KISIM BURADA BİTTİ ===
+                // 4. O da yoksa image etiketi dene (CNN Türk, CNN Dünya)
+                if (!img) {
+                    const imageTag = el.querySelector("image");
+                    if (imageTag) img = imageTag.textContent || imageTag.getAttribute("url");
+                }
+                
+                // 5. O da yoksa ipimage etiketi dene (Mynet)
+                if (!img) {
+                    const ipImage = el.querySelector("ipimage");
+                    if (ipImage) img = ipImage.textContent || ipImage.getAttribute("url");
+                }
+                
+                // 6. O da yoksa img640x360 veya img300x300 dene (Mynet alternatif)
+                if (!img) {
+                    const img640 = el.querySelector("img640x360");
+                    if (img640) img = img640.textContent;
+                }
+                if (!img) {
+                    const img300 = el.querySelector("img300x300");
+                    if (img300) img = img300.textContent;
+                }
+                
+                // 7. O da yoksa content:encoded içindeki img'den resim bul (Donanım Günlüğü, WordPress)
+                if (!img) {
+                    const contentEncoded = el.querySelector("content\\:encoded");
+                    if (contentEncoded) {
+                        const contentText = contentEncoded.textContent || "";
+                        const imgMatch = contentText.match(/<img[^>]+src="([^">]+)"/);
+                        if (imgMatch && imgMatch[1]) {
+                            img = imgMatch[1];
+                        }
+                    }
+                }
+                
+                // 8. O da yoksa description içindeki img'den resim bul (Milliyet, Takvim, Ahaber, Haber7, Megabayt)
+                if (!img) {
+                    const description = el.querySelector("description");
+                    if (description) {
+                        const descText = description.textContent || "";
+                        // <img src="..." yakala
+                        const imgMatch = descText.match(/<img[^>]+src="([^">]+)"/);
+                        if (imgMatch && imgMatch[1]) {
+                            img = imgMatch[1];
+                        } else {
+                            // Ayrıca <a href="..."><img src="..."/></a> formatını dene
+                            const linkImgMatch = descText.match(/<a[^>]+><img[^>]+src="([^">]+)"[^>]*><\/a>/);
+                            if (linkImgMatch && linkImgMatch[1]) {
+                                img = linkImgMatch[1];
+                            }
+                        }
+                    }
+                }
+                
+                // === RESİM BULMA MANTIĞI BİTTİ ===
 
                 if (title && title.length > 5) {
                     news.push({
