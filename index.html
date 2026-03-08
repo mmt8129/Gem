@@ -271,12 +271,6 @@ body{
 
 .category-bar::-webkit-scrollbar{display:none;}
 
-/* Karanlık mod için özel ekleme (Gerekirse) */
-body.dark-mode .category-item.active {
-    background: #ff4d4d !important;
-    color: white !important;
-}
-		
 .cat-item{
     font-size:0.8rem;
     font-weight:600;
@@ -510,7 +504,6 @@ body.dark-mode .category-item.active {
     font-size:var(--chat-size);
     font-weight:var(--chat-weight);
     max-width:100%;
-	
 }
 
 .msg.user{
@@ -522,9 +515,6 @@ body.dark-mode .category-item.active {
 .msg.ai{
     background:#ededf0;
 	border-radius: 2px 2px 2px 0px;
-max-width:100%;
-	width: fit-content;
-    word-wrap: break-word;
 }
 
 [data-theme="dark"] .msg.ai{
@@ -2603,7 +2593,7 @@ function openDetail(idx) {
                             ✨ AI ile Özetle
                         </button>
                     </div>
-                    <div class="chat-box" id="cBox" style="min-height:250px; max-height:350px; overflow-y:auto; padding:10px; ">
+                    <div class="chat-box" id="cBox" style="min-height:250px; max-height:350px; overflow-y:auto; padding:10px;">
                         <div class="msg ai">Haber hakkında soru sorabilirsin...</div>
                     </div>
                 </div>
