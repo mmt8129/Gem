@@ -1660,6 +1660,13 @@ async function fetchAllNews() {
                             }
                         }
                         
+						// EĞER HALA BOŞSA (ShiftDelete gibi kaynaklar için burası hayat kurtarır)
+if (!imageUrl) {
+    const desc = item.querySelector('description')?.textContent || '';
+    const imgMatch = desc.match(/<img[^>]+src="([^">]+)"/);
+    if (imgMatch && imgMatch[1]) imageUrl = imgMatch[1];
+}
+						
                         // Eğer hala bulunamadıysa, doğrudan resim URL'si ara
                         if (!img) {
                             const urlMatch = descText.match(/(https?:\/\/[^\s"']+\.(jpg|jpeg|png|gif|webp))/i);
