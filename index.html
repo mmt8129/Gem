@@ -7,6 +7,8 @@
     <link rel="apple-touch-icon" href="icon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <!-- HTML head kısmına ekleyin -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * self 'unsafe-inline' 'unsafe-eval' blob: data: gap:; object-src * self blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;">
     <title>Gemini Pro Dashboard v7</title>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Orbitron:wght@600&display=swap" rel="stylesheet">
     <!-- Toast bildirimleri için -->
@@ -1546,21 +1548,25 @@ async function fetchAllNews() {
         return;
     }
     
-    document.getElementById('newsFeed').innerHTML = '<div style="text-align:center; padding:50px; color:white;">Haberler Cloudflare hattından geliyor...</div>';
+    document.getElementById('newsFeed').innerHTML = '<div style="text-align:center; padding:50px; color:var(--text);">Haberler Cloudflare hattından geliyor...</div>';
 
     for (const id in rssListesi) {
         const rss = rssListesi[id];
         try {
+            console.log(`${rss.ad} yükleniyor...`);
             const response = await fetch(proxyUrl + encodeURIComponent(rss.url));
             const xmlText = await response.text();
+            
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xmlText, "text/xml");
             
             const items = xmlDoc.querySelectorAll("item, entry");
+            console.log(`${rss.ad}: ${items.length} haber bulundu`);
 
-            items.forEach(el => {
+            items.forEach((el, index) => {
                 const title = el.querySelector("title")?.textContent || "";
-                let link = el.querySelector("link")?.textContent || el.querySelector("link")?.getAttribute("href") || "";
+                let link = el.querySelector("link")?.textContent || 
+                          el.querySelector("link")?.getAttribute("href") || "";
                 
                 const date = el.querySelector("pubDate")?.textContent || 
                           el.querySelector("dc\\:date")?.textContent ||
@@ -1568,102 +1574,192 @@ async function fetchAllNews() {
                           el.querySelector("lastBuildDate")?.textContent || 
                           "";
 
-                // === RESİM BULMA MANTIĞI (8 FARKLI FORMAT) ===
+                // === GELİŞTİRİLMİŞ RESİM BULMA ===
                 let img = "";
                 
-                // 1. media:content dene (CHIP, Webtekno, Onedio, Sordum, GZT, Donanım Günlüğü)
-                const mediaContent = el.querySelector("media\\:content");
-                if (mediaContent) img = mediaContent.getAttribute("url");
-                
-                // 2. O da yoksa media:thumbnail dene (CHIP, bazı RSS'ler)
-                if (!img) {
-                    const mediaThumb = el.querySelector("media\\:thumbnail");
-                    if (mediaThumb) img = mediaThumb.getAttribute("url");
+                // 1. Mynet özel etiketleri (ipimage, img640x360, img300x300)
+                const mynetImg = el.querySelector("ipimage")?.textContent || 
+                                el.querySelector("img640x360")?.textContent ||
+                                el.querySelector("img300x300")?.textContent;
+                if (mynetImg) {
+                    img = mynetImg;
+                    console.log(`${rss.ad} - Mynet ipimage bulundu:`, img.substring(0, 50));
                 }
                 
-                // 3. O da yoksa enclosure dene (CHIP, DonanımHaber, eski RSS'ler)
+                // 2. Media content (standart RSS)
+                if (!img) {
+                    const mediaContent = el.querySelector("media\\:content") || 
+                                        el.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "content")[0];
+                    if (mediaContent) {
+                        img = mediaContent.getAttribute("url") || mediaContent.getAttribute("src") || "";
+                    }
+                }
+                
+                // 3. Media thumbnail
+                if (!img) {
+                    const mediaThumb = el.querySelector("media\\:thumbnail") || 
+                                      el.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0];
+                    if (mediaThumb) {
+                        img = mediaThumb.getAttribute("url") || mediaThumb.getAttribute("src") || "";
+                    }
+                }
+                
+                // 4. Enclosure
                 if (!img) {
                     const enclosure = el.querySelector("enclosure");
-                    if (enclosure) img = enclosure.getAttribute("url");
+                    if (enclosure && enclosure.getAttribute("type")?.startsWith("image/")) {
+                        img = enclosure.getAttribute("url") || "";
+                    }
                 }
                 
-                // 4. O da yoksa image etiketi dene (CNN Türk, CNN Dünya)
+                // 5. Content:encoded içindeki ilk resmi bul
                 if (!img) {
-                    const imageTag = el.querySelector("image");
-                    if (imageTag) img = imageTag.textContent || imageTag.getAttribute("url");
-                }
-                
-                // 5. O da yoksa ipimage etiketi dene (Mynet)
-                if (!img) {
-                    const ipImage = el.querySelector("ipimage");
-                    if (ipImage) img = ipImage.textContent || ipImage.getAttribute("url");
-                }
-                
-                // 6. O da yoksa img640x360 veya img300x300 dene (Mynet alternatif)
-                if (!img) {
-                    const img640 = el.querySelector("img640x360");
-                    if (img640) img = img640.textContent;
-                }
-                if (!img) {
-                    const img300 = el.querySelector("img300x300");
-                    if (img300) img = img300.textContent;
-                }
-                
-                // 7. O da yoksa content:encoded içindeki img'den resim bul (Donanım Günlüğü, WordPress)
-                if (!img) {
-                    const contentEncoded = el.querySelector("content\\:encoded");
-                    if (contentEncoded) {
-                        const contentText = contentEncoded.textContent || "";
-                        const imgMatch = contentText.match(/<img[^>]+src="([^">]+)"/);
-                        if (imgMatch && imgMatch[1]) {
-                            img = imgMatch[1];
+                    const contentEncoded = el.querySelector("content\\:encoded") || 
+                                         el.getElementsByTagNameNS("http://purl.org/rss/1.0/modules/content/", "encoded")[0];
+                    if (contentEncoded?.textContent) {
+                        // Tüm img etiketlerini bul
+                        const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+                        const matches = [...contentEncoded.textContent.matchAll(imgRegex)];
+                        
+                        // İkon veya logo olmayan ilk resmi al
+                        for (const match of matches) {
+                            const imgUrl = match[1];
+                            if (!imgUrl.includes('icon') && !imgUrl.includes('logo') && !imgUrl.includes('avatar')) {
+                                img = imgUrl;
+                                break;
+                            }
+                        }
+                        
+                        // Eğer hala bulunamadıysa, ilk resmi al
+                        if (!img && matches.length > 0) {
+                            img = matches[0][1];
                         }
                     }
                 }
                 
-                // 8. O da yoksa description içindeki img'den resim bul (Milliyet, Takvim, Ahaber, Haber7, Megabayt)
+                // 6. Description içindeki resmi bul (ShiftDelete için)
                 if (!img) {
                     const description = el.querySelector("description");
-                    if (description) {
-                        const descText = description.textContent || "";
-                        // <img src="..." yakala
-                        const imgMatch = descText.match(/<img[^>]+src="([^">]+)"/);
-                        if (imgMatch && imgMatch[1]) {
-                            img = imgMatch[1];
-                        } else {
-                            // Ayrıca <a href="..."><img src="..."/></a> formatını dene
-                            const linkImgMatch = descText.match(/<a[^>]+><img[^>]+src="([^">]+)"[^>]*><\/a>/);
-                            if (linkImgMatch && linkImgMatch[1]) {
-                                img = linkImgMatch[1];
+                    if (description?.textContent) {
+                        // HTML entity'leri düzelt
+                        let descText = description.textContent
+                            .replace(/&lt;/g, '<')
+                            .replace(/&gt;/g, '>')
+                            .replace(/&quot;/g, '"')
+                            .replace(/&amp;/g, '&');
+                        
+                        // img etiketlerini ara
+                        const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+                        const matches = [...descText.matchAll(imgRegex)];
+                        
+                        for (const match of matches) {
+                            const imgUrl = match[1];
+                            if (imgUrl && !imgUrl.includes('data:image') && !imgUrl.includes('icon')) {
+                                img = imgUrl;
+                                break;
+                            }
+                        }
+                        
+                        // Eğer hala bulunamadıysa, doğrudan resim URL'si ara
+                        if (!img) {
+                            const urlMatch = descText.match(/(https?:\/\/[^\s"']+\.(jpg|jpeg|png|gif|webp))/i);
+                            if (urlMatch) {
+                                img = urlMatch[1];
                             }
                         }
                     }
                 }
                 
-                // === RESİM BULMA MANTIĞI BİTTİ ===
-
+                // 7. image etiketi
+                if (!img) {
+                    const imageTag = el.querySelector("image url, image");
+                    if (imageTag) {
+                        img = imageTag.textContent || imageTag.getAttribute("url") || "";
+                    }
+                }
+                
+                // === URL DÜZENLEMELERİ ===
+                if (img) {
+                    // HTML entity'leri temizle
+                    img = img.replace(/&amp;/g, '&')
+                             .replace(/&lt;/g, '<')
+                             .replace(/&gt;/g, '>')
+                             .replace(/&quot;/g, '"')
+                             .replace(/&#039;/g, "'");
+                    
+                    // Tırnak işaretlerini temizle
+                    img = img.replace(/['"]/g, '');
+                    
+                    // Göreceli URL'leri tam URL'ye çevir
+                    if (img.startsWith('/')) {
+                        try {
+                            const baseUrl = new URL(rss.url).origin;
+                            img = baseUrl + img;
+                        } catch (e) {
+                            const domainMatch = rss.url.match(/^(https?:\/\/[^\/]+)/);
+                            if (domainMatch) {
+                                img = domainMatch[1] + img;
+                            }
+                        }
+                    }
+                    
+                    // HTTP'yi HTTPS yap (güvenli bağlantı için)
+                    if (img.startsWith('http:')) {
+                        img = 'https:' + img.substring(5);
+                    }
+                    
+                    // URL'de boşluk varsa encode et
+                    img = img.replace(/ /g, '%20');
+                    
+                    // **CORS SORUNU İÇİN**: Resim URL'sini proxy'den geçir
+                    // Bazı siteler CORS politikası nedeniyle resimlerin başka domainlerde gösterilmesini engeller
+                    // Bunu aşmak için resimleri de proxy üzerinden yükleyebiliriz
+                    if (!img.includes('localhost') && !img.includes('mmt8129.github.io')) {
+                        // İsteğe bağlı: Resimleri de proxy'den geçir
+                        // img = proxyUrl + encodeURIComponent(img);
+                    }
+                }
+                
+                // === VARSAYILAN LOGO ===
+                const defaultLogo = rss.logo || "https://mmt8129.github.io/Gem/rsslogo.png";
+                
                 if (title && title.length > 5) {
-                    news.push({
+                    const newsItem = {
                         title: title.trim(),
                         link: link.trim(),
                         source: rss.ad,
                         category: rss.kategori || "GÜNDEM",
                         pubDate: date,
-                        thumbnail: img || rss.logo || "https://mmt8129.github.io/Gem/rsslogo.png"
-                    });
+                        thumbnail: img || defaultLogo
+                    };
+                    
+                    news.push(newsItem);
+                    
+                    // Debug için log
+                    if (!img) {
+                        console.log(`⚠️ ${rss.ad} - Resim bulunamadı! Başlık: ${title.substring(0, 50)}`);
+                    } else if (index < 3) {
+                        console.log(`✅ ${rss.ad} - Resim bulundu: ${img.substring(0, 50)}`);
+                    }
                 }
             });
             
-            news.sort(() => Math.random() - 0.5);
-            localStorage.setItem('khoj_news_cache', JSON.stringify(news));
-            localStorage.setItem('khoj_news_time', new Date().getTime());
-            render(); 
-
         } catch (e) {
-            console.log(rss.ad + " bağlantı sorunu:", e);
+            console.log(`${rss.ad} bağlantı sorunu:`, e);
         }
     }
+    
+    // Haberleri karıştır
+    news.sort(() => Math.random() - 0.5);
+    
+    // Önbelleğe al
+    localStorage.setItem('khoj_news_cache', JSON.stringify(news));
+    localStorage.setItem('khoj_news_time', new Date().getTime());
+    
+    console.log(`Toplam ${news.length} haber yüklendi`);
+    render(); 
 }
+
 
 db.ref('rss_ayarlari').on('value', snap => {
     rssListesi = snap.val() || {};
@@ -1674,6 +1770,29 @@ db.ref('rss_ayarlari').on('value', snap => {
 
 setInterval(updateTime, 1000);
 updateTime();
+
+// Render fonksiyonunda resim yüklenirken hata kontrolü
+function renderNewsCard(item) {
+    return `
+        <div class="news-card" onclick="window.open('${item.link}', '_blank')">
+            <div class="news-image-container">
+                <img 
+                    src="${item.thumbnail}" 
+                    alt="${item.title}" 
+                    class="news-image"
+                    onerror="this.onerror=null; this.src='${item.sourceLogo || 'https://mmt8129.github.io/Gem/rsslogo.png'}'; this.classList.add('fallback-image');"
+                    loading="lazy"
+                >
+            </div>
+            <div class="news-content">
+                <div class="news-source">${item.source}</div>
+                <h3 class="news-title">${item.title}</h3>
+                <div class="news-category">${item.category}</div>
+            </div>
+        </div>
+    `;
+}
+
 
 function filterCat(cat) {
     const items = document.querySelectorAll('.cat-item');
@@ -1737,18 +1856,19 @@ function render() {
             }
         }
         
-        return `
-            <div class="news-card" onclick="openDetail(${realIdx})">
-                <img src="${n.thumbnail || 'logo.png'}" onerror="this.src='logo.png'" loading="lazy">
-                <div style="flex:1">
-                    <div class="news-meta">
-                        <span class="news-source-badge">${n.source}</span>
-                        <span class="news-date-badge">${displayDate || 'Tarih yok'}</span>
-                        </div>
-                    <div class="news-title">${n.title}</div>
-                    ${n.description ? `<div style="font-size:0.8rem; color:var(--muted); margin-top:8px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${n.description.replace(/<[^>]*>/g, '').substring(0, 100)}...</div>` : ''}
-                </div>
-            </div>`;
+     return `
+    <div class="news-card" onclick="openDetail(${realIdx})">
+        <img src="${n.thumbnail || 'https://mmt8129.github.io/Gem/rsslogo.png'}" 
+             onerror="this.onerror=null; this.src='https://mmt8129.github.io/Gem/rsslogo.png';"
+             loading="lazy">
+        <div style="flex:1">
+            <div class="news-meta">
+                <span class="news-source-badge">${n.source}</span>
+                <span class="news-date-badge">${displayDate || 'Tarih yok'}</span>
+            </div>
+            <div class="news-title">${n.title}</div>
+        </div>
+    </div>`;
     }).join('');
 
     if (filteredNews.length > visibleCount) {
