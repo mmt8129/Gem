@@ -1742,7 +1742,7 @@ function render() {
                     <div class="news-meta">
                         <span class="news-source-badge">${n.source}</span>
                         <span class="news-date-badge">${displayDate || 'Tarih yok'}</span>
-                        <span style="background:rgba(239,68,68,0.2); color:#ef4444; padding:4px 8px; border-radius:12px; font-size:0.65rem; font-weight:700;">${n.category}</span>
+                        <span style="background:rgba(239,68,68,0.2); color:#ef4444; padding:4px 8px; border-radius:12px; font-size:0.45rem; font-weight:600;">${n.category}</span>
                     </div>
                     <div class="news-title">${n.title}</div>
                     ${n.description ? `<div style="font-size:0.8rem; color:var(--muted); margin-top:8px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${n.description.replace(/<[^>]*>/g, '').substring(0, 100)}...</div>` : ''}
