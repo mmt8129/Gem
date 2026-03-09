@@ -2941,7 +2941,7 @@ async function ask() {
             chatHistory.push({role: 'user', text: q}); // Kullanıcının saf sorusunu ekle
             chatHistory.push({role: 'ai', text: temizCevap}); // AI'nın cevabını ekle
             
-            if (chatHistory.length > 50) chatHistory = chatHistory.slice(-50);
+            if (chatHistory.length > 10) chatHistory = chatHistory.slice(-10);
             localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory)); 
         }
         
