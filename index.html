@@ -1466,7 +1466,7 @@ function sortNews(newsArray) {
 }
 
 function metniTemizle(hamMetin) {
-    let temiz = hamMetin.replace(/␃🔚␗/g, '').replace(/\{"organic":[\s\S]*?\}\}/g, '').replace(/\{"peopleAlsoAsk":[\s\S]*?\}\}/g, '').replace(/"organic":\s*\[[\s\S]*?\]/g, '').replace(/"codeContext":\s*\{[\s\S]*?\}/g, '').replace(/"position":\s*\d+/g, '').replace(/\{.*?\}/g, '');
+    let temiz = hamMetin.replace(/␃🔚␗/g, '').replace(/\{"organic":[\s\S]*?\}\}/g, '').replace(/\{"peopleAlso":[\s\S]*?\}\}/g, '').replace(/"organic":\s*\[[\s\S]*?\]/g, '').replace(/"codeContext":\s*\{[\s\S]*?\}/g, '').replace(/"position":\s*\d+/g, '').replace(/\{.*?\}/g, '');
     const ilkHarf = temiz.search(/[A-ZİĞÜŞÖÇ]/);
     if (ilkHarf !== -1) { temiz = temiz.substring(ilkHarf); }
     temiz = temiz.replace(/[\s\}\]奉",:]{2,}$/g, '');
@@ -2862,11 +2862,6 @@ function quickAdjustContent(type, val) {
     showToast(`İçerik boyutu: ${sets.contentSize}px`);
 }
 
-// --- GEMINI ASK FONKSİYONU (KALICI CEVAP) ---
-let pendingRequest = null;
-let pendingAiMsg = null;
-let pendingQ = null;
-
 // --- BASİT SOHBET ASK FONKSİYONU (ESKİ HALİ) ---
 async function ask() {
     console.time('🤖 Gemini Cevap Süresi');
@@ -2879,43 +2874,47 @@ async function ask() {
     const q = inp.value.trim();
     inp.value = '';
     
-    // Kullanıcı mesajını ekle (sağda)
+    // Kullanıcı mesajını ekle
     const userMsg = document.createElement('div');
     userMsg.className = 'msg user';
     userMsg.textContent = q;
     box.appendChild(userMsg);
     scrollToBottom('smooth');
     
-    if(active && active.source === "KHOJ") {
-        chatHistory.push({role: 'user', text: q});
-    }
-    
-    // AI mesajı (solda)
+    // AI mesajı (typing animasyonu ile)
     const aiMsg = document.createElement('div');
     aiMsg.className = 'msg ai';
     aiMsg.id = 'currentAiResponse';
     aiMsg.innerHTML = '<span class="typing-cursor">▋</span>';
     box.appendChild(aiMsg);
     scrollToBottom('smooth');
-    
-    // Haber detayındaysa haber bağlamını ekle
-    let prompt = q;
+
+    // --- KRİTİK NOKTA 1: HAFIZA YAPISINI HAZIRLA ---
+    // Gemini geçmişte 'ai' yerine 'model' kelimesini bekler.
+    let memory = chatHistory.map(m => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        parts: [{ text: m.text }]
+    }));
+
+    // --- KRİTİK NOKTA 2: BAĞLAM EKLEME ---
+    let currentPrompt = q;
+    // Eğer haber detayındaysan, haberi hafızaya değil sadece mevcut soruya bağlam olarak ekle
     if (active && active.source !== "KHOJ" && active.title) {
-        prompt = `Haber: ${active.title}\n\n${active.description || ''}\n\nSoru: ${q}`;
+        currentPrompt = `Haber: ${active.title}\n\n${active.description || ''}\n\nSoru: ${q}`;
     }
-    
+
+    // Mevcut mesajı hafıza paketine ekle
+    memory.push({
+        role: 'user',
+        parts: [{ text: currentPrompt }]
+    });
+
     try {
         const response = await fetch(`${GEMINI_URL}?key=${decryptAPIKey(ENCRYPTED_KEY)}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }],
+                contents: memory, // <-- Eskiden sadece tek mesaj vardı, şimdi tüm 'memory' gidiyor!
                 tools: [{ googleSearch: {} }],
                 generationConfig: {
                     temperature: 0.7,
@@ -2931,26 +2930,27 @@ async function ask() {
             cevap = data.candidates[0].content.parts[0].text || 'Cevap alınamadı.';
         } else {
             cevap = 'Üzgünüm, bir hata oluştu.';
-            console.error('Gemini hatası:', data);
         }
         
         const temizCevap = metniTemizle(cevap);
         aiMsg.innerHTML = temizCevap;
         scrollToBottom('smooth');
         
-        console.timeEnd('🤖 Gemini Cevap Süresi');
-        
+        // --- KRİTİK NOKTA 3: HAFIZAYI GÜNCELLE VE KAYDET ---
         if(active && active.source === "KHOJ") { 
-            chatHistory.push({role: 'ai', text: temizCevap}); 
+            chatHistory.push({role: 'user', text: q}); // Kullanıcının saf sorusunu ekle
+            chatHistory.push({role: 'ai', text: temizCevap}); // AI'nın cevabını ekle
+            
             if (chatHistory.length > 50) chatHistory = chatHistory.slice(-50);
             localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory)); 
         }
+        
+        console.timeEnd('🤖 Gemini Cevap Süresi');
         
     } catch (e) {
         console.error('Gemini hatası:', e);
         aiMsg.innerHTML = 'Bağlantı hatası! 😕';
         scrollToBottom('smooth');
-        console.timeEnd('🤖 Gemini Cevap Süresi');
     }
 }
 
