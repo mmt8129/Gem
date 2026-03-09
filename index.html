@@ -1216,31 +1216,36 @@ window.addEventListener('DOMContentLoaded', () => {
     }, 500);
 });
 
-// --- 1. SİSTEM AYARLARI ---
-// GEMINI API - Bunu kendi anahtarınla değiştir
-// Gemini 2.0 Flash + Google Search Grounding + Hafıza + API Güvenliği
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
-const ENCRYPTED_KEY = 'A*I*z*a*S*y*B*q*g*H*x*_*Z*3*s*g*c*6*-*t*L*G*V*F*d*1*9*F*3*b*7*c*n*G*h*7*Y*U*U'; // Senin anahtarın *'lı
+// --- 1. AI ENGINE AYARLARI (GROK & TAVILY) ---
+const PROXY_URL = "https://autumn-dew-1884.06mmt8129.workers.dev/"; 
+const ENCRYPTED_GROK_KEY = 'g*s*k*_*o*R*j*m*G*d*W*Q*K*p*0*i*9*c*0*B*l*k*M*B*W*G*d*y*b*3*F*Y*a*8*l*Q*l*X*R*6*t*4*1*l*m*x*p*Z*h*o*H*H*x*V*v*x'; 
+const ENCRYPTED_TAVILY_KEY = 't*v*l*y*-*d*e*v*-*1*1*N*X*v*w*-*8*S*h*U*8*b*3*i*l*v*i*W*1*a*H*w*5*b*V*V*9*g*q*h*I*T*6*5*K*3*C*4*1*F*r*i*E*q*4*g*1*Q'; 
 
+// Anahtar Çözücü (Senin mevcut fonksiyonun)
+function decryptAPIKey(key) {
+    return key.split('*').join('');
+}
 
+// --- FIREBASE AYARLARI ---
 const fbCfg = { apiKey: "AIzaSyAwQfifK4eaSrSjKpA776hD0RAlx_6a2_w", databaseURL: "https://piyasa-9049c-default-rtdb.firebaseio.com", projectId: "piyasa-9049c" };
 if (!firebase.apps.length) firebase.initializeApp(fbCfg);
 const db = firebase.database();
 
-// 1. Ayarları yükle, yoksa varsayılanları kur
+// --- DEĞİŞKENLER VE HAFIZA ---
 let sets = JSON.parse(localStorage.getItem('khoj_sets')) || { size: 13, weight: 600, speed: 20, newsLimit: 10 };
-
-// 2. Başlangıç sayacını ayardan çek
 let visibleCount = sets.newsLimit || 10;
 let chatHistory = JSON.parse(localStorage.getItem('khoj_ai_history')) || [];
 let news = [];
 let active = null;
 let activeSearchQuery = null;
-let autoScrollEnabled = true; // Otomatik kaydırma kontrolü
-
+let autoScrollEnabled = true;
 let currentNewsLimit = parseInt(localStorage.getItem('news_limit')) || 10;
 let displayedNewsCount = {};
 let allCachedNews = JSON.parse(localStorage.getItem('khoj_cache')) || {};
+
+// Tavily Kontrolü (Varsayılan kapalı - Sadece haberde veya manuel açınca çalışır)
+let tavily_is_active = false;
+
 
 function softRefresh() {
     showToast("Haberler güncelleniyor...");
@@ -1253,8 +1258,9 @@ function softRefresh() {
 let currentImages = []; // Tüm resimlerin listesi
 let currentImageIndex = 0; // Şu anki resim indeksi
 
-function decryptAPIKey(encrypted) {
-    return encrypted.replace(/\*/g, '');
+function decryptAPIKey(key) {
+    if (!key) return '';
+    return key.split('*').join('').trim();
 }
 
 // Haber detayında resimleri bul
@@ -1466,12 +1472,22 @@ function sortNews(newsArray) {
 }
 
 function metniTemizle(hamMetin) {
-    let temiz = hamMetin.replace(/␃🔚␗/g, '').replace(/\{"organic":[\s\S]*?\}\}/g, '').replace(/\{"peopleAlso":[\s\S]*?\}\}/g, '').replace(/"organic":\s*\[[\s\S]*?\]/g, '').replace(/"codeContext":\s*\{[\s\S]*?\}/g, '').replace(/"position":\s*\d+/g, '').replace(/\{.*?\}/g, '');
-    const ilkHarf = temiz.search(/[A-ZİĞÜŞÖÇ]/);
-    if (ilkHarf !== -1) { temiz = temiz.substring(ilkHarf); }
-    temiz = temiz.replace(/[\s\}\]奉",:]{2,}$/g, '');
-    temiz = temiz.replace(/^#{1,6}\s+(.*)$/gm, '<b style="color:#ef4444; font-size:1.1em;">$1</b>');
-    return temiz.replace(/\[\d+\]\(.*?\)/g, '').replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>').replace(/^\s*[\-\*]\s+/gm, '🔹 ').replace(/\n/g, '<br>');
+    // 1. Gereksiz karakterleri ve boşlukları temizle
+    let temiz = hamMetin.replace(/␃🔚␗/g, '').trim();
+    
+    // 2. Başlıkları (### veya ##) senin tasarımındaki kırmızı kalın stile çevir
+    temiz = temiz.replace(/^#{1,6}\s+(.*)$/gm, '<b style="color:#ef4444; font-size:1.1em; display:block; margin:10px 0 5px 0;">$1</b>');
+    
+    // 3. Kalın yazıları (**yazı**) senin kırmızı rengine çevir
+    temiz = temiz.replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>');
+    
+    // 4. Liste işaretlerini ( - veya * ) senin mavi elmas (🔹) simgene çevir
+    temiz = temiz.replace(/^\s*[\-\*]\s+/gm, '🔹 ');
+    
+    // 5. Satır başlarını HTML alt satıra çevir
+    temiz = temiz.replace(/\n/g, '<br>');
+    
+    return temiz;
 }
 
 // --- YAZIYOR ANİMASYONU VE OTOMATİK KAYDIRMA FONKSİYONLARI ---
@@ -2862,149 +2878,119 @@ function quickAdjustContent(type, val) {
     showToast(`İçerik boyutu: ${sets.contentSize}px`);
 }
 
-// --- BASİT SOHBET ASK FONKSİYONU (ESKİ HALİ) ---
 async function ask() {
-    console.time('🤖 Gemini Cevap Süresi');
-    
     const inp = document.getElementById('uInp');
     const box = document.getElementById('cBox');
-    
     if(!inp || !inp.value.trim()) return;
     
     const q = inp.value.trim();
     inp.value = '';
     
-    // Kullanıcı mesajını ekle
+    // 1. KULLANICI MESAJI
     const userMsg = document.createElement('div');
     userMsg.className = 'msg user';
     userMsg.textContent = q;
     box.appendChild(userMsg);
     scrollToBottom('smooth');
     
-    // AI mesajı (typing animasyonu ile)
+    // 2. AI MESAJI (BAŞLANGIÇ)
     const aiMsg = document.createElement('div');
     aiMsg.className = 'msg ai';
-    aiMsg.id = 'currentAiResponse';
-    aiMsg.innerHTML = '<span class="typing-cursor">▋</span>';
+    aiMsg.innerHTML = '<span class="typing-cursor">▋</span> İnternette araştırıyorum...';
     box.appendChild(aiMsg);
     scrollToBottom('smooth');
 
-    // --- KRİTİK NOKTA 1: HAFIZA YAPISINI HAZIRLA ---
-    // Gemini geçmişte 'ai' yerine 'model' kelimesini bekler.
-    let memory = chatHistory.map(m => ({
-        role: m.role === 'user' ? 'user' : 'model',
-        parts: [{ text: m.text }]
-    }));
-
-    // --- KRİTİK NOKTA 2: BAĞLAM EKLEME ---
-    let currentPrompt = q;
-    // Eğer haber detayındaysan, haberi hafızaya değil sadece mevcut soruya bağlam olarak ekle
-    if (active && active.source !== "KHOJ" && active.title) {
-        currentPrompt = `Haber: ${active.title}\n\n${active.description || ''}\n\nSoru: ${q}`;
-    }
-
-    // Mevcut mesajı hafıza paketine ekle
-    memory.push({
-        role: 'user',
-        parts: [{ text: currentPrompt }]
-    });
-
     try {
-        const response = await fetch(`${GEMINI_URL}?key=${decryptAPIKey(ENCRYPTED_KEY)}`, {
+        const grokKey = decryptAPIKey(ENCRYPTED_GROK_KEY);
+        const tavilyKey = decryptAPIKey(ENCRYPTED_TAVILY_KEY);
+        let context = "";
+
+        // --- TARİH BİLGİSİ ---
+        const suAnkiTarih = new Date().toLocaleString('tr-TR', { 
+            day: 'numeric', month: 'long', year: 'numeric', 
+            hour: '2-digit', minute: '2-digit', weekday: 'long' 
+        });
+
+        // --- DOĞRUDAN VE HER SEFERİNDE TAVILY ARAMASI ---
+        // Sadece haber detay penceresi açık değilse (KHOJ modundaysak) her zaman internete bak
+        if (!active || active.source === "KHOJ") {
+            console.log("%c🌐 TAVILY: Her sorgu için internete çıkılıyor...", "color: #22c55e; font-weight: bold;");
+            
+            try {
+                const sRes = await fetch(`${PROXY_URL}?url=https://api.tavily.com/search`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        api_key: tavilyKey, 
+                        query: q, 
+                        search_depth: "basic", 
+                        max_results: 5 // Daha fazla sonuç çekmesi için 5 yaptık
+                    })
+                });
+                const sData = await sRes.json();
+                context = sData.results ? sData.results.map(r => r.content).join("\n---\n") : "";
+            } catch (searchError) {
+                console.error("Tavily Hatası:", searchError);
+            }
+        }
+
+        // --- PROMPT HAZIRLAMA ---
+        let finalPrompt = q;
+        if (context) {
+            // İnternetten gelen verileri Grok'a bağlam olarak sunuyoruz
+            finalPrompt = `GÜNCEL İNTERNET VERİLERİ (${suAnkiTarih}):\n${context}\n\nSORU: ${q}\n\nBu verilere göre samimi bir cevap yaz abi.`;
+        } else if (active && active.source !== "KHOJ") {
+            // Haber detayındaysak haberi kullan
+            finalPrompt = `HABER İÇERİĞİ:\n${active.title}\n${active.description || ''}\n\nSORU: ${q}`;
+        }
+
+        // --- GROK CEVAP SÜRECİ ---
+        const chatRes = await fetch(`${PROXY_URL}?url=https://api.groq.com/openai/v1/chat/completions`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: memory, // <-- Eskiden sadece tek mesaj vardı, şimdi tüm 'memory' gidiyor!
-                tools: [{ googleSearch: {} }],
-                generationConfig: {
-                    temperature: 0.7,
-                    maxOutputTokens: 2048,
-                }
+            headers: { 'Authorization': `Bearer ${grokKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                model: "llama-3.3-70b-versatile", 
+                messages: [
+                    {role: "system", content: `Sen samimi bir arkadaşsın. Bugün: ${suAnkiTarih}. Her cevaba ABİ diyerek başla. 🔹 ve bol emoji kullan. Kısa ve öz ol.`},
+                    ...chatHistory.map(m => ({role: m.role === 'user' ? 'user' : 'assistant', content: m.text})).slice(-6),
+                    {role: "user", content: finalPrompt}
+                ],
+                temperature: 0.5
             })
         });
         
-        const data = await response.json();
+        const chatData = await chatRes.json();
+        const reply = chatData.choices[0].message.content;
         
-        let cevap = '';
-        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-            cevap = data.candidates[0].content.parts[0].text || 'Cevap alınamadı.';
-        } else {
-            cevap = 'Üzgünüm, bir hata oluştu.';
+        // --- YAZMA ANİMASYONU ---
+        aiMsg.innerHTML = ''; 
+        const temizReply = metniTemizle(reply);
+        const tamCevap = temizReply.startsWith("ABİ") ? temizReply : "ABİ " + temizReply;
+        
+        const words = tamCevap.split(' ');
+        let currentText = '';
+        for (let i = 0; i < words.length; i++) {
+            currentText += words[i] + ' ';
+            aiMsg.innerHTML = currentText + '<span class="typing-cursor">▋</span>';
+            scrollToBottom('smooth');
+            await new Promise(resolve => setTimeout(resolve, 25)); // Hızı biraz artırdım
         }
-        
-        const temizCevap = metniTemizle(cevap);
-        aiMsg.innerHTML = temizCevap;
-        scrollToBottom('smooth');
-        
-        // --- KRİTİK NOKTA 3: HAFIZAYI GÜNCELLE VE KAYDET ---
-        if(active && active.source === "KHOJ") { 
-            chatHistory.push({role: 'user', text: q}); // Kullanıcının saf sorusunu ekle
-            chatHistory.push({role: 'ai', text: temizCevap}); // AI'nın cevabını ekle
-            
+        aiMsg.innerHTML = tamCevap;
+
+        // --- HAFIZA SİSTEMİ ---
+        if(!active || active.source === "KHOJ") { 
+            chatHistory.push({role: 'user', text: q});
+            chatHistory.push({role: 'ai', text: tamCevap});
             if (chatHistory.length > 10) chatHistory = chatHistory.slice(-10);
             localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory)); 
         }
-        
-        console.timeEnd('🤖 Gemini Cevap Süresi');
-        
+
     } catch (e) {
-        console.error('Gemini hatası:', e);
-        aiMsg.innerHTML = 'Bağlantı hatası! 😕';
-        scrollToBottom('smooth');
+        console.error("Genel Hata:", e);
+        aiMsg.innerHTML = 'ABİ bir hata oldu, bağlantıyı veya anahtarları kontrol et! 😕';
     }
 }
 
-// Bekleyen cevapları listele (AYRI BİR MODALDA)
-function showPendingList() {
-    const pendingResponses = JSON.parse(localStorage.getItem('pending_ai_responses') || '[]');
-    if (pendingResponses.length === 0) {
-        showToast('Bekleyen cevap yok');
-        return;
-    }
-    
-    const m = document.getElementById('mdl');
-    let html = `
-        <div class="modal-header">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2>📨 BEKLEYEN CEVAPLAR</h2>
-                <button class="btn-icon" onclick="closeM()">❌</button>
-            </div>
-        </div>
-        <div class="modal-body" style="padding-bottom:20px;">
-    `;
-    
-    pendingResponses.reverse().forEach((item, index) => {
-        const date = new Date(item.timestamp).toLocaleString('tr-TR');
-        html += `
-            <div style="background:var(--card-bg); border:1px solid var(--brd); border-radius:12px; padding:15px; margin-bottom:15px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                    <span style="background:#ef4444; color:white; padding:4px 10px; border-radius:20px; font-size:11px;">${item.context}</span>
-                    <span style="font-size:10px; color:var(--muted);">${date}</span>
-                </div>
-                <div style="font-size:13px; margin-bottom:10px; background:rgba(0,0,0,0.05); padding:8px; border-radius:8px;">
-                    <strong>Soru:</strong> ${item.question}
-                </div>
-                <div style="font-size:14px; padding:10px; background:var(--bg); border-radius:8px; max-height:200px; overflow-y:auto;">
-                    ${item.answer}
-                </div>
-                <button onclick="removePendingItem(${item.id})" 
-                    style="width:100%; margin-top:10px; padding:8px; background:#22c55e; color:white; border:none; border-radius:8px; font-weight:bold;">
-                    ✓ Okundu olarak işaretle ve sil
-                </button>
-            </div>
-        `;
-    });
-    
-    html += `
-        </div>
-        <div class="modal-footer">
-            <button class="btn-full" onclick="clearAllPending()">TÜMÜNÜ TEMİZLE</button>
-        </div>
-    `;
-    
-    m.innerHTML = html;
-    document.getElementById('ovl').style.display = 'flex';
-}
 
 // Tek bir bildirimi sil
 function removePendingItem(id) {
