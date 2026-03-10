@@ -2883,20 +2883,28 @@ async function ask() {
     const box = document.getElementById('cBox');
     if(!inp || !inp.value.trim()) return;
     
-    const q = inp.value.trim();
+    let q = inp.value.trim();
+    let forceSearch = false;
+
+    // --- YILDIZ (*) KONTROLÜ ---
+    if (q.startsWith('*')) {
+        forceSearch = true;
+        q = q.substring(1).trim(); // Yıldızı kaldır, temiz soruyu al
+    }
+    
     inp.value = '';
     
     // 1. KULLANICI MESAJI
     const userMsg = document.createElement('div');
     userMsg.className = 'msg user';
-    userMsg.textContent = q;
+    userMsg.textContent = (forceSearch ? '* ' : '') + q;
     box.appendChild(userMsg);
     scrollToBottom('smooth');
     
     // 2. AI MESAJI (BAŞLANGIÇ)
     const aiMsg = document.createElement('div');
     aiMsg.className = 'msg ai';
-    aiMsg.innerHTML = '<span class="typing-cursor">▋</span> İnternette araştırıyorum...';
+    aiMsg.innerHTML = forceSearch ? '<span class="typing-cursor">▋</span> İnternette araştırıyorum...' : '<span class="typing-cursor">▋</span> Düşünüyorum...';
     box.appendChild(aiMsg);
     scrollToBottom('smooth');
 
@@ -2905,16 +2913,14 @@ async function ask() {
         const tavilyKey = decryptAPIKey(ENCRYPTED_TAVILY_KEY);
         let context = "";
 
-        // --- TARİH BİLGİSİ ---
         const suAnkiTarih = new Date().toLocaleString('tr-TR', { 
             day: 'numeric', month: 'long', year: 'numeric', 
             hour: '2-digit', minute: '2-digit', weekday: 'long' 
         });
 
-        // --- DOĞRUDAN VE HER SEFERİNDE TAVILY ARAMASI ---
-        // Sadece haber detay penceresi açık değilse (KHOJ modundaysak) her zaman internete bak
-        if (!active || active.source === "KHOJ") {
-            console.log("%c🌐 TAVILY: Her sorgu için internete çıkılıyor...", "color: #22c55e; font-weight: bold;");
+        // --- TAVILY SADECE YILDIZ VARSA ÇALIŞIR ---
+        if (forceSearch && (!active || active.source === "KHOJ")) {
+            console.log("%c🌐 TAVILY AKTİF: Yıldız algılandı, internete çıkılıyor...", "color: #22c55e; font-weight: bold;");
             
             try {
                 const sRes = await fetch(`${PROXY_URL}?url=https://api.tavily.com/search`, {
@@ -2924,7 +2930,7 @@ async function ask() {
                         api_key: tavilyKey, 
                         query: q, 
                         search_depth: "basic", 
-                        max_results: 5 // Daha fazla sonuç çekmesi için 5 yaptık
+                        max_results: 5 
                     })
                 });
                 const sData = await sRes.json();
@@ -2932,30 +2938,29 @@ async function ask() {
             } catch (searchError) {
                 console.error("Tavily Hatası:", searchError);
             }
+        } else {
+            console.log("%c🧠 SADECE GROK: Yıldız yok, hafıza ve genel bilgi kullanılıyor.", "color: #3b82f6; font-weight: bold;");
         }
 
         // --- PROMPT HAZIRLAMA ---
         let finalPrompt = q;
         if (context) {
-            // İnternetten gelen verileri Grok'a bağlam olarak sunuyoruz
-            finalPrompt = `GÜNCEL İNTERNET VERİLERİ (${suAnkiTarih}):\n${context}\n\nSORU: ${q}\n\nBu verilere göre samimi bir cevap yaz abi.`;
+            finalPrompt = `GÜNCEL İNTERNET VERİLERİ (${suAnkiTarih}):\n${context}\n\nSORU: ${q}`;
         } else if (active && active.source !== "KHOJ") {
-            // Haber detayındaysak haberi kullan
             finalPrompt = `HABER İÇERİĞİ:\n${active.title}\n${active.description || ''}\n\nSORU: ${q}`;
         }
 
-        // --- GROK CEVAP SÜRECİ ---
+        // --- GROK CEVAP ---
         const chatRes = await fetch(`${PROXY_URL}?url=https://api.groq.com/openai/v1/chat/completions`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${grokKey}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 model: "llama-3.3-70b-versatile", 
                 messages: [
-                    {role: "system", content: `Sen samimi bir arkadaşsın. Bugün: ${suAnkiTarih}. Her cevaba ABİ diyerek başla. 🔹 ve bol emoji kullan. Kısa ve öz ol.`},
-                    ...chatHistory.map(m => ({role: m.role === 'user' ? 'user' : 'assistant', content: m.text})).slice(-6),
+                    {role: "system", content: `Sen samimi bir arkadaşsın. Bugün: ${suAnkiTarih}. Her cevaba ABİ diyerek başla. 🔹 ve emojiler kullan.`},
+                    ...chatHistory.map(m => ({role: m.role === 'user' ? 'user' : 'assistant', content: m.text})).slice(-8),
                     {role: "user", content: finalPrompt}
-                ],
-                temperature: 0.5
+                ]
             })
         });
         
@@ -2973,11 +2978,11 @@ async function ask() {
             currentText += words[i] + ' ';
             aiMsg.innerHTML = currentText + '<span class="typing-cursor">▋</span>';
             scrollToBottom('smooth');
-            await new Promise(resolve => setTimeout(resolve, 25)); // Hızı biraz artırdım
+            await new Promise(resolve => setTimeout(resolve, 25)); 
         }
         aiMsg.innerHTML = tamCevap;
 
-        // --- HAFIZA SİSTEMİ ---
+        // --- HAFIZA ---
         if(!active || active.source === "KHOJ") { 
             chatHistory.push({role: 'user', text: q});
             chatHistory.push({role: 'ai', text: tamCevap});
@@ -2986,8 +2991,8 @@ async function ask() {
         }
 
     } catch (e) {
-        console.error("Genel Hata:", e);
-        aiMsg.innerHTML = 'ABİ bir hata oldu, bağlantıyı veya anahtarları kontrol et! 😕';
+        console.error("Hata:", e);
+        aiMsg.innerHTML = 'ABİ bir hata oldu, bağlantıyı kontrol et! 😕';
     }
 }
 
