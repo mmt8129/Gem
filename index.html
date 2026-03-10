@@ -1317,10 +1317,10 @@ function toggleTheme() {
 
 // Tema Hafızası
 (function() {
-    const saved = localStorage.getItem('khoj_theme') || 'light';
+    const saved = localStorage.getItem('khoj_theme') || 'dark';
     document.documentElement.setAttribute('data-theme', saved);
     window.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('themeBtn').innerText = saved === 'light' ? '🌙' : '☀️';
+        document.getElementById('themeBtn').innerText = saved === 'dark' ? '🌙' : '☀️';
     });
 })();
 
@@ -2605,7 +2605,7 @@ function openDetail(idx) {
                 <div style="background:var(--card-bg); border:1px solid var(--brd); border-radius:12px; overflow:hidden;">
                     <div style="background:var(--brd); padding:8px 15px; display:flex; justify-content:space-between; align-items:center;">
                         <span style="font-size:11px; font-weight:bold; color:var(--text); opacity:0.7;">YAPAY ZEKA ANALİZİ</span>
-                        <button onclick="document.getElementById('uInp').value='Haberin önemli noktalarını, gerekirse detaylıca ve maddeler halinde özetle.'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                        <button onclick="document.getElementById('uInp').value='Haberin önemli noktalarını, gerekirse detaylıca ve maddeler halinde Türkçe olarak özetle.'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:4px;">
     ✨ AI ile Özetle
 </button>
 
