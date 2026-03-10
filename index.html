@@ -2958,12 +2958,20 @@ async function ask() {
             body: JSON.stringify({ 
                 model: "llama-3.3-70b-versatile", 
                 messages: [
-                    {role: "system", content: `Sen samimi bir arkadaşsın. Bugün: ${suAnkiTarih}. Her cevaba ABİ diyerek başla. 🔹 ve emojiler kullan.`},
+                    {
+                        role: "system", 
+                        content: `Sen samimi bir arkadaşsın. Bugün: ${suAnkiTarih}. 
+                                  ÖNEMLİ: Sadece TÜRKÇE konuş, asla yabancı kelime (ingilizce, çince vb.) karıştırma! 
+                                  Her cevaba ABİ, diyerek başla. 🔹 ve emojiler kullan.`
+                    },
                     ...chatHistory.map(m => ({role: m.role === 'user' ? 'user' : 'assistant', content: m.text})).slice(-8),
                     {role: "user", content: finalPrompt}
-                ]
+                ],
+                temperature: 0.3, // Değeri düşürdük, daha uslu ve Türkçe odaklı olacak
+                max_tokens: 1024  // Özetin yarım kalmaması için sınırı artırdık
             })
         });
+
         
         const chatData = await chatRes.json();
         const reply = chatData.choices[0].message.content;
