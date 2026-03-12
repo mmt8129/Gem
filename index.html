@@ -283,6 +283,11 @@ body{
     transition:.2s ease;
 }
 
+[data-theme="dark"] .cat-item.active {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
 .cat-item.active{
     background:var(--primary);
     color:#fff;
@@ -1863,7 +1868,7 @@ function render() {
             }
         }
         
-     return `
+    return `
     <div class="news-card" onclick="openDetail(${realIdx})">
         <img src="${n.thumbnail || 'https://mmt8129.github.io/Gem/rsslogo.png'}" 
              onerror="this.onerror=null; this.src='https://mmt8129.github.io/Gem/rsslogo.png';"
@@ -1872,6 +1877,7 @@ function render() {
             <div class="news-meta">
                 <span class="news-source-badge">${n.source}</span>
                 <span class="news-date-badge">${displayDate || 'Tarih yok'}</span>
+                <span style="background:rgba(239,68,68,0.2); color:#ef4444; padding:4px 8px; border-radius:12px; font-size:0.65rem; font-weight:700; margin-left:auto;">${n.category}</span>
             </div>
             <div class="news-title">${n.title}</div>
         </div>
