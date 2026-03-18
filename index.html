@@ -1230,7 +1230,12 @@ const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemi
 const ENCRYPTED_KEY = 'A*I*z*a*S*y*B*q*g*H*x*_*Z*3*s*g*c*6*-*t*L*G*V*F*d*1*9*F*3*b*7*c*n*G*h*7*Y*U*U'; // Senin anahtarın *'lı
 
 
-const fbCfg = { apiKey: "AIzaSyAwQfifK4eaSrSjKpA776hD0RAlx_6a2_w", databaseURL: "https://piyasa-9049c-default-rtdb.firebaseio.com", projectId: "piyasa-9049c" };
+const fbCfg = { 
+    apiKey: "AIzaSyBr57bmspJo8r_4IdkBNI_DhULYf0ynCQs", 
+    databaseURL: "https://gen-lang-client-0253857481-default-rtdb.firebaseio.com", 
+    projectId: "gen-lang-client-0253857481" 
+};
+
 if (!firebase.apps.length) firebase.initializeApp(fbCfg);
 const db = firebase.database();
 
@@ -1250,10 +1255,21 @@ let displayedNewsCount = {};
 let allCachedNews = JSON.parse(localStorage.getItem('khoj_cache')) || {};
 
 function softRefresh() {
-    showToast("Haberler güncelleniyor...");
-    news = news.sort(() => Math.random() - 0.5);
+    showToast("🔄 Yeni haberler getiriliyor...");
+    
+    // Önbelleği temizle (1 saat beklemesin diye)
+    localStorage.removeItem('khoj_news_cache');
+    localStorage.removeItem('khoj_news_time');
+    
+    // Firebase'den RSS'leri al ve yeni haberleri çek
     db.ref('rss_ayarlari').once('value', snap => {
-        render(); 
+        rssListesi = snap.val() || {};
+        if (Object.keys(rssListesi).length > 0) {
+            // Yeni haberleri çek
+            fetchAllNews().then(() => {
+                showToast("✅ Haberler güncellendi!");
+            });
+        }
     });
 }
 
@@ -1819,6 +1835,13 @@ function filterCat(cat) {
     });
 
     console.log("Seçilen yeni kategori:", cat);
+    
+    // Kategori değişince scroll'u en başa al
+    const newsFeed = document.getElementById('newsFeed');
+    if (newsFeed) {
+        newsFeed.scrollTop = 0; // En tepeye git
+    }
+    
     render(); 
 }
 
