@@ -1953,7 +1953,36 @@ function render() {
 
 function closeSearch() {
     activeSearchQuery = null;
-    closeM();
+    
+    // Stack'ten search modalını çıkar
+    if (modalStack.length > 0 && modalStack[modalStack.length - 1].type === 'search') {
+        modalStack.pop();
+    }
+    
+    // Eğer stack'te başka modal varsa onu göster
+    if (modalStack.length > 0) {
+        const lastModal = modalStack[modalStack.length - 1];
+        if (lastModal.type === 'sourceList' && lastModal.sourceName) {
+            openSourceNewsList(lastModal.sourceName);
+        } else if (lastModal.type === 'newsDetail' && lastModal.newsItem) {
+            active = lastModal.newsItem;
+            openDetail(-2);
+        } else if (lastModal.type === 'settings') {
+            openSettings();
+        } else if (lastModal.type === 'rssManager') {
+            openRSSManager();
+        } else if (lastModal.type === 'savedList') {
+            openSavedList();
+        } else {
+            document.getElementById('ovl').style.display = 'none';
+            document.getElementById('mdl').classList.remove('fullscreen-chat');
+            document.body.style.overflow = '';
+        }
+    } else {
+        document.getElementById('ovl').style.display = 'none';
+        document.getElementById('mdl').classList.remove('fullscreen-chat');
+        document.body.style.overflow = '';
+    }
 }
 
 function loadMoreNews() {
@@ -1979,13 +2008,13 @@ function getBestImage(item, sourceName) {
     return kaynakLogosu || `https://ui-avatars.com/api/?name=${sourceName}&background=random&color=fff&size=200`;
 }
 
-function openSettings() {
+function openSettings(fromStack = false) {
     const m = document.getElementById('mdl');
     m.classList.remove('fullscreen-chat');
     m.innerHTML = `
         <div class="modal-header">
             <h2>AYARLAR</h2>
-            <button class="btn-icon" onclick="event.stopPropagation(); closeM(event);" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
+            <button class="btn-icon" onclick="event.stopPropagation(); closeSettingsModal()" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
         </div>
         <div class="modal-body">
             <div class="set-row">
@@ -2035,29 +2064,51 @@ function openSettings() {
 
             <hr style="border:0; border-top:1px solid var(--brd); margin:15px 0;">
 
-            <button class="btn-full" style="background:var(--card-bg); color:var(--text); border:1px solid var(--brd); margin-bottom:10px; display:flex; align-items:center; justify-content:center; gap:10px;" onclick="openRSSManager()">
-                📡 RSS KAYNAKLARINI YÖNET
-            </button>
-
-            <button class="btn-full" style="background:#ef4444; color:white;" onclick="clearHistory()">
-                🗑️ SOHBETİ SIFIRLA
-            </button>
+            <button class="btn-full" style="background:var(--card-bg); color:var(--text); border:1px solid var(--brd); margin-bottom:10px;" onclick="openRSSManager()">📡 RSS KAYNAKLARINI YÖNET</button>
+            <button class="btn-full" style="background:#ef4444; color:white;" onclick="clearHistory()">🗑️ SOHBETİ SIFIRLA</button>
         </div>
         <div class="modal-footer">
             <button class="btn-full" style="background:#22c55e; color:white;" onclick="closeSettingsModal()">TAMAM</button>
         </div>`;
     document.getElementById('ovl').style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    pushModal({ type: 'settings' });
+    
+    if (!fromStack) {
+        pushModal({ type: 'settings' });
+    }
 }
 
+
 function closeSettingsModal() {
+    // Stack'ten settings modalını çıkar
     if (modalStack.length > 0 && modalStack[modalStack.length - 1].type === 'settings') {
         modalStack.pop();
     }
-    document.getElementById('ovl').style.display = 'none';
-    document.getElementById('mdl').classList.remove('fullscreen-chat');
-    document.body.style.overflow = '';
+    
+    // Eğer stack'te başka modal varsa onu göster
+    if (modalStack.length > 0) {
+        const lastModal = modalStack[modalStack.length - 1];
+        if (lastModal.type === 'sourceList' && lastModal.sourceName) {
+            openSourceNewsList(lastModal.sourceName);
+        } else if (lastModal.type === 'newsDetail' && lastModal.newsItem) {
+            active = lastModal.newsItem;
+            openDetail(-2);
+        } else if (lastModal.type === 'search' && lastModal.query) {
+            performLocalNewsSearch(lastModal.query, true);
+        } else if (lastModal.type === 'rssManager') {
+            openRSSManager(true);
+        } else if (lastModal.type === 'savedList') {
+            openSavedList(true);
+        } else {
+            document.getElementById('ovl').style.display = 'none';
+            document.getElementById('mdl').classList.remove('fullscreen-chat');
+            document.body.style.overflow = '';
+        }
+    } else {
+        document.getElementById('ovl').style.display = 'none';
+        document.getElementById('mdl').classList.remove('fullscreen-chat');
+        document.body.style.overflow = '';
+    }
 }
 
 // Haber içerik boyutu ayarı
@@ -2092,7 +2143,7 @@ function saveSets() {
     localStorage.setItem('khoj_sets', JSON.stringify(sets));
 }
 
-function openRSSManager() {
+function openRSSManager(fromStack = false) {
     const m = document.getElementById('mdl');
     m.classList.remove('fullscreen-chat');
     m.innerHTML = `
@@ -2100,19 +2151,22 @@ function openRSSManager() {
             <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
                 <h2 style="font-size:1.1rem; font-weight:900;">📡 RSS AYARLARI</h2>
                 <button class="btn-icon" onclick="openAddRSS()" style="background:var(--primary); color:white; border:none; width:35px; height:35px; font-weight:bold; font-size:1.2rem;">+</button>
-                <button class="btn-icon" onclick="event.stopPropagation(); closeM(event);" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
+                <button class="btn-icon" onclick="event.stopPropagation(); closeRSSManager()" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
             </div>
         </div>
         <div class="modal-body" id="rssListContainer">
             <p style="text-align:center; padding:20px; color:#888;">Kaynaklar yükleniyor...</p>
         </div>
         <div class="modal-footer">
-            <button onclick="openSettings()" class="btn-full">GERİ DÖN</button>
+            <button onclick="closeRSSManager()" class="btn-full">GERİ DÖN</button>
         </div>
     `;
     document.getElementById('ovl').style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    pushModal({ type: 'rssManager' });
+    
+    if (!fromStack) {
+        pushModal({ type: 'rssManager' });
+    }
 
     db.ref('rss_ayarlari').once('value', snap => {
         const container = document.getElementById('rssListContainer');
@@ -2130,6 +2184,39 @@ function openRSSManager() {
         container.innerHTML = html;
     });
 }
+
+function closeRSSManager() {
+    // Stack'ten rssManager modalını çıkar
+    if (modalStack.length > 0 && modalStack[modalStack.length - 1].type === 'rssManager') {
+        modalStack.pop();
+    }
+    
+    // Eğer stack'te başka modal varsa onu göster
+    if (modalStack.length > 0) {
+        const lastModal = modalStack[modalStack.length - 1];
+        if (lastModal.type === 'sourceList' && lastModal.sourceName) {
+            openSourceNewsList(lastModal.sourceName);
+        } else if (lastModal.type === 'newsDetail' && lastModal.newsItem) {
+            active = lastModal.newsItem;
+            openDetail(-2);
+        } else if (lastModal.type === 'search' && lastModal.query) {
+            performLocalNewsSearch(lastModal.query, true);
+        } else if (lastModal.type === 'settings') {
+            openSettings(true);
+        } else if (lastModal.type === 'savedList') {
+            openSavedList(true);
+        } else {
+            document.getElementById('ovl').style.display = 'none';
+            document.getElementById('mdl').classList.remove('fullscreen-chat');
+            document.body.style.overflow = '';
+        }
+    } else {
+        document.getElementById('ovl').style.display = 'none';
+        document.getElementById('mdl').classList.remove('fullscreen-chat');
+        document.body.style.overflow = '';
+    }
+}
+
 
 function editRSS(key) {
     db.ref('rss_ayarlari/' + key).once('value', snap => {
@@ -2402,92 +2489,167 @@ function closeM(event) {
     if (modalStack.length > 0) {
         const prev = modalStack.pop();
         
-        if (prev && prev.type === 'sourceList' && prev.sourceName) {
-            // Kaynak listesine geri dön
-            const sourceNews = news.filter(n => n.source === prev.sourceName);
-            const sortedNews = sortNews([...sourceNews]);
-            const modalDiv = document.getElementById('mdl');
-            modalDiv.classList.remove('fullscreen-chat');
+        // Eğer stack'te hala eleman varsa, o modalı geri göster
+        if (modalStack.length > 0) {
+            const lastModal = modalStack[modalStack.length - 1];
             
-            modalDiv.innerHTML = `
-                <div style="position:sticky; top:0; background:var(--header-bg); backdrop-filter:blur(20px); border-bottom:1px solid var(--brd); padding:12px 16px; display:flex; justify-content:space-between; align-items:center; z-index:10;">
-                    <h2 style="font-size:1rem; font-weight:800;">${prev.sourceName}</h2>
-                    <button class="btn-icon" onclick="event.stopPropagation(); closeM(event);" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
-                </div>
-                <div class="modal-body" style="padding:16px; display:flex; flex-direction:column; gap:16px;">
-                    ${sortedNews.map((n, idx) => {
-                        const realIdx = news.findIndex(x => x.title === n.title && x.source === n.source);
-                        let displayDate = '';
-                        if (n.pubDate) {
-                            const d = new Date(n.pubDate);
-                            if (!isNaN(d.getTime())) displayDate = d.toLocaleDateString('tr-TR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
-                        }
-                        return `<div class="news-card" onclick="openDetail(${realIdx})" style="margin-bottom:0;">
-                            <img src="${n.thumbnail || 'https://mmt8129.github.io/Gem/rsslogo.png'}" onerror="this.src='https://mmt8129.github.io/Gem/rsslogo.png';">
-                            <div>
-                                <div class="news-meta">
-                                    <span class="news-date-badge">${displayDate || 'Tarih yok'}</span>
-                                    <span style="background:rgba(239,68,68,0.2); color:#ef4444; padding:4px 8px; border-radius:12px;">${n.category}</span>
+            if (lastModal.type === 'sourceList' && lastModal.sourceName) {
+                // Kaynak listesini geri aç
+                const sourceNews = news.filter(n => n.source === lastModal.sourceName);
+                const sortedNews = sortNews([...sourceNews]);
+                const modalDiv = document.getElementById('mdl');
+                modalDiv.classList.remove('fullscreen-chat');
+                
+                modalDiv.innerHTML = `
+                    <div style="position:sticky; top:0; background:var(--header-bg); backdrop-filter:blur(20px); border-bottom:1px solid var(--brd); padding:12px 16px; display:flex; justify-content:space-between; align-items:center; z-index:10;">
+                        <h2 style="font-size:1rem; font-weight:800;">${lastModal.sourceName}</h2>
+                        <button class="btn-icon" onclick="event.stopPropagation(); closeM(event);" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
+                    </div>
+                    <div class="modal-body" style="padding:16px; display:flex; flex-direction:column; gap:16px;">
+                        ${sortedNews.map((n, idx) => {
+                            const realIdx = news.findIndex(x => x.title === n.title && x.source === n.source);
+                            let displayDate = '';
+                            if (n.pubDate) {
+                                const d = new Date(n.pubDate);
+                                if (!isNaN(d.getTime())) displayDate = d.toLocaleDateString('tr-TR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+                            }
+                            return `<div class="news-card" onclick="openDetail(${realIdx})" style="margin-bottom:0;">
+                                <img src="${n.thumbnail || 'https://mmt8129.github.io/Gem/rsslogo.png'}" onerror="this.src='https://mmt8129.github.io/Gem/rsslogo.png';">
+                                <div>
+                                    <div class="news-meta">
+                                        <span class="news-date-badge">${displayDate || 'Tarih yok'}</span>
+                                        <span style="background:rgba(239,68,68,0.2); color:#ef4444; padding:4px 8px; border-radius:12px;">${n.category}</span>
+                                    </div>
+                                    <div class="news-title">${n.title}</div>
                                 </div>
-                                <div class="news-title">${n.title}</div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                `;
+                document.getElementById('ovl').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                
+            } else if (lastModal.type === 'newsDetail' && lastModal.newsItem) {
+                // Haber detayını geri aç (push yapmadan)
+                active = lastModal.newsItem;
+                const isGeneralChat = (active.source === "KHOJ");
+                const m = document.getElementById('mdl');
+                if (isGeneralChat) m.classList.add('fullscreen-chat');
+                else m.classList.remove('fullscreen-chat');
+                
+                // Haber detayını yeniden oluştur
+                const savedNews = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+                const isSaved = savedNews.some(item => item.title === active?.title);
+                const saveBtnClass = isSaved ? 'btn-icon saved' : 'btn-icon';
+                
+                let displayDate = '';
+                if (active.pubDate) {
+                    const d = new Date(active.pubDate);
+                    if (!isNaN(d.getTime())) displayDate = d.toLocaleString('tr-TR', { day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' });
+                }
+                
+                const cleanDesc = active.description ? active.description.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim().substring(0, 1000) + "..." : "Haber içeriği yükleniyor...";
+                
+                if (isGeneralChat) {
+                    m.innerHTML = `<div class="modal-header" style="padding: 10px 16px;">
+                        <div style="display:flex; justify-content: space-between; align-items:center; width:100%;">
+                            <div style="font-weight: 800; font-size: 1rem; color: var(--primary);">✨ GENEL SOHBET</div>
+                            <div style="display:flex; align-items:center; gap:5px;">
+                                <button class="btn-icon size-btn" onclick="quickAdjust('size',1)">Y+</button>
+                                <button class="btn-icon size-btn" onclick="quickAdjust('size',-1)">Y-</button>
+                                <button class="btn-icon weight-btn" onclick="quickAdjust('weight',100)">K+</button>
+                                <button class="btn-icon weight-btn" onclick="quickAdjust('weight',-100)">K-</button>
+                                <button class="btn-icon" onclick="event.stopPropagation(); closeM(event);" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
                             </div>
-                        </div>`;
-                    }).join('')}
-                </div>
-            `;
-            document.getElementById('ovl').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-            
-} else if (prev && prev.type === 'newsDetail' && prev.newsItem) {
-    // Haber detayına geri dön - ama tekrar push yapma
-    active = prev.newsItem;
-    // Direkt mevcut modalı güncelle, openDetail çağırma (push yapmasın diye)
-    const isGeneralChat = (active.source === "KHOJ");
-    const m = document.getElementById('mdl');
-    if (isGeneralChat) m.classList.add('fullscreen-chat');
-    else m.classList.remove('fullscreen-chat');
-    
-    // Modal içeriğini güncelle (openDetail içindeki HTML oluşturma kodunu buraya kopyala)
-    // Veya daha basit: openDetail'i çağır ama push yapmasını engelle
-    // Şimdilik direkt closeM'de kapatma yapalım:
-    document.getElementById('ovl').style.display = 'none';
-    document.getElementById('mdl').classList.remove('fullscreen-chat');
-    document.body.style.overflow = '';
-}
+                        </div>
+                    </div>
+                    <div class="modal-body" style="padding: 0; overflow: hidden;">
+                        <div class="chat-box" id="cBox" style="height:100%; padding:16px; overflow-y:auto;">
+                            ${chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('')}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" id="uInp" placeholder="Bir şeyler sor..." style="flex:1; padding:14px; border-radius:30px; border:2px solid var(--brd);">
+                            <button class="btn-icon btn-save" id="sendBtn" style="width:50px;">➤</button>
+                        </div>
+                    </div>`;
+                } else {
+                    m.innerHTML = `<div class="modal-header" style="padding: 10px 15px;">
+                        <div style="display:flex; justify-content: space-between; align-items:center; width:100%;">
+                            <span class="news-source-badge" style="cursor:pointer;" onclick="openSourceNewsList('${active.source.replace(/'/g, "\\'")}')">${active.source}</span>
+                            <div style="display:flex; align-items:center; gap:5px;">
+                                <button class="btn-icon size-btn" onclick="quickAdjust('size',1)">Y+</button>
+                                <button class="btn-icon size-btn" onclick="quickAdjust('size',-1)">Y-</button>
+                                <button class="btn-icon weight-btn" onclick="quickAdjust('weight',100)">K+</button>
+                                <button class="btn-icon weight-btn" onclick="quickAdjust('weight',-100)">K-</button>
+                                <button class="btn-icon content-btn" onclick="quickAdjustContent('size',-1)">İ-</button>
+                                <button class="btn-icon content-btn" onclick="quickAdjustContent('size',1)">İ+</button>
+                                <button class="btn-icon" onclick="shareNews(active.title.replace(/'/g, ''), active.link)">📤</button>
+                                ${active.link ? `<button class="btn-icon" onclick="openFullNews('${active.link}')">🔗</button>` : ''}
+                                <button class="${saveBtnClass}" onclick="saveNews()" id="detailSaveBtn">💾</button>
+                                <button class="btn-icon" onclick="event.stopPropagation(); closeM(event);" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <h2 style="margin-bottom:15px;">${active.title}</h2>
+                        <div style="margin-bottom:15px;"><span class="news-date-badge">📅 ${displayDate || 'Tarih yok'}</span></div>
+                        <div id="dynamicContent" style="margin-bottom:20px; padding:15px; background:rgba(239,68,68,0.05); border-left:4px solid #ef4444;">${cleanDesc}</div>
+                        <img src="${active.thumbnail || 'https://mmt8129.github.io/Gem/rsslogo.png'}" style="width:100%; border-radius:15px; margin-bottom:20px;" onerror="this.src='https://mmt8129.github.io/Gem/rsslogo.png';">
+                        <div style="background:var(--card-bg); border:1px solid var(--brd); border-radius:12px;">
+                            <div style="background:var(--brd); padding:8px 15px; display:flex; justify-content:space-between;">
+                                <span>✨ YAPAY ZEKA ANALİZİ</span>
+                                <button onclick="document.getElementById('uInp').value='Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px;">✨ AI ile Özetle</button>
+                            </div>
+                            <div class="chat-box" id="cBox" style="min-height:200px; max-height:300px; padding:10px;">
+                                <div class="msg ai">Haber hakkında soru sorabilirsin...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" id="uInp" placeholder="Haberi analiz et..." style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd);">
+                            <button class="btn-icon btn-save" id="sendBtn" style="width:50px;">➤</button>
+                        </div>
+                    </div>`;
+                }
+                
+                const inp = document.getElementById('uInp');
+                if(inp) inp.addEventListener('keypress', (e) => { if(e.key === 'Enter') ask(); });
+                const sendBtn = document.getElementById('sendBtn');
+                if(sendBtn) sendBtn.onclick = ask;
+                
+                document.getElementById('ovl').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                
+            } else if (lastModal.type === 'search' && lastModal.query) {
+                performLocalNewsSearch(lastModal.query, true);
+            } else if (lastModal.type === 'settings') {
+                openSettings(true);
+            } else if (lastModal.type === 'rssManager') {
+                openRSSManager(true);
+            } else if (lastModal.type === 'savedList') {
+                openSavedList(true);
+            } else {
+                // Bilinmeyen tip, direkt kapat
+                document.getElementById('ovl').style.display = 'none';
+                document.getElementById('mdl').classList.remove('fullscreen-chat');
+                document.body.style.overflow = '';
+            }
+        } else {
+            // Stack boş, direkt kapat
+            document.getElementById('ovl').style.display = 'none';
+            document.getElementById('mdl').classList.remove('fullscreen-chat');
+            document.body.style.overflow = '';
+        }
     } else {
-        // Stack boşsa direkt kapat
+        // Stack zaten boş
         document.getElementById('ovl').style.display = 'none';
         document.getElementById('mdl').classList.remove('fullscreen-chat');
         document.body.style.overflow = '';
     }
 }
-
-// openDetail fonksiyonunu stack ile güncelle
-const originalOpenDetail = openDetail;
-openDetail = function(idx, fromStack = false) {
-    originalOpenDetail(idx);
-    if (!fromStack && document.getElementById('ovl').style.display === 'flex') {
-        pushModal({ type: 'newsDetail', newsItem: active });
-    }
-    
-    setTimeout(() => {
-        showPendingResponses();
-    }, 500);
-};
-
-const originalOpenGeneralChat = openGeneralChat;
-openGeneralChat = function() {
-    // Bekleyen bildirim var mı kontrol et
-    const pendingResponses = JSON.parse(localStorage.getItem('pending_ai_responses') || '[]');
-    
-    if (pendingResponses.length > 0) {
-        // Bildirim varsa listeyi göster
-        showPendingList();
-    } else {
-        // Yoksa normal sohbeti aç
-        originalOpenGeneralChat();
-    }
-};
 
 // Bekleyen cevapları göster (ANCAK MESAJLARI SİLMEZ)
 function showPendingResponses() {
@@ -3476,12 +3638,12 @@ function shareNews(title, link) {
     }
 }
 
-function openSavedList() {
+function openSavedList(fromStack = false) {
     const saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
     const m = document.getElementById('mdl');
     m.classList.remove('fullscreen-chat');
     
-    let html = '<div class="modal-header"><h2>💾 KAYDEDİLENLER</h2><button class="btn-icon" onclick="event.stopPropagation(); closeM(event);" style="background:rgba(239,68,68,0.2); color:#ef4444;">❌</button></div>';
+    let html = '<div class="modal-header"><h2>💾 KAYDEDİLENLER</h2><button class="btn-icon" onclick="event.stopPropagation(); closeSavedList()" style="background:rgba(239,68,68,0.2); color:#ef4444;">❌</button></div>';
     html += '<div class="modal-body">';
     
     if (saved.length === 0) {
@@ -3504,12 +3666,47 @@ function openSavedList() {
     }
     
     html += '</div>';
-    html += '<div class="modal-footer"><button class="btn-full" onclick="closeM()">KAPAT</button></div>';
+    html += '<div class="modal-footer"><button class="btn-full" onclick="closeSavedList()">KAPAT</button></div>';
     
     m.innerHTML = html;
     document.getElementById('ovl').style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    pushModal({ type: 'savedList' });
+    
+    if (!fromStack) {
+        pushModal({ type: 'savedList' });
+    }
+}
+
+function closeSavedList() {
+    // Stack'ten savedList modalını çıkar
+    if (modalStack.length > 0 && modalStack[modalStack.length - 1].type === 'savedList') {
+        modalStack.pop();
+    }
+    
+    // Eğer stack'te başka modal varsa onu göster
+    if (modalStack.length > 0) {
+        const lastModal = modalStack[modalStack.length - 1];
+        if (lastModal.type === 'sourceList' && lastModal.sourceName) {
+            openSourceNewsList(lastModal.sourceName);
+        } else if (lastModal.type === 'newsDetail' && lastModal.newsItem) {
+            active = lastModal.newsItem;
+            openDetail(-2);
+        } else if (lastModal.type === 'search' && lastModal.query) {
+            performLocalNewsSearch(lastModal.query, true);
+        } else if (lastModal.type === 'settings') {
+            openSettings(true);
+        } else if (lastModal.type === 'rssManager') {
+            openRSSManager(true);
+        } else {
+            document.getElementById('ovl').style.display = 'none';
+            document.getElementById('mdl').classList.remove('fullscreen-chat');
+            document.body.style.overflow = '';
+        }
+    } else {
+        document.getElementById('ovl').style.display = 'none';
+        document.getElementById('mdl').classList.remove('fullscreen-chat');
+        document.body.style.overflow = '';
+    }
 }
 
 function showNewNewsBadge() {
@@ -3540,19 +3737,22 @@ function handleMainInput() {
     inp.value = '';
 }
 
-function performLocalNewsSearch(q) {
+function performLocalNewsSearch(q, fromStack = false) {
     const results = news.filter(n => n.title.toLowerCase().includes(q.toLowerCase()) || (n.description && n.description.toLowerCase().includes(q.toLowerCase())) );
     activeSearchQuery = q; 
     const m = document.getElementById('mdl');
-    let html = ` <div class="modal-header"> <div style="display:flex; justify-content:space-between; align-items:center; width:100%;"> <div> <h2 style="font-size:1.1rem;">🔍 ARAMA SONUÇLARI</h2> <p style="font-size:11px; opacity:0.7;">"${q}" kelimesi geçen haberler</p> </div> <span class="search-count">${results.length} HABER BULUNDU</span> <button class="btn-icon" onclick="closeSearch()" style="background:rgba(239,68,68,0.2); color:#ef4444;">❌</button> </div> </div> <div class="modal-body">`; 
+    let html = ` <div class="modal-header"> <div style="display:flex; justify-content:space-between; align-items:center; width:100%;"> <div> <h2 style="font-size:1.1rem;">🔍 ARAMA SONUÇLARI</h2> <p style="font-size:11px; opacity:0.7;">"${q}" kelimesi geçen haberler</p> </div> <span class="search-count">${results.length} HABER BULUNDU</span> <button class="btn-icon" onclick="event.stopPropagation(); closeSearch()" style="background:rgba(239,68,68,0.2); color:#ef4444;">❌</button> </div> </div> <div class="modal-body">`; 
     if (results.length === 0) { html += `<p style="text-align:center; padding:40px; color:#888;">Aradığın kriterde haber bulamadım ABİ. 😔</p>`; } 
     else { results.forEach(n => { const realIdx = news.findIndex(x => x.title === n.title); html += ` <div class="news-card" onclick="openDetail(${realIdx})" style="margin-bottom:10px; cursor:pointer;"> <img src="${n.thumbnail || 'logo.png'}" style="width:50px; height:50px;"> <div style="flex:1"> <div class="news-meta"><span>${n.source}</span></div> <div class="news-title" style="font-size:0.85rem;">${n.title}</div> </div> </div>`; }); } 
     html += `</div><div class="modal-footer"> <button class="btn-full" onclick="closeSearch()">KAPAT</button> </div>`; 
     m.innerHTML = html; 
-document.body.style.overflow = 'hidden';
-	document.getElementById('ovl').style.display = 'flex';
-    pushModal({ type: 'search' }); // YENİ: Stack'e ekle
-} 
+    document.getElementById('ovl').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    if (!fromStack) {
+        pushModal({ type: 'search', query: q });
+    }
+}
 
 function openGeneralChatWithText(text) { 
     openGeneralChat(); 
@@ -3790,15 +3990,59 @@ function setupPinchZoom() {
     });
 }
 
-// YENİ: Android geri butonu için event listener
+// ==================== ANDROID GERİ BUTONU KESİN ÇÖZÜM ====================
+
+history.pushState(null, null, location.href);
+
+window.addEventListener('popstate', function(e) {
+    if (document.getElementById('ovl').style.display === 'flex') {
+        e.preventDefault();
+        history.pushState(null, null, location.href);
+        closeM();
+        return false;
+    } else {
+        history.pushState(null, null, location.href);
+    }
+});
+
 document.addEventListener('backbutton', function(e) {
     e.preventDefault();
+    e.stopPropagation();
     if (document.getElementById('ovl').style.display === 'flex') {
         closeM();
     }
-    // Ana ekranda hiçbir şey yapma (pasif)
+    return false;
 }, false);
+
+function wrapModalOpen(originalFn) {
+    return function() {
+        history.pushState(null, null, location.href);
+        return originalFn.apply(this, arguments);
+    };
+}
+
+const modalFunctions = [
+    'openDetail', 
+    'openSettings', 
+    'openRSSManager', 
+    'openSavedList', 
+    'openSourceNewsList', 
+    'showPendingList', 
+    'performLocalNewsSearch',
+    'openAddRSS',
+    'editRSS',
+    'openSourceListModal'
+];
+modalFunctions.forEach(fnName => {
+    if (typeof window[fnName] === 'function') {
+        const original = window[fnName];
+        window[fnName] = function() {
+            history.pushState(null, null, location.href);
+            return original.apply(this, arguments);
+        };
+    }
+});
+
 </script>
 </body>
-
 </html>
