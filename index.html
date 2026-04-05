@@ -1,0 +1,4455 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <!-- HTML head kısmına ekleyin -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * self 'unsafe-inline' 'unsafe-eval' blob: data: gap:; object-src * self blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;">
+    <title>Gemini Pro Dashboard v7</title>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <!-- Toast bildirimleri için -->
+<div id="toast" style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--card-bg); color:var(--text); padding:10px 20px; border-radius:30px; border:1px solid var(--brd); font-weight:600; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.15); opacity:0; transition:opacity 0.3s ease; pointer-events:none;">✅ Kaydedildi!</div>
+	<style>
+
+
+/* ============================= */
+/* 🍎 APPLE NEWS MODERN UI      */
+/* 9 TEMA (Light, Dark + 7 Yeni) */
+/* ============================= */
+
+/* ========= ANA DEĞİŞKENLER (Varsayılan) ========= */
+:root {
+    --news-size:1rem;
+    --news-weight:700;
+    --chat-size:15px;
+    --chat-weight:500;
+    --content-size:15px;
+    --content-line-height:1.6;
+}
+
+/* ========= 1. AÇIK TEMA (Varsayılan Light) ========= */
+[data-theme="light"] {
+    --primary:#e11d48;
+    --bg:#f5f5f7;
+    --text:#1d1d1f;
+    --muted:#6e6e73;
+    --card-bg:#ffffff;
+    --brd:#e5e5ea;
+    --header-bg:rgba(255,255,255,0.85);
+    --size-color: #ef4444;
+    --weight-color: #3b82f6;
+    --content-color: #22c55e;
+    --btn-bg-light: rgba(0,0,0,0.05);
+    --btn-bg-size: rgba(239,68,68,0.1);
+    --btn-bg-weight: rgba(59,130,246,0.1);
+    --btn-bg-content: rgba(34,197,94,0.1);
+    --btn-text: #1d1d1f;
+    --btn-hover: rgba(0,0,0,0.08);
+}
+
+/* ========= 2. KOYU TEMA (Mevcut Dark) ========= */
+[data-theme="dark"] {
+    --primary:#e11d48;
+    --bg:#000000;
+    --text:#f5f5f7;
+    --muted:#8e8e93;
+    --card-bg:#1c1c1e;
+    --brd:#2c2c2e;
+    --header-bg:rgba(0,0,0,0.85);
+    --size-color: #ff6b6b;
+    --weight-color: #6b9eff;
+    --content-color: #6bff6b;
+    --btn-bg-light: rgba(255,255,255,0.08);
+    --btn-bg-size: rgba(255,107,107,0.15);
+    --btn-bg-weight: rgba(107,158,255,0.15);
+    --btn-bg-content: rgba(107,255,107,0.15);
+    --btn-text: #f5f5f7;
+    --btn-hover: rgba(255,255,255,0.1);
+}
+
+/* ========= 3. GECE MAVİSİ (Night Blue) ========= */
+[data-theme="nightblue"] {
+    --primary:#3B82F6;
+    --bg:#0A1628;
+    --text:#E2E8F0;
+    --muted:#94A3B8;
+    --card-bg:#0F1A2E;
+    --brd:#1E293B;
+    --header-bg:rgba(10,22,40,0.85);
+    --size-color: #60A5FA;
+    --weight-color: #818CF8;
+    --content-color: #34D399;
+    --btn-bg-light: rgba(59,130,246,0.1);
+    --btn-bg-size: rgba(96,165,250,0.15);
+    --btn-bg-weight: rgba(129,140,248,0.15);
+    --btn-bg-content: rgba(52,211,153,0.15);
+    --btn-text: #E2E8F0;
+    --btn-hover: rgba(59,130,246,0.15);
+}
+
+/* ========= 4. SABAH ESİNTİSİ (Morning Breeze) ========= */
+[data-theme="morning"] {
+    --primary:#0891B2;
+    --bg:#F0F9FF;
+    --text:#1E293B;
+    --muted:#64748B;
+    --card-bg:#FFFFFF;
+    --brd:#BAE6FD;
+    --header-bg:rgba(240,249,255,0.85);
+    --size-color: #EC4899;
+    --weight-color: #06B6D4;
+    --content-color: #10B981;
+    --btn-bg-light: rgba(0,0,0,0.04);
+    --btn-bg-size: rgba(236,72,153,0.1);
+    --btn-bg-weight: rgba(6,182,212,0.1);
+    --btn-bg-content: rgba(16,185,129,0.1);
+    --btn-text: #1E293B;
+    --btn-hover: rgba(0,0,0,0.06);
+}
+
+[data-theme="morning-dark"] {
+    --primary:#06B6D4;
+    --bg:#0F172A;
+    --text:#F1F5F9;
+    --muted:#94A3B8;
+    --card-bg:#1E293B;
+    --brd:#334155;
+    --header-bg:rgba(15,23,42,0.85);
+    --size-color: #F472B6;
+    --weight-color: #22D3EE;
+    --content-color: #34D399;
+    --btn-bg-light: rgba(6,182,212,0.1);
+    --btn-bg-size: rgba(244,114,182,0.15);
+    --btn-bg-weight: rgba(34,211,238,0.15);
+    --btn-bg-content: rgba(52,211,153,0.15);
+    --btn-text: #F1F5F9;
+    --btn-hover: rgba(6,182,212,0.12);
+}
+
+/* ========= 5. KUM VE DENİZ (Sand & Sea) ========= */
+[data-theme="sandsea"] {
+    --primary:#E76F51;
+    --bg:#FFF8F0;
+    --text:#2B2D2E;
+    --muted:#7A6B5A;
+    --card-bg:#FFFFFF;
+    --brd:#F4A261;
+    --header-bg:rgba(255,248,240,0.85);
+    --size-color: #E9C46A;
+    --weight-color: #2A9D8F;
+    --content-color: #E76F51;
+    --btn-bg-light: rgba(0,0,0,0.04);
+    --btn-bg-size: rgba(233,196,106,0.15);
+    --btn-bg-weight: rgba(42,157,143,0.1);
+    --btn-bg-content: rgba(231,111,81,0.1);
+    --btn-text: #2B2D2E;
+    --btn-hover: rgba(0,0,0,0.06);
+}
+
+[data-theme="sandsea-dark"] {
+    --primary:#F4A261;
+    --bg:#1A1A1A;
+    --text:#EAE2B7;
+    --muted:#A8A29E;
+    --card-bg:#2D2D2D;
+    --brd:#5C4D3C;
+    --header-bg:rgba(26,26,26,0.85);
+    --size-color: #E9C46A;
+    --weight-color: #2A9D8F;
+    --content-color: #E76F51;
+    --btn-bg-light: rgba(244,162,97,0.1);
+    --btn-bg-size: rgba(233,196,106,0.15);
+    --btn-bg-weight: rgba(42,157,143,0.12);
+    --btn-bg-content: rgba(231,111,81,0.12);
+    --btn-text: #EAE2B7;
+    --btn-hover: rgba(244,162,97,0.12);
+}
+
+/* ========= 6. ORMAN GÖLGESİ (Forest Shade) ========= */
+[data-theme="forest"] {
+    --primary:#2D6A4F;
+    --bg:#F4F9F4;
+    --text:#1B3B2B;
+    --muted:#5A6B5A;
+    --card-bg:#FFFFFF;
+    --brd:#A7C7A7;
+    --header-bg:rgba(244,249,244,0.85);
+    --size-color: #D4A373;
+    --weight-color: #40916C;
+    --content-color: #52B788;
+    --btn-bg-light: rgba(0,0,0,0.04);
+    --btn-bg-size: rgba(212,163,115,0.12);
+    --btn-bg-weight: rgba(64,145,108,0.1);
+    --btn-bg-content: rgba(82,183,136,0.1);
+    --btn-text: #1B3B2B;
+    --btn-hover: rgba(0,0,0,0.05);
+}
+
+[data-theme="forest-dark"] {
+    --primary:#52B788;
+    --bg:#0D1F0D;
+    --text:#D8F3DC;
+    --muted:#8CA88C;
+    --card-bg:#1A2E1A;
+    --brd:#2D4A2D;
+    --header-bg:rgba(13,31,13,0.85);
+    --size-color: #D4A373;
+    --weight-color: #74C69D;
+    --content-color: #95D5B2;
+    --btn-bg-light: rgba(82,183,136,0.1);
+    --btn-bg-size: rgba(212,163,115,0.12);
+    --btn-bg-weight: rgba(116,198,157,0.12);
+    --btn-bg-content: rgba(149,213,178,0.12);
+    --btn-text: #D8F3DC;
+    --btn-hover: rgba(82,183,136,0.12);
+}
+
+/* ========= 7. TOZ PEMBE (Dusty Rose) ========= */
+[data-theme="rose"] {
+    --primary:#D47B86;
+    --bg:#FFF5F7;
+    --text:#4A2B3A;
+    --muted:#8C6A7A;
+    --card-bg:#FFFFFF;
+    --brd:#F7C8D4;
+    --header-bg:rgba(255,245,247,0.85);
+    --size-color: #E8A2B0;
+    --weight-color: #B86B7A;
+    --content-color: #A15C6E;
+    --btn-bg-light: rgba(0,0,0,0.04);
+    --btn-bg-size: rgba(232,162,176,0.12);
+    --btn-bg-weight: rgba(184,107,122,0.1);
+    --btn-bg-content: rgba(161,92,110,0.1);
+    --btn-text: #4A2B3A;
+    --btn-hover: rgba(0,0,0,0.05);
+}
+
+[data-theme="rose-dark"] {
+    --primary:#D47B86;
+    --bg:#2D1B2E;
+    --text:#FFE4EC;
+    --muted:#B897A8;
+    --card-bg:#3D2A3E;
+    --brd:#5C3D5E;
+    --header-bg:rgba(45,27,46,0.85);
+    --size-color: #FFB7C5;
+    --weight-color: #E8A2B0;
+    --content-color: #D47B86;
+    --btn-bg-light: rgba(212,123,134,0.1);
+    --btn-bg-size: rgba(255,183,197,0.12);
+    --btn-bg-weight: rgba(232,162,176,0.12);
+    --btn-bg-content: rgba(212,123,134,0.12);
+    --btn-text: #FFE4EC;
+    --btn-hover: rgba(212,123,134,0.12);
+}
+
+/* ========= 8. LAVANTA RÜYASI (Lavender Dream) ========= */
+[data-theme="lavender"] {
+    --primary:#8B5CF6;
+    --bg:#F5F0FF;
+    --text:#2D1B4E;
+    --muted:#7A6B8A;
+    --card-bg:#FFFFFF;
+    --brd:#D9C6FF;
+    --header-bg:rgba(245,240,255,0.85);
+    --size-color: #C084FC;
+    --weight-color: #A78BFA;
+    --content-color: #8B5CF6;
+    --btn-bg-light: rgba(0,0,0,0.04);
+    --btn-bg-size: rgba(192,132,252,0.12);
+    --btn-bg-weight: rgba(167,139,250,0.1);
+    --btn-bg-content: rgba(139,92,246,0.1);
+    --btn-text: #2D1B4E;
+    --btn-hover: rgba(0,0,0,0.05);
+}
+
+[data-theme="lavender-dark"] {
+    --primary:#A78BFA;
+    --bg:#1A1025;
+    --text:#E9D5FF;
+    --muted:#A994C2;
+    --card-bg:#2D1F3A;
+    --brd:#4A3655;
+    --header-bg:rgba(26,16,37,0.85);
+    --size-color: #D8B4FE;
+    --weight-color: #C084FC;
+    --content-color: #A78BFA;
+    --btn-bg-light: rgba(167,139,250,0.1);
+    --btn-bg-size: rgba(216,180,254,0.12);
+    --btn-bg-weight: rgba(192,132,252,0.12);
+    --btn-bg-content: rgba(167,139,250,0.12);
+    --btn-text: #E9D5FF;
+    --btn-hover: rgba(167,139,250,0.12);
+}
+
+/* ========= 9. GRİ ELEGANCE (Gray Elegance) ========= */
+[data-theme="gray"] {
+    --primary:#6B7280;
+    --bg:#FFFFFF;
+    --text:#1F2937;
+    --muted:#6B7280;
+    --card-bg:#F9FAFB;
+    --brd:#E5E7EB;
+    --header-bg:rgba(255,255,255,0.85);
+    --size-color: #9CA3AF;
+    --weight-color: #6B7280;
+    --content-color: #4B5563;
+    --btn-bg-light: rgba(0,0,0,0.04);
+    --btn-bg-size: rgba(156,163,175,0.12);
+    --btn-bg-weight: rgba(107,114,128,0.1);
+    --btn-bg-content: rgba(75,85,99,0.1);
+    --btn-text: #1F2937;
+    --btn-hover: rgba(0,0,0,0.05);
+}
+
+[data-theme="gray-dark"] {
+    --primary:#9CA3AF;
+    --bg:#111827;
+    --text:#F3F4F6;
+    --muted:#9CA3AF;
+    --card-bg:#1F2937;
+    --brd:#374151;
+    --header-bg:rgba(17,24,39,0.85);
+    --size-color: #D1D5DB;
+    --weight-color: #9CA3AF;
+    --content-color: #6B7280;
+    --btn-bg-light: rgba(156,163,175,0.1);
+    --btn-bg-size: rgba(209,213,219,0.12);
+    --btn-bg-weight: rgba(156,163,175,0.12);
+    --btn-bg-content: rgba(107,114,128,0.12);
+    --btn-text: #F3F4F6;
+    --btn-hover: rgba(156,163,175,0.12);
+}
+
+/* ========= RESET ========= */
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+    -webkit-tap-highlight-color:transparent;
+}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    height:100vh;
+    overflow:hidden;
+}
+
+/* ========= HEADER ========= */
+.header{
+    position:fixed;
+    top:0;
+    width:100%;
+    height:70px;
+    background:var(--header-bg);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--brd);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 16px;
+    z-index:1001;
+}
+
+.header-left,.header-right{
+    display:flex;
+    gap:8px;
+    flex:1;
+}
+
+.header-right{justify-content:flex-end;}
+.header-center{text-align:center;flex:1.5;}
+
+.time-text{
+    font-size:1.3rem;
+    font-weight:600;
+}
+
+.date-text{
+    font-size:0.7rem;
+    color:var(--muted);
+    font-weight:500;
+}
+
+/* ========= ICON BUTON ========= */
+
+.btn-icon.saved {
+    background: #22c55e !important;
+    color: white !important;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+}
+
+.btn-icon.saved:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.7);
+}
+
+#savedBadge {
+    animation: badgePop 0.3s ease;
+}
+
+.btn-icon.saved::after {
+    content: '✓';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    font-size: 10px;
+    background: white;
+    color: #22c55e;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border: 1px solid #22c55e;
+}
+
+.btn-icon.saved-outline {
+    border: 2px solid #22c55e !important;
+    box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.3);
+    position: relative;
+}
+
+.btn-save.has-saved {
+    position: relative;
+}
+
+.btn-save.has-saved::after {
+    content: attr(data-count);
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 12px;
+    min-width: 18px;
+    text-align: center;
+}
+
+.btn-icon{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:none;
+    background: var(--btn-bg-light);
+    cursor:pointer;
+    font-size:1.1rem;
+    transition: all 0.2s ease;
+    color: var(--btn-text);
+}
+
+.btn-icon.size-btn {
+    background: color-mix(in srgb, var(--size-color) 20%, transparent);
+    color:  var(--size-color);
+    border: 1px solid color-mix(in srgb, var(--size-color) 30%, transparent);
+}
+
+.btn-icon.weight-btn {
+    background: color-mix(in srgb, var(--weight-color) 20%, transparent);
+    color: var(--weight-color);
+    border: 1px solid color-mix(in srgb, var(--weight-color) 30%, transparent);
+}
+
+.btn-icon.content-btn {
+    background: color-mix(in srgb, var(--content-color) 20%, transparent);
+    color: var(--content-color);
+    border: 1px solid color-mix(in srgb, var(--content-color) 30%, transparent);
+}
+
+.btn-icon:hover {
+    background: var(--btn-hover) !important;
+    transform: scale(1.05);
+}
+
+@keyframes badgePop {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.btn-gemini{background:var(--primary)!important;color:#fff!important;border:none!important;}
+.btn-save{background:var(--primary)!important;color:#fff!important;border:none!important;}
+
+/* ========= CATEGORY BAR ========= */
+.category-bar{
+    position:fixed;
+    top:70px;
+    width:100%;
+    display:flex;
+    gap:10px;
+    padding:10px 16px;
+    overflow-x:auto;
+    background:var(--bg);
+    border-bottom:1px solid var(--brd);
+    z-index:1000;
+}
+
+/* ========= SOURCE BAR ========= */
+.source-bar{
+    position:fixed;
+    top:125px;
+    width:100%;
+    display:flex;
+    gap:10px;
+    padding:10px 16px;
+    overflow-x:auto;
+    background:var(--bg);
+    border-bottom:1px solid var(--brd);
+    z-index:999;
+}
+
+.category-bar::-webkit-scrollbar,
+.source-bar::-webkit-scrollbar{display:none;}
+
+.cat-item{
+    font-size:0.8rem;
+    font-weight:600;
+    padding:6px 14px;
+    border-radius:20px;
+    background:#ededf0;
+    color:#000;
+    white-space:nowrap;
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+.source-item{
+    font-size:0.8rem;
+    font-weight:600;
+    padding:6px 14px;
+    border-radius:20px;
+    background:#ededf0;
+    color:#000;
+    white-space:nowrap;
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+[data-theme="dark"] .cat-item.active,
+[data-theme="dark"] .source-item.active {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+.cat-item.active,
+.source-item.active{
+    background:var(--primary);
+    color:#fff;
+}
+
+[data-theme="dark"] .cat-item,
+[data-theme="dark"] .source-item{
+    background:#2c2c2e;
+    color:#fff;
+}
+
+/* Diğer temalar için kategori butonları */
+[data-theme="nightblue"] .cat-item,
+[data-theme="nightblue"] .source-item,
+[data-theme="morning"] .cat-item,
+[data-theme="morning-dark"] .cat-item,
+[data-theme="sandsea"] .cat-item,
+[data-theme="sandsea-dark"] .cat-item,
+[data-theme="forest"] .cat-item,
+[data-theme="forest-dark"] .cat-item,
+[data-theme="rose"] .cat-item,
+[data-theme="rose-dark"] .cat-item,
+[data-theme="lavender"] .cat-item,
+[data-theme="lavender-dark"] .cat-item,
+[data-theme="gray"] .cat-item,
+[data-theme="gray-dark"] .cat-item,
+[data-theme="morning"] .source-item,
+[data-theme="morning-dark"] .source-item,
+[data-theme="sandsea"] .source-item,
+[data-theme="sandsea-dark"] .source-item,
+[data-theme="forest"] .source-item,
+[data-theme="forest-dark"] .source-item,
+[data-theme="rose"] .source-item,
+[data-theme="rose-dark"] .source-item,
+[data-theme="lavender"] .source-item,
+[data-theme="lavender-dark"] .source-item,
+[data-theme="gray"] .source-item,
+[data-theme="gray-dark"] .source-item {
+    background: color-mix(in srgb, var(--primary) 25%, var(--card-bg));
+    color: var(--text);
+}
+
+[data-theme="nightblue"] .cat-item.active,
+[data-theme="morning"] .cat-item.active,
+[data-theme="morning-dark"] .cat-item.active,
+[data-theme="sandsea"] .cat-item.active,
+[data-theme="sandsea-dark"] .cat-item.active,
+[data-theme="forest"] .cat-item.active,
+[data-theme="forest-dark"] .cat-item.active,
+[data-theme="rose"] .cat-item.active,
+[data-theme="rose-dark"] .cat-item.active,
+[data-theme="lavender"] .cat-item.active,
+[data-theme="lavender-dark"] .cat-item.active,
+[data-theme="gray"] .cat-item.active,
+[data-theme="gray-dark"] .cat-item.active,
+[data-theme="nightblue"] .source-item.active,
+[data-theme="morning"] .source-item.active,
+[data-theme="morning-dark"] .source-item.active,
+[data-theme="sandsea"] .source-item.active,
+[data-theme="sandsea-dark"] .source-item.active,
+[data-theme="forest"] .source-item.active,
+[data-theme="forest-dark"] .source-item.active,
+[data-theme="rose"] .source-item.active,
+[data-theme="rose-dark"] .source-item.active,
+[data-theme="lavender"] .source-item.active,
+[data-theme="lavender-dark"] .source-item.active,
+[data-theme="gray"] .source-item.active,
+[data-theme="gray-dark"] .source-item.active {
+    background: var(--primary);
+    color: #fff;
+}
+
+[data-theme="dark"] .btn-icon.saved {
+    background: #22c55e !important;
+    color: white !important;
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+}
+
+/* ========= NEWS FEED ========= */
+#newsFeed{
+    margin-top:185px !important;
+    height:calc(100vh - 185px);
+    overflow-y:auto;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    padding-bottom:120px !important;
+}
+
+/* ========= NEWS CARD ========= */
+.news-card{
+    background:var(--card-bg);
+    border-radius:24px;
+    padding:18px;
+    display:flex;
+    flex-direction: column-reverse;
+    gap:18px;
+    border:1px solid var(--brd);
+    transition: all 0.2s ease;
+    margin-bottom:16px;
+}
+
+.news-card:active {
+    transform: scale(0.99);
+}
+
+.news-card:hover{
+    transform:scale(1.01);
+}
+
+.news-card img{
+    width:100%;
+    height:230px;
+    border-radius:18px;
+    object-fit:cover;
+}
+
+.news-title{
+    font-size:var(--news-size)!important;
+    font-weight:var(--news-weight)!important;
+    line-height:1.4;
+    margin-top:4px;
+}
+
+.news-meta{
+    font-size:0.8rem;
+    color:var(--muted);
+    font-weight:600;
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.news-source-badge {
+    background:var(--primary);
+    color:white;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:0.7rem;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.news-date-badge {
+    background:rgba(255,255,255,0.1);
+    padding:4px 8px;
+    border-radius:12px;
+    font-size:0.65rem;
+}
+
+/* ========= ALT ARAMA BAR ========= */
+.bottom-banner{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    display:flex;
+    gap:10px;
+    padding:12px 16px;
+    background:var(--header-bg);
+    backdrop-filter:blur(20px);
+    border-top:1px solid var(--brd);
+    z-index:2000;
+}
+
+.bottom-banner input{
+    flex:1;
+    padding:12px 16px;
+    border-radius:22px;
+    border:1px solid var(--brd);
+    background:#f2f2f7;
+    font-size:14px;
+}
+
+[data-theme="dark"] .bottom-banner input{
+    background:#2c2c2e;
+    color:#fff;
+}
+
+.bottom-banner button{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:none;
+    background:var(--primary);
+    color:#fff;
+    font-size:1rem;
+    cursor:pointer;
+}
+
+/* ========= MODAL ========= */
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.4);
+    backdrop-filter:blur(10px);
+    display:none;
+    z-index:5000;
+    justify-content:center;
+    align-items:flex-end;
+}
+
+.modal{
+    width:100% !important;
+    height:92vh !important;
+    background:var(--bg);
+    border-radius: 0px 0px 0 0;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+}
+
+.modal-header{
+    padding:18px;
+    border-bottom:1px solid var(--brd);
+}
+
+.modal-header .btn-icon {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.9rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.modal-header .btn-icon-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.modal-header .btn-icon-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--brd);
+    margin: 0 2px;
+}
+
+@media (max-width: 480px) {
+    .modal-header .btn-icon {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .modal-header h2 {
+        font-size: 0.9rem !important;
+    }
+}
+
+.modal-body{
+    flex:1;
+    overflow-y:auto;
+    padding:18px;
+}
+
+.modal-footer{
+    padding:14px;
+    border-top:1px solid var(--brd);
+}
+
+/* ========= CHAT ========= */
+.chat-box{
+    background:var(--card-bg);
+    border-radius:0px;
+    padding:3px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.msg{
+    padding:12px 36px;
+    border-radius:2px;
+    font-size:var(--chat-size);
+    font-weight:var(--chat-weight);
+}
+
+.msg.user{
+    background:var(--primary);
+    color:#fff;
+    align-self:flex-end;
+}
+
+.msg.ai{
+    background: transparent;
+    border-radius: 2px 2px 2px 0px;
+}
+
+[data-theme="dark"] .msg.ai{
+    background:#2c2c2e;
+}
+
+/* ========= FULL BUTTON ========= */
+.btn-full{
+    width:100%;
+    padding:14px;
+    border-radius:20px;
+    border:none;
+    background:var(--primary);
+    color:#fff;
+    font-weight:600;
+    cursor:pointer;
+}
+
+/* ========= TOAST ========= */
+#toast{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--card-bg);
+    color:var(--text);
+    padding:10px 20px;
+    border-radius:20px;
+    border:1px solid var(--brd);
+    font-weight:600;
+    z-index:9999;
+}
+
+/* Yazıyor animasyonu */
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px;
+    background: #e9e9eb;
+    border-radius: 8px;
+    width: fit-content;
+    margin: 8px 0;
+}
+
+[data-theme="dark"] .typing-indicator {
+    background: #2c2c2e;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background: #888;
+    border-radius: 50%;
+    animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+    30% { transform: translateY(-10px); opacity: 1; }
+}
+
+/* ========= AYARLAR PANELİ ========= */
+.set-row{
+    margin-bottom:20px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.set-label{
+    font-size:0.75rem;
+    font-weight:600;
+    color:var(--text);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+}
+
+.set-ctrl{
+    display:flex;
+    align-items:center;
+    background:rgba(255,255,255,0.8);
+    border:1px solid rgba(60,60,67,0.3);
+    border-radius:16px;
+    height:55px;
+    overflow:hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    backdrop-filter: blur(10px);
+    transition: 0.2s ease;
+    color:black;
+}
+
+.set-ctrl button{
+    flex:1;
+    height:100%;
+    border:none;
+    background:transparent;
+    font-size:1.4rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s ease, transform .15s ease;
+    color:black;
+    border-radius: 16px;
+}
+
+.set-ctrl button:hover{
+    background:rgba(0,0,0,0.05);
+    transform: scale(0.98);
+    color:black;
+}
+
+.set-ctrl span{
+    flex:2;
+    text-align:center;
+    font-weight:600;
+    font-size:0.95rem;
+    border-left:1px solid rgba(60,60,67,0.3);
+    border-right:1px solid rgba(60,60,67,0.3);
+    color:#1c1c1e;
+}
+
+.modal-footer textarea {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 2px solid var(--brd);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    resize: none;
+    min-height: 50px;
+    max-height: 120px;
+    overflow-y: auto;
+    font-family: inherit;
+}
+
+.chat-box {
+    scroll-behavior: smooth;
+    overflow-y: auto !important;
+}
+
+/* Tam ekran sohbet modu */
+.modal.fullscreen-chat {
+    width: 100% !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    background: var(--bg);
+}
+
+.modal.fullscreen-chat .modal-body {
+    padding: 0 !important;
+    height: calc(100vh - 130px) !important;
+    overflow: hidden !important;
+}
+
+.modal.fullscreen-chat .chat-box {
+    border: none !important;
+    border-radius: 0 !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
+    background: transparent !important;
+    padding: 15px !important;
+}
+
+.modal.fullscreen-chat .modal-footer {
+    background: var(--header-bg);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--brd);
+    padding: 12px 16px !important;
+}
+
+.modal.fullscreen-chat .modal-header {
+    background: var(--header-bg);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--brd);
+}
+
+.modal.fullscreen-chat .news-meta,
+.modal.fullscreen-chat h2,
+.modal.fullscreen-chat img:not(.chat-box img) {
+    display: none !important;
+}
+
+.modal.fullscreen-chat .chat-box .msg {
+    max-width: 100%;
+    margin-bottom: 12px;
+}
+
+.dot-animation {
+    display: inline-block;
+    animation: dotPulse 1.5s infinite;
+}
+
+@keyframes dotPulse {
+    0% { opacity: 0.2; }
+    20% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+
+/* Çoklu resim galerisi */
+.multi-image-gallery {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 5px 0 15px 0;
+    margin-bottom: 20px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+}
+
+.multi-image-gallery::-webkit-scrollbar {
+    height: 4px;
+}
+
+.multi-image-gallery::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+.gallery-thumb {
+    flex: 0 0 auto;
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    opacity: 0.8;
+}
+
+.gallery-thumb:hover,
+.gallery-thumb:active {
+    opacity: 1;
+    border-color: var(--primary);
+    transform: scale(1.05);
+}
+
+.gallery-thumb.active {
+    opacity: 1;
+    border-color: var(--primary);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+.main-image {
+    width: 100%;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    max-height: 300px;
+    object-fit: cover;
+}
+
+/* Resim görüntüleyici */
+.image-viewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.2s ease;
+}
+
+.image-viewer.show {
+    display: flex;
+}
+
+.image-viewer .gallery-container {
+    position: relative;
+    width: 90%;
+    height: 80%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(20, 20, 20, 0.3);
+    border-radius: 24px;
+    padding: 10px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.image-viewer .main-viewer-image {
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: zoomIn 0.2s ease;
+    cursor: grab;
+    transition: transform 0.1s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.image-viewer .main-viewer-image:active {
+    cursor: grabbing;
+}
+
+.image-viewer .main-viewer-image.zoomed {
+    transform: scale(var(--zoom-scale, 1.5));
+}
+
+.image-viewer .thumbnail-strip {
+    position: absolute;
+    bottom: -60px;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 30px;
+    margin: 10px auto;
+    width: fit-content;
+    max-width: 90%;
+    scrollbar-width: thin;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.image-viewer .thumbnail-strip::-webkit-scrollbar {
+    height: 4px;
+}
+
+.image-viewer .thumbnail-strip::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+.image-viewer .thumb-img {
+    flex: 0 0 auto;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.image-viewer .thumb-img:hover,
+.image-viewer .thumb-img.active {
+    opacity: 1;
+    border-color: var(--primary);
+    transform: scale(1.05);
+}
+
+.image-viewer .nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10001;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.image-viewer .nav-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.image-viewer .nav-btn.prev {
+    left: 10px;
+}
+
+.image-viewer .nav-btn.next {
+    right: 10px;
+}
+
+.image-viewer .counter {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 10001;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.image-viewer .download-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10001;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.image-viewer .close-hint {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    white-space: nowrap;
+}
+
+.image-viewer .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 60px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 59, 48, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10001;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.image-viewer .close-btn:hover,
+.image-viewer .close-btn:active {
+    background: rgb(255, 59, 48);
+    transform: scale(1.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* ========= SIRALAMA MENÜSÜ ========= */
+.sort-menu {
+    position: fixed;
+    top: 70px;
+    right: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--brd);
+    border-radius: 16px;
+    padding: 8px;
+    z-index: 2000;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    min-width: 200px;
+    display: none;
+}
+
+.sort-menu.show {
+    display: block;
+    animation: slideDown 0.2s ease;
+}
+
+.sort-item {
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s;
+    color: var(--text);
+}
+
+.sort-item:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.sort-item.active {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.sort-item span:first-child {
+    font-size: 1.2rem;
+}
+
+.sort-icon {
+    margin-left: auto;
+    color: var(--primary);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.btn-sort.active {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+.modal-body h2 {
+    font-size: calc(var(--content-size) + 0.4rem) !important;
+    line-height: var(--content-line-height) !important;
+}
+
+#dynamicContent p,
+.modal-body p {
+    font-size: var(--content-size) !important;
+    line-height: var(--content-line-height) !important;
+}
+
+.modal-body .news-meta,
+.modal-body [style*="background:#ef4444"] {
+    font-size: calc(var(--content-size) - 2px) !important;
+}
+
+    </style>
+</head>
+<body>   
+
+  <header class="header">
+    <div class="header-left">
+        <button class="btn-icon" onclick="openSettings()">⚙️</button>
+        <button class="btn-icon" id="themeBtn" onclick="toggleTheme()">🌙</button>
+    </div>
+    <div class="header-center">
+        <span class="time-text" id="clk">00:00</span>
+        <span class="date-text" id="dt">YÜKLENİYOR</span>
+    </div>
+    <div class="header-right">
+        <button class="btn-icon btn-sort" onclick="openSortMenu()" title="Sıralama" id="sortBtn">🔽</button>
+        <button class="btn-icon btn-gemini" onclick="openGeneralChat()">✨</button>
+        <button class="btn-icon btn-save" onclick="openSavedList()">💾</button>
+        <button class="btn-icon" onclick="softRefresh()">🔄</button>
+    </div>
+</header>
+
+<div class="category-bar" id="catBar">
+    <div class="cat-item active" onclick="filterCat('TÜMÜ')">TÜMÜ</div>
+    <div class="cat-item" onclick="filterCat('TÜRKİYE')">TÜRKİYE</div>
+    <div class="cat-item" onclick="filterCat('DÜNYA')">DÜNYA</div>
+    <div class="cat-item" onclick="filterCat('GÜNDEM')">GÜNDEM</div>
+    <div class="cat-item" onclick="filterCat('TEKNOLOJİ')">TEKNOLOJİ</div>
+    <div class="cat-item" onclick="filterCat('SPOR')">SPOR</div>
+    <div class="cat-item" onclick="filterCat('OTOMOBİL')">OTOMOBİL</div>
+    <!-- 🆕 YENİ: DİĞER KATEGORİSİ -->
+    <div class="cat-item" onclick="filterCat('DİĞER')">DİĞER</div>
+</div>
+
+<!-- YENİ: KAYNAK BUTONLARI SATIRI -->
+<div class="source-bar" id="sourceBar"></div>
+
+    <main id="newsFeed"></main>
+    <div class="overlay" id="ovl"><div class="modal" id="mdl"></div></div>
+
+  <!-- Yeni Alt Banner -->
+    <div class="bottom-banner">
+        <input type="text" id="mainInp" placeholder="Sohbet et veya *haber ara*..." 
+               onkeypress="if(event.key==='Enter') handleMainInput()">
+        <button onclick="handleMainInput()">➤</button>
+    </div>
+	
+  <!-- Resim <!-- Resim Görüntüleyici - güncel HTML -->
+<div class="image-viewer" id="imageViewer" onclick="closeImageViewer(event)">
+    <div class="gallery-container">
+        <!-- Kapat butonu (sağ üstte) -->
+        <button class="close-btn" onclick="closeViewer(); event.stopPropagation();" title="Kapat">✕</button>
+        
+        <!-- Önceki buton -->
+        <button class="nav-btn prev" id="prevImageBtn" onclick="navigateGallery(-1); event.stopPropagation();">◀</button>
+        
+        <!-- Ana resim -->
+        <img id="viewerImage" class="main-viewer-image" src="" alt="Haber Resmi" draggable="false">
+        
+        <!-- Sonraki buton -->
+        <button class="nav-btn next" id="nextImageBtn" onclick="navigateGallery(1); event.stopPropagation();">▶</button>
+        
+        <!-- Sayaç -->
+        <div class="counter" id="imageCounter">1/1</div>
+        
+        <!-- İndirme butonu -->
+        <button class="download-btn" id="downloadImageBtn" onclick="downloadCurrentImage(event)" title="Resmi Kaydet">⬇️</button>
+        
+        <!-- Alt küçük resimler -->
+        <div class="thumbnail-strip" id="thumbnailStrip"></div>
+        
+        <!-- Kapatma ipucu -->
+        <div class="close-hint">⬅️ Resmin dışına tıkla veya ESC'ye bas</div>
+    </div>
+</div>
+
+
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+
+// --- 1. AI ENGINE AYARLARI (GROK & TAVILY) - GEMINI KALDIRILDI ---
+const PROXY_URL = "https://autumn-dew-1884.06mmt8129.workers.dev/"; 
+const ENCRYPTED_GROK_KEY = 'g*s*k*_*o*R*j*m*G*d*W*Q*K*p*0*i*9*c*0*B*l*k*M*B*W*G*d*y*b*3*F*Y*a*8*l*Q*l*X*R*6*t*4*1*l*m*x*p*Z*h*o*H*H*x*V*v*x'; 
+const ENCRYPTED_TAVILY_KEY = 't*v*l*y*-*d*e*v*-*1*1*N*X*v*w*-*8*S*h*U*8*b*3*i*l*v*i*W*1*a*H*w*5*b*V*V*9*g*q*h*I*T*6*5*K*3*C*4*1*F*r*i*E*q*4*g*1*Q'; 
+
+// Anahtar Çözücü
+function decryptAPIKey(key) {
+    return key.split('*').join('');
+}
+
+// --- FIREBASE AYARLARI ---
+const fbCfg = { 
+    apiKey: "AIzaSyBr57bmspJo8r_4IdkBNI_DhULYf0ynCQs", 
+    databaseURL: "https://gen-lang-client-0253857481-default-rtdb.firebaseio.com", 
+    projectId: "gen-lang-client-0253857481" 
+};
+
+if (!firebase.apps.length) firebase.initializeApp(fbCfg);
+const db = firebase.database();
+
+// --- DEĞİŞKENLER VE HAFIZA ---
+let sets = JSON.parse(localStorage.getItem('khoj_sets')) || { size: 13, weight: 600, speed: 20, newsLimit: 10 };
+let visibleCount = sets.newsLimit || 10;
+let chatHistory = JSON.parse(localStorage.getItem('khoj_ai_history')) || [];
+let news = [];
+let active = null;
+let activeSearchQuery = null;
+let autoScrollEnabled = true;
+let currentNewsLimit = parseInt(localStorage.getItem('news_limit')) || 10;
+let displayedNewsCount = {};
+let allCachedNews = JSON.parse(localStorage.getItem('khoj_cache')) || {};
+
+// YENİ: Kaynak filtresi için değişken
+let activeSourceFilter = null;
+
+// YENİ: Modal stack için
+let modalStack = [];
+
+function softRefresh() {
+    showToast("🔄 Yeni haberler getiriliyor...");
+    
+    // Önbelleği temizle (1 saat beklemesin diye)
+    localStorage.removeItem('khoj_news_cache');
+    localStorage.removeItem('khoj_news_time');
+    
+    // Firebase'den RSS'leri al ve yeni haberleri çek
+    db.ref('rss_ayarlari').once('value', snap => {
+        rssListesi = snap.val() || {};
+        if (Object.keys(rssListesi).length > 0) {
+            // Yeni haberleri çek
+            fetchAllNews().then(() => {
+                showToast("✅ Haberler güncellendi!");
+            });
+        }
+    });
+}
+
+let currentImages = []; // Tüm resimlerin listesi
+let currentImageIndex = 0; // Şu anki resim indeksi
+
+// Haber detayında resimleri bul
+function extractImagesFromNews(newsItem) {
+    let images = [];
+    
+    // 1. Ana thumbnail varsa ekle
+    if (newsItem.thumbnail && newsItem.thumbnail !== 'logo.png') {
+        images.push(newsItem.thumbnail);
+    }
+    
+    // 2. Açıklamadan resimleri bul
+    if (newsItem.description) {
+        const imgRegex = /<img[^>]+src="([^">]+)"/g;
+        let match;
+        while ((match = imgRegex.exec(newsItem.description)) !== null) {
+            if (!images.includes(match[1])) {
+                images.push(match[1]);
+            }
+        }
+    }
+    
+    // 3. RSS'den gelen diğer resimler (eğer varsa)
+    if (newsItem.images && Array.isArray(newsItem.images)) {
+        newsItem.images.forEach(img => {
+            if (!images.includes(img)) {
+                images.push(img);
+            }
+        });
+    }
+    
+    // Eğer hiç resim yoksa, varsayılan logo
+    if (images.length === 0) {
+        images.push('logo.png');
+    }
+    
+    return images;
+}
+
+// TEMA SİSTEMİ
+function toggleTheme() {
+    // Tüm temalar (light, dark + 7 yeni tema)
+    const themes = [
+        'light', 'dark',
+        'nightblue', 'morning', 'morning-dark',
+        'sandsea', 'sandsea-dark',
+        'forest', 'forest-dark',
+        'rose', 'rose-dark',
+        'lavender', 'lavender-dark',
+        'gray', 'gray-dark'
+    ];
+    
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme') || 'light';
+    let nextIndex = (themes.indexOf(current) + 1) % themes.length;
+    const next = themes[nextIndex];
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('khoj_theme', next);
+    
+    // Her tema için farklı emoji
+    const icons = {
+        'light': '☀️',
+        'dark': '🌙',
+        'nightblue': '🌃',
+        'morning': '🌅',
+        'morning-dark': '🌌',
+        'sandsea': '🏖️',
+        'sandsea-dark': '🌊',
+        'forest': '🌲',
+        'forest-dark': '🌳',
+        'rose': '🌸',
+        'rose-dark': '🌹',
+        'lavender': '💜',
+        'lavender-dark': '🟣',
+        'gray': '⚪',
+        'gray-dark': '⚫'
+    };
+    
+    document.getElementById('themeBtn').innerText = icons[next] || '🎨';
+    showToast(`🎨 Tema: ${next.toUpperCase()}`);
+}
+
+// Tema Hafızası
+(function() {
+    const saved = localStorage.getItem('khoj_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    window.addEventListener('DOMContentLoaded', () => {
+        const icons = {
+            'light': '☀️', 'dark': '🌙', 'nightblue': '🌃',
+            'morning': '🌅', 'morning-dark': '🌌', 'sandsea': '🏖️',
+            'sandsea-dark': '🌊', 'forest': '🌲', 'forest-dark': '🌳',
+            'rose': '🌸', 'rose-dark': '🌹', 'lavender': '💜',
+            'lavender-dark': '🟣', 'gray': '⚪', 'gray-dark': '⚫'
+        };
+        document.getElementById('themeBtn').innerText = icons[saved] || '☀️';
+    });
+})();
+
+function updateTime() {
+    const n = new Date();
+    const clk = document.getElementById('clk');
+    const dt = document.getElementById('dt');
+    if(clk) clk.innerText = n.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+    if(dt) dt.innerText = n.toLocaleDateString('tr-TR', {day:'numeric', month:'long'}).toUpperCase();
+}
+setInterval(updateTime, 1000); updateTime(); applySets();
+
+// --- 2.5 SIRALAMA SİSTEMİ ---
+let sortConfig = {
+    type: localStorage.getItem('khoj_sort_type') || 'date', // 'date', 'source', 'title'
+    direction: localStorage.getItem('khoj_sort_dir') || 'desc' // 'asc', 'desc'
+};
+
+// Sıralama menüsünü aç
+function openSortMenu() {
+    // Varolan menüyü kaldır
+    const existingMenu = document.getElementById('sortMenu');
+    if (existingMenu) existingMenu.remove();
+    
+    // Menüyü oluştur
+    const menu = document.createElement('div');
+    menu.id = 'sortMenu';
+    menu.className = 'sort-menu';
+    
+    const sortOptions = [
+        { type: 'date', label: 'Tarihe Göre', icon: '📅', desc: '🔽 Yeniden Eskiye', asc: '🔼 Eskiden Yeniye' },
+        { type: 'source', label: 'Kaynağa Göre', icon: '📰', desc: '🔽 Z\'den A\'ya', asc: '🔼 A\'dan Z\'ye' },
+        { type: 'title', label: 'Başlığa Göre', icon: '📝', desc: '🔽 Z\'den A\'ya', asc: '🔼 A\'dan Z\'ye' }
+    ];
+    
+    let menuHTML = '';
+    sortOptions.forEach(opt => {
+        const isActive = sortConfig.type === opt.type;
+        const currentDir = isActive ? sortConfig.direction : 'desc';
+        
+        menuHTML += `
+            <div class="sort-item ${isActive ? 'active' : ''}" onclick="changeSort('${opt.type}')">
+                <span>${opt.icon}</span>
+                <span style="flex:1;">${opt.label}</span>
+                <span class="sort-icon" onclick="event.stopPropagation(); toggleSortDirection('${opt.type}')">
+                    ${isActive ? (sortConfig.direction === 'desc' ? '🔽' : '🔼') : '🔽'}
+                </span>
+            </div>
+        `;
+    });
+    
+    menu.innerHTML = menuHTML;
+    document.body.appendChild(menu);
+    
+    // Menüyü göster
+    setTimeout(() => menu.classList.add('show'), 10);
+    
+    // Butonu aktif yap
+    const sortBtn = document.getElementById('sortBtn');
+    if (sortBtn) sortBtn.classList.add('active');
+    
+    // Dışarı tıklayınca kapat
+    setTimeout(() => {
+        document.addEventListener('click', function closeSortMenu(e) {
+            if (!menu.contains(e.target) && e.target.id !== 'sortBtn') {
+                menu.classList.remove('show');
+                document.getElementById('sortBtn')?.classList.remove('active');
+                setTimeout(() => menu.remove(), 200);
+                document.removeEventListener('click', closeSortMenu);
+            }
+        });
+    }, 100);
+}
+
+// Sıralama tipini değiştir
+function changeSort(type) {
+    sortConfig.type = type;
+    localStorage.setItem('khoj_sort_type', type);
+    
+    // Menüyü güncelle ve render'ı yenile
+    openSortMenu(); // Menüyü yeniden aç (aktif öğeyi göstermek için)
+    render(); // Haberleri yeniden sırala ve göster
+    
+    showToast(`📊 ${getSortLabel(type)} ile sıralanıyor`);
+}
+
+// Sıralama yönünü değiştir (asc/desc)
+function toggleSortDirection(type) {
+    // Eğer farklı bir tipe tıklandıysa, önce tipi değiştir
+    if (type !== sortConfig.type) {
+        sortConfig.type = type;
+        sortConfig.direction = 'desc'; // Varsayılan
+    } else {
+        // Aynı tip için yönü değiştir
+        sortConfig.direction = sortConfig.direction === 'desc' ? 'asc' : 'desc';
+    }
+    
+    localStorage.setItem('khoj_sort_type', sortConfig.type);
+    localStorage.setItem('khoj_sort_dir', sortConfig.direction);
+    
+    // Menüyü güncelle
+    openSortMenu();
+    render(); // Haberleri yeniden sırala ve göster
+    
+    const dirText = sortConfig.direction === 'desc' ? 'Azalan' : 'Artan';
+    showToast(`📊 ${getSortLabel(sortConfig.type)} (${dirText})`);
+}
+
+// Sıralama etiketini getir
+function getSortLabel(type) {
+    const labels = {
+        'date': 'Tarih',
+        'source': 'Kaynak',
+        'title': 'Başlık'
+    };
+    return labels[type] || type;
+}
+
+// Haberleri sırala (render fonksiyonu içinde kullanılacak)
+function sortNews(newsArray) {
+    return [...newsArray].sort((a, b) => {
+        let comparison = 0;
+        
+        switch(sortConfig.type) {
+            case 'date':
+                // Tarihe göre sırala
+                const dateA = a.pubDate ? new Date(a.pubDate).getTime() : 0;
+                const dateB = b.pubDate ? new Date(b.pubDate).getTime() : 0;
+                comparison = dateA - dateB;
+                break;
+                
+            case 'source':
+                // Kaynağa göre sırala
+                comparison = (a.source || '').localeCompare(b.source || '');
+                break;
+                
+            case 'title':
+                // Başlığa göre sırala
+                comparison = (a.title || '').localeCompare(b.title || '');
+                break;
+                
+            default:
+                return 0;
+        }
+        
+        // Yönü uygula (desc: büyükten küçüğe, asc: küçükten büyüğe)
+        return sortConfig.direction === 'desc' ? -comparison : comparison;
+    });
+}
+
+function metniTemizle(hamMetin) {
+    let temiz = hamMetin.replace(/␃🔚␗/g, '').replace(/\{"organic":[\s\S]*?\}\}/g, '').replace(/\{"peopleAlso":[\s\S]*?\}\}/g, '').replace(/"organic":\s*\[[\s\S]*?\]/g, '').replace(/"codeContext":\s*\{[\s\S]*?\}/g, '').replace(/"position":\s*\d+/g, '').replace(/\{.*?\}/g, '');
+    const ilkHarf = temiz.search(/[A-ZİĞÜŞÖÇ]/);
+    if (ilkHarf !== -1) { temiz = temiz.substring(ilkHarf); }
+    temiz = temiz.replace(/[\s\}\]奉",:]{2,}$/g, '');
+    temiz = temiz.replace(/^#{1,6}\s+(.*)$/gm, '<b style="color:#ef4444; font-size:1.1em;">$1</b>');
+    return temiz.replace(/\[\d+\]\(.*?\)/g, '').replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>').replace(/^\s*[\-\*]\s+/gm, '🔹 ').replace(/\n/g, '<br>');
+}
+
+// --- YAZIYOR ANİMASYONU VE OTOMATİK KAYDIRMA FONKSİYONLARI ---
+function showTypingIndicator() {
+    const box = document.getElementById('cBox');
+    if (!box) return;
+    
+    hideTypingIndicator();
+    
+    const indicator = document.createElement('div');
+    indicator.id = 'typingIndicator';
+    indicator.className = 'typing-indicator';
+    indicator.innerHTML = '<span></span><span></span><span></span>';
+    box.appendChild(indicator);
+    
+    scrollToBottom('smooth');
+}
+
+function hideTypingIndicator() {
+    const existing = document.getElementById('typingIndicator');
+    if (existing) existing.remove();
+}
+
+function scrollToBottom(behavior = 'smooth') {
+    const box = document.getElementById('cBox');
+    if (!box || !autoScrollEnabled) return;
+    
+    box.scrollTo({
+        top: box.scrollHeight,
+        behavior: behavior
+    });
+}
+
+function focusInput() {
+    const inp = document.getElementById('uInp');
+    if (inp) {
+        inp.focus();
+        setTimeout(() => inp.focus(), 100);
+    }
+}
+
+function setupScrollListener() {
+    const box = document.getElementById('cBox');
+    if (!box) return;
+    
+    box.removeEventListener('scroll', scrollHandler);
+    box.addEventListener('scroll', scrollHandler);
+}
+
+function scrollHandler() {
+    const box = document.getElementById('cBox');
+    if (!box) return;
+    
+    const isAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 50;
+    autoScrollEnabled = isAtBottom;
+}
+
+// --- 2. HABERLER ---
+let rssListesi = {};
+
+async function fetchAllNews() {
+    news = []; 
+    const proxyUrl = "https://wild-sky-08d7.06mmt8129.workers.dev/?url=";
+    
+    const cachedData = localStorage.getItem('khoj_news_cache');
+    const cacheTime = localStorage.getItem('khoj_news_time');
+    const now = new Date().getTime();
+    const birSaat = 60 * 60 * 1000;
+
+    if (cachedData && cacheTime && (now - cacheTime < birSaat)) {
+        console.log("Haberler hafızadan yükleniyor...");
+        news = JSON.parse(cachedData);
+        render();
+        buildSourceBar(); // YENİ: Kaynak barını güncelle
+        return;
+    }
+    
+    document.getElementById('newsFeed').innerHTML = '<div style="text-align:center; padding:50px; color:var(--text);">Haberler Cloudflare hattından geliyor...</div>';
+
+    for (const id in rssListesi) {
+        const rss = rssListesi[id];
+        try {
+            console.log(`${rss.ad} yükleniyor...`);
+            const response = await fetch(proxyUrl + encodeURIComponent(rss.url));
+            const xmlText = await response.text();
+            
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+            
+            const items = xmlDoc.querySelectorAll("item, entry");
+            console.log(`${rss.ad}: ${items.length} haber bulundu`);
+
+            items.forEach((el, index) => {
+                const title = el.querySelector("title")?.textContent || "";
+                let link = el.querySelector("link")?.textContent || 
+                          el.querySelector("link")?.getAttribute("href") || "";
+                
+                const date = el.querySelector("pubDate")?.textContent || 
+                          el.querySelector("dc\\:date")?.textContent ||
+                          el.querySelector("date")?.textContent || 
+                          el.querySelector("lastBuildDate")?.textContent || 
+                          "";
+
+                // === GELİŞTİRİLMİŞ RESİM BULMA ===
+                let img = "";
+                
+                // 1. Mynet özel etiketleri (ipimage, img640x360, img300x300)
+                const mynetImg = el.querySelector("ipimage")?.textContent || 
+                                el.querySelector("img640x360")?.textContent ||
+                                el.querySelector("img300x300")?.textContent;
+                if (mynetImg) {
+                    img = mynetImg;
+                    console.log(`${rss.ad} - Mynet ipimage bulundu:`, img.substring(0, 50));
+                }
+                
+                // 2. Media content (standart RSS)
+                if (!img) {
+                    const mediaContent = el.querySelector("media\\:content") || 
+                                        el.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "content")[0];
+                    if (mediaContent) {
+                        img = mediaContent.getAttribute("url") || mediaContent.getAttribute("src") || "";
+                    }
+                }
+                
+                // 3. Media thumbnail
+                if (!img) {
+                    const mediaThumb = el.querySelector("media\\:thumbnail") || 
+                                      el.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0];
+                    if (mediaThumb) {
+                        img = mediaThumb.getAttribute("url") || mediaThumb.getAttribute("src") || "";
+                    }
+                }
+                
+                // 4. Enclosure
+                if (!img) {
+                    const enclosure = el.querySelector("enclosure");
+                    if (enclosure && enclosure.getAttribute("type")?.startsWith("image/")) {
+                        img = enclosure.getAttribute("url") || "";
+                    }
+                }
+                
+                // 5. Content:encoded içindeki ilk resmi bul
+                if (!img) {
+                    const contentEncoded = el.querySelector("content\\:encoded") || 
+                                         el.getElementsByTagNameNS("http://purl.org/rss/1.0/modules/content/", "encoded")[0];
+                    if (contentEncoded?.textContent) {
+                        // Tüm img etiketlerini bul
+                        const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+                        const matches = [...contentEncoded.textContent.matchAll(imgRegex)];
+                        
+                        // İkon veya logo olmayan ilk resmi al
+                        for (const match of matches) {
+                            const imgUrl = match[1];
+                            if (!imgUrl.includes('icon') && !imgUrl.includes('logo') && !imgUrl.includes('avatar')) {
+                                img = imgUrl;
+                                break;
+                            }
+                        }
+                        
+                        // Eğer hala bulunamadıysa, ilk resmi al
+                        if (!img && matches.length > 0) {
+                            img = matches[0][1];
+                        }
+                    }
+                }
+                
+                // 6. Description içindeki resmi bul (ShiftDelete için)
+                if (!img) {
+                    const description = el.querySelector("description");
+                    if (description?.textContent) {
+                        // HTML entity'leri düzelt
+                        let descText = description.textContent
+                            .replace(/&lt;/g, '<')
+                            .replace(/&gt;/g, '>')
+                            .replace(/&quot;/g, '"')
+                            .replace(/&amp;/g, '&');
+                        
+                        // img etiketlerini ara
+                        const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+                        const matches = [...descText.matchAll(imgRegex)];
+                        
+                        for (const match of matches) {
+                            const imgUrl = match[1];
+                            if (imgUrl && !imgUrl.includes('data:image') && !imgUrl.includes('icon')) {
+                                img = imgUrl;
+                                break;
+                            }
+                        }
+                        
+                        // Eğer hala bulunamadıysa, doğrudan resim URL'si ara
+                        if (!img) {
+                            const urlMatch = descText.match(/(https?:\/\/[^\s"']+\.(jpg|jpeg|png|gif|webp))/i);
+                            if (urlMatch) {
+                                img = urlMatch[1];
+                            }
+                        }
+                    }
+                }
+                
+                // 7. image etiketi
+                if (!img) {
+                    const imageTag = el.querySelector("image url, image");
+                    if (imageTag) {
+                        img = imageTag.textContent || imageTag.getAttribute("url") || "";
+                    }
+                }
+                
+                // === URL DÜZENLEMELERİ ===
+                if (img) {
+                    // HTML entity'leri temizle
+                    img = img.replace(/&amp;/g, '&')
+                             .replace(/&lt;/g, '<')
+                             .replace(/&gt;/g, '>')
+                             .replace(/&quot;/g, '"')
+                             .replace(/&#039;/g, "'");
+                    
+                    // Tırnak işaretlerini temizle
+                    img = img.replace(/['"]/g, '');
+                    
+                    // Göreceli URL'leri tam URL'ye çevir
+                    if (img.startsWith('/')) {
+                        try {
+                            const baseUrl = new URL(rss.url).origin;
+                            img = baseUrl + img;
+                        } catch (e) {
+                            const domainMatch = rss.url.match(/^(https?:\/\/[^\/]+)/);
+                            if (domainMatch) {
+                                img = domainMatch[1] + img;
+                            }
+                        }
+                    }
+                    
+                    // HTTP'yi HTTPS yap (güvenli bağlantı için)
+                    if (img.startsWith('http:')) {
+                        img = 'https:' + img.substring(5);
+                    }
+                    
+                    // URL'de boşluk varsa encode et
+                    img = img.replace(/ /g, '%20');
+                }
+                
+                // === VARSAYILAN LOGO ===
+                const defaultLogo = rss.logo || "https://mmt8129.github.io/Gem/rsslogo.png";
+                
+                if (title && title.length > 5) {
+                    const newsItem = {
+                        title: title.trim(),
+                        link: link.trim(),
+                        source: rss.ad,
+                        category: rss.kategori || "GÜNDEM",
+                        pubDate: date,
+                        thumbnail: img || defaultLogo
+                    };
+                    
+                    news.push(newsItem);
+                    
+                    // Debug için log
+                    if (!img) {
+                        console.log(`⚠️ ${rss.ad} - Resim bulunamadı! Başlık: ${title.substring(0, 50)}`);
+                    } else if (index < 3) {
+                        console.log(`✅ ${rss.ad} - Resim bulundu: ${img.substring(0, 50)}`);
+                    }
+                }
+            });
+            
+        } catch (e) {
+            console.log(`${rss.ad} bağlantı sorunu:`, e);
+        }
+    }
+    
+    // Haberleri karıştır
+    news.sort(() => Math.random() - 0.5);
+    
+    // Önbelleğe al
+    localStorage.setItem('khoj_news_cache', JSON.stringify(news));
+    localStorage.setItem('khoj_news_time', new Date().getTime());
+    
+    console.log(`Toplam ${news.length} haber yüklendi`);
+    render(); 
+    buildSourceBar(); // YENİ: Kaynak barını oluştur
+}
+
+
+db.ref('rss_ayarlari').on('value', snap => {
+    rssListesi = snap.val() || {};
+    if (Object.keys(rssListesi).length > 0) {
+        fetchAllNews();
+    }
+});
+
+setInterval(updateTime, 1000);
+updateTime();
+
+// Render fonksiyonunda resim yüklenirken hata kontrolü
+function renderNewsCard(item) {
+    return `
+        <div class="news-card" onclick="window.open('${item.link}', '_blank')">
+            <div class="news-image-container">
+                <img 
+                    src="${item.thumbnail}" 
+                    alt="${item.title}" 
+                    class="news-image"
+                    onerror="this.onerror=null; this.src='${item.sourceLogo || 'https://mmt8129.github.io/Gem/rsslogo.png'}'; this.classList.add('fallback-image');"
+                    loading="lazy"
+                >
+            </div>
+            <div class="news-content">
+                <div class="news-source">${item.source}</div>
+                <h3 class="news-title">${item.title}</h3>
+                <div class="news-category">${item.category}</div>
+            </div>
+        </div>
+    `;
+}
+
+
+function filterCat(cat) {
+    const items = document.querySelectorAll('.cat-item');
+    items.forEach(item => item.classList.remove('active'));
+
+    items.forEach(item => {
+        if (item.innerText.trim() === cat) {
+            item.classList.add('active');
+        }
+    });
+
+    console.log("Seçilen yeni kategori:", cat);
+    
+    // Kategori değişince scroll'u en başa al
+    const newsFeed = document.getElementById('newsFeed');
+    if (newsFeed) {
+        newsFeed.scrollTop = 0; // En tepeye git
+    }
+    
+    render(); 
+}
+
+function render() {
+    const f = document.getElementById('newsFeed');
+    if(!f) return;
+
+    const activeBtn = document.querySelector('.cat-item.active');
+    const currentCategory = activeBtn ? activeBtn.innerText.trim().toUpperCase() : "TÜMÜ";
+
+    // Kategoriye göre filtrele
+    let filteredNews = news.filter(n => {
+        if (currentCategory === "TÜMÜ") return true;
+        const haberKategorisi = n.category ? n.category.trim().toUpperCase() : "";
+        return haberKategorisi === currentCategory;
+    });
+    
+    // YENİ: Kaynak filtresini uygula
+    if (activeSourceFilter) {
+        filteredNews = filteredNews.filter(n => n.source === activeSourceFilter);
+    }
+
+    // SIRALAMA UYGULA
+    filteredNews = sortNews(filteredNews);
+
+    if (filteredNews.length === 0) {
+        f.innerHTML = `
+            <div style="text-align:center; padding:50px; color:var(--text);">
+                <div style="font-size:48px; margin-bottom:20px;">📂</div>
+                <div style="font-size:18px; font-weight:600;">${currentCategory} kategorisinde haber yok</div>
+                <div style="font-size:14px; color:var(--muted); margin-top:10px;">Farklı bir kategori seçmeyi dene</div>
+            </div>`;
+        return;
+    }
+
+    const displayedNews = filteredNews.slice(0, visibleCount);
+
+    f.innerHTML = displayedNews.map((n) => {
+        const realIdx = news.findIndex(x => x.title === n.title);
+        
+        // Tarihi formatla
+        let displayDate = '';
+        if (n.pubDate) {
+            const d = new Date(n.pubDate);
+            if (!isNaN(d.getTime())) {
+                displayDate = d.toLocaleDateString('tr-TR', { 
+                    day: 'numeric', 
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } else {
+                displayDate = n.pubDate.substring(0, 16);
+            }
+        }
+        
+    return `
+    <div class="news-card" onclick="openDetail(${realIdx})">
+        <img src="${n.thumbnail || 'https://mmt8129.github.io/Gem/rsslogo.png'}" 
+             onerror="this.onerror=null; this.src='https://mmt8129.github.io/Gem/rsslogo.png';"
+             loading="lazy">
+        <div style="flex:1">
+            <div class="news-meta">
+                <span class="news-source-badge" onclick="event.stopPropagation(); openSourceNewsList('${n.source.replace(/'/g, "\\'")}')">${n.source}</span>
+                <span class="news-date-badge">${displayDate || 'Tarih yok'}</span>
+                <span style="background:rgba(239,68,68,0.2); color:#ef4444; padding:4px 8px; border-radius:12px; font-size:0.65rem; font-weight:700; margin-left:auto;">${n.category}</span>
+            </div>
+            <div class="news-title">${n.title}</div>
+        </div>
+    </div>`;
+    }).join('');
+
+    if (filteredNews.length > visibleCount) {
+        f.innerHTML += `
+            <div id="loadMoreArea" style="text-align:center; padding:20px 10px 40px 10px;">
+                <button class="btn-full" style="background:var(--primary); color:white; font-weight:bold; padding:16px; border-radius:30px;" onclick="loadMoreNews()">
+                    ➕ DAHA FAZLA GÖSTER (${filteredNews.length - visibleCount} HABER DAHA)
+                </button>
+            </div>`;
+    }
+}
+
+function closeSearch() {
+    activeSearchQuery = null;
+    
+    // Stack'ten search modalını çıkar
+    if (modalStack.length > 0 && modalStack[modalStack.length - 1].type === 'search') {
+        modalStack.pop();
+    }
+    
+    // Eğer stack'te başka modal varsa onu göster
+    if (modalStack.length > 0) {
+        const lastModal = modalStack[modalStack.length - 1];
+        if (lastModal.type === 'sourceList' && lastModal.sourceName) {
+            openSourceNewsList(lastModal.sourceName);
+        } else if (lastModal.type === 'newsDetail' && lastModal.newsItem) {
+            active = lastModal.newsItem;
+            openDetail(-2);
+        } else if (lastModal.type === 'settings') {
+            openSettings();
+        } else if (lastModal.type === 'rssManager') {
+            openRSSManager();
+        } else if (lastModal.type === 'savedList') {
+            openSavedList();
+        } else {
+            document.getElementById('ovl').style.display = 'none';
+            document.getElementById('mdl').classList.remove('fullscreen-chat');
+            document.body.style.overflow = '';
+        }
+    } else {
+        document.getElementById('ovl').style.display = 'none';
+        document.getElementById('mdl').classList.remove('fullscreen-chat');
+        document.body.style.overflow = '';
+    }
+}
+
+function loadMoreNews() {
+    const artisMiktari = (sets && sets.newsLimit) ? sets.newsLimit : 10;
+    visibleCount += artisMiktari;
+    render();
+}
+
+function getBestImage(item, sourceName) {
+    if (item.enclosure && item.enclosure.link) return item.enclosure.link;
+    if (item.thumbnail) return item.thumbnail;
+    
+    if (item.description && item.description.includes('<img')) {
+        const match = /<img[^>]+src="([^">]+)"/g.exec(item.description);
+        if (match && match[1]) return match[1];
+    }
+
+    let kaynakLogosu = "";
+    Object.values(rssListesi).forEach(r => {
+        if(r.ad === sourceName) kaynakLogosu = r.logo;
+    });
+
+    return kaynakLogosu || `https://ui-avatars.com/api/?name=${sourceName}&background=random&color=fff&size=200`;
+}
+
+function openSettings(fromStack = false) {
+    const m = document.getElementById('mdl');
+    m.classList.remove('fullscreen-chat');
+    m.innerHTML = `
+        <div class="modal-header">
+            <h2>AYARLAR</h2>
+            <button class="btn-icon" onclick="event.stopPropagation(); closeSettingsModal()" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="set-row">
+                <label class="set-label">HABER SAYISI (ANA EKRAN)</label>
+                <div class="set-ctrl">
+                    <button onclick="adjustNewsLimit(-5)">-</button>
+                    <span id="newsLimitDisplay" style="min-width:45px; text-align:center; font-weight:bold; color:var(--text);">${sets.newsLimit || 10}</span>
+                    <button onclick="adjustNewsLimit(5)">+</button>
+                </div>
+            </div>
+            
+            <div class="set-row">
+                <label class="set-label">ANA EKRAN HABER BAŞLIK BOYUTU</label>
+                <div class="set-ctrl">
+                    <button onclick="adjustSet('size',-1)">-</button>
+                    <span style="min-width:45px; text-align:center; color:var(--text);">${sets.size}PX</span>
+                    <button onclick="adjustSet('size',1)">+</button>
+                </div>
+            </div>
+
+            <div class="set-row">
+                <label class="set-label">ANA EKRAN HABER BAŞLIK KALINLIĞI</label>
+                <div class="set-ctrl">
+                    <button onclick="adjustSet('weight',-100)">-</button>
+                    <span style="min-width:45px; text-align:center; color:var(--text);">${sets.weight}</span>
+                    <button onclick="adjustSet('weight',100)">+</button>
+                </div>
+            </div>
+
+            <div class="set-row">
+                <label class="set-label">HABER İÇERİK YAZI BOYUTU</label>
+                <div class="set-ctrl">
+                    <button onclick="adjustContent('size',-1)">-</button>
+                    <span style="min-width:45px; text-align:center; color:var(--text);">${sets.contentSize || 14}PX</span>
+                    <button onclick="adjustContent('size',1)">+</button>
+                </div>
+            </div>
+
+            <div class="set-row">
+                <label class="set-label">HABER İÇERİK SATIR YÜKSEKLİĞİ</label>
+                <div class="set-ctrl">
+                    <button onclick="adjustContent('lineHeight',-0.1)">-</button>
+                    <span style="min-width:45px; text-align:center; color:var(--text);">${(sets.contentLineHeight || 1.6).toFixed(1)}</span>
+                    <button onclick="adjustContent('lineHeight',0.1)">+</button>
+                </div>
+            </div>
+
+            <hr style="border:0; border-top:1px solid var(--brd); margin:15px 0;">
+
+            <button class="btn-full" style="background:var(--card-bg); color:var(--text); border:1px solid var(--brd); margin-bottom:10px;" onclick="openRSSManager()">📡 RSS KAYNAKLARINI YÖNET</button>
+            <button class="btn-full" style="background:#ef4444; color:white;" onclick="clearHistory()">🗑️ SOHBETİ SIFIRLA</button>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-full" style="background:#22c55e; color:white;" onclick="closeSettingsModal()">TAMAM</button>
+        </div>`;
+    document.getElementById('ovl').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    if (!fromStack) {
+        pushModal({ type: 'settings' });
+    }
+}
+
+
+function closeSettingsModal() {
+    // Stack'ten settings modalını çıkar
+    if (modalStack.length > 0 && modalStack[modalStack.length - 1].type === 'settings') {
+        modalStack.pop();
+    }
+    
+    // Eğer stack'te başka modal varsa onu göster
+    if (modalStack.length > 0) {
+        const lastModal = modalStack[modalStack.length - 1];
+        if (lastModal.type === 'sourceList' && lastModal.sourceName) {
+            openSourceNewsList(lastModal.sourceName);
+        } else if (lastModal.type === 'newsDetail' && lastModal.newsItem) {
+            active = lastModal.newsItem;
+            openDetail(-2);
+        } else if (lastModal.type === 'search' && lastModal.query) {
+            performLocalNewsSearch(lastModal.query, true);
+        } else if (lastModal.type === 'rssManager') {
+            openRSSManager(true);
+        } else if (lastModal.type === 'savedList') {
+            openSavedList(true);
+        } else {
+            document.getElementById('ovl').style.display = 'none';
+            document.getElementById('mdl').classList.remove('fullscreen-chat');
+            document.body.style.overflow = '';
+        }
+    } else {
+        document.getElementById('ovl').style.display = 'none';
+        document.getElementById('mdl').classList.remove('fullscreen-chat');
+        document.body.style.overflow = '';
+    }
+}
+
+// Haber içerik boyutu ayarı
+function adjustContent(type, val) {
+    if(type === 'size') {
+        sets.contentSize = Math.max(10, Math.min(24, (sets.contentSize || 14) + val));
+        document.documentElement.style.setProperty('--content-size', sets.contentSize + 'px');
+    } else if(type === 'lineHeight') {
+        sets.contentLineHeight = Math.max(1.2, Math.min(2.5, (sets.contentLineHeight || 1.6) + val));
+        document.documentElement.style.setProperty('--content-line-height', sets.contentLineHeight);
+    }
+    localStorage.setItem('khoj_sets', JSON.stringify(sets));
+    openSettings();
+}
+
+function adjustNewsLimit(amount) {
+    if(!sets.newsLimit) sets.newsLimit = 10;
+    let newLimit = sets.newsLimit + amount;
+
+    if (newLimit >= 5 && newLimit <= 20) {
+        sets.newsLimit = newLimit;
+        visibleCount = newLimit; 
+        
+        const display = document.getElementById('newsLimitDisplay');
+        if (display) display.innerText = newLimit;
+        
+        saveSets();
+    }
+}
+
+function saveSets() {
+    localStorage.setItem('khoj_sets', JSON.stringify(sets));
+}
+
+function openRSSManager(fromStack = false) {
+    const m = document.getElementById('mdl');
+    m.classList.remove('fullscreen-chat');
+    m.innerHTML = `
+        <div class="modal-header">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <h2 style="font-size:1.1rem; font-weight:900;">📡 RSS AYARLARI</h2>
+                <button class="btn-icon" onclick="openAddRSS()" style="background:var(--primary); color:white; border:none; width:35px; height:35px; font-weight:bold; font-size:1.2rem;">+</button>
+                <button class="btn-icon" onclick="event.stopPropagation(); closeRSSManager()" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
+            </div>
+        </div>
+        <div class="modal-body" id="rssListContainer">
+            <p style="text-align:center; padding:20px; color:#888;">Kaynaklar yükleniyor...</p>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeRSSManager()" class="btn-full">GERİ DÖN</button>
+        </div>
+    `;
+    document.getElementById('ovl').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    if (!fromStack) {
+        pushModal({ type: 'rssManager' });
+    }
+
+    db.ref('rss_ayarlari').once('value', snap => {
+        const container = document.getElementById('rssListContainer');
+        if(!container) return;
+        const data = snap.val();
+        if(!data) { container.innerHTML = '<p style="text-align:center; padding:20px;">Henüz RSS eklenmemiş.</p>'; return; }
+        let html = '';
+        Object.keys(data).forEach(key => {
+            const rss = data[key];
+            html += `<div style="padding:12px; background:var(--bg); border:1px solid var(--brd); border-radius:12px; margin-bottom:8px; display:flex; justify-content:space-between;">
+                <div><span style="font-weight:bold;">${rss.ad}</span><br><span style="font-size:10px; color:var(--primary);">${rss.kategori}</span></div>
+                <div><span onclick="editRSS('${key}')" style="cursor:pointer; margin-right:10px;">✏️</span><span onclick="confirmDeleteRSS('${key}')" style="color:#ef4444; cursor:pointer;">🗑️</span></div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    });
+}
+
+function closeRSSManager() {
+    // Stack'ten rssManager modalını çıkar
+    if (modalStack.length > 0 && modalStack[modalStack.length - 1].type === 'rssManager') {
+        modalStack.pop();
+    }
+    
+    // Eğer stack'te başka modal varsa onu göster
+    if (modalStack.length > 0) {
+        const lastModal = modalStack[modalStack.length - 1];
+        if (lastModal.type === 'sourceList' && lastModal.sourceName) {
+            openSourceNewsList(lastModal.sourceName);
+        } else if (lastModal.type === 'newsDetail' && lastModal.newsItem) {
+            active = lastModal.newsItem;
+            openDetail(-2);
+        } else if (lastModal.type === 'search' && lastModal.query) {
+            performLocalNewsSearch(lastModal.query, true);
+        } else if (lastModal.type === 'settings') {
+            openSettings(true);
+        } else if (lastModal.type === 'savedList') {
+            openSavedList(true);
+        } else {
+            document.getElementById('ovl').style.display = 'none';
+            document.getElementById('mdl').classList.remove('fullscreen-chat');
+            document.body.style.overflow = '';
+        }
+    } else {
+        document.getElementById('ovl').style.display = 'none';
+        document.getElementById('mdl').classList.remove('fullscreen-chat');
+        document.body.style.overflow = '';
+    }
+}
+
+
+function editRSS(key) {
+    db.ref('rss_ayarlari/' + key).once('value', snap => {
+        const rss = snap.val();
+        if(!rss) return;
+
+        const m = document.getElementById('mdl');
+        m.innerHTML = `
+            <div class="modal-header">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <button class="btn-icon" onclick="openRSSManager()" style="width:35px; height:35px;">⬅️</button>
+                    <h2 style="font-size:1.1rem; font-weight:900;">RSS DÜZENLE</h2>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="set-row"><label class="set-label">RSS ADI</label>
+                    <input type="text" id="edit_rssName" value="${rss.ad}" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text);">
+                </div>
+                <div class="set-row"><label class="set-label">RSS KAYNAĞI (URL)</label>
+                    <input type="text" id="edit_rssUrl" value="${rss.url}" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text);">
+                </div>
+                <div class="set-row"><label class="set-label">LOGO URL</label>
+                    <input type="text" id="edit_rssLogo" value="${rss.logo || ''}" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text);">
+                </div>
+                <div class="set-row"><label class="set-label">KATEGORİ</label>
+                    <select id="edit_rssCat" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text);">
+                        ${['TÜRKİYE','DÜNYA','GÜNDEM','TEKNOLOJİ','SPOR','OTOMOBİL','DİĞER'].map(c => 
+                            `<option value="${c}" ${rss.kategori === c ? 'selected' : ''}>${c}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-full" onclick="updateRSS('${key}')">GÜNCELLEMELERİ KAYDET</button>
+            </div>
+        `;
+    });
+}
+
+function updateRSS(key) {
+    const ad = document.getElementById('edit_rssName').value;
+    const url = document.getElementById('edit_rssUrl').value;
+    const kat = document.getElementById('edit_rssCat').value;
+    const logo = document.getElementById('edit_rssLogo').value;
+
+    if(!ad || !url) { alert("Alanlar boş bırakılamaz!"); return; }
+
+    db.ref('rss_ayarlari/' + key).update({
+        ad: ad,
+        url: url,
+        kategori: kat,
+        logo: logo
+    }).then(() => {
+        showToast("Güncellendi! ✅");
+        openRSSManager();
+    }).catch(e => alert("Hata: " + e.message));
+}
+
+function executeDeleteRSS(key) {
+    db.ref('rss_ayarlari/' + key).remove()
+        .then(() => {
+            showToast("Kaynak Silindi 🗑️");
+            openRSSManager();
+        })
+        .catch(e => alert("Hata: " + e.message));
+}
+
+function confirmDeleteRSS(key) {
+    const m = document.getElementById('mdl');
+    m.innerHTML = `
+        <div class="modal-header">
+            <h2 style="color:#ef4444;">KAYNAĞI SİL?</h2>
+            <button class="btn-icon" onclick="openRSSManager()" style="color:red;">❌</button>
+        </div>
+        <div class="modal-body" style="text-align:center; padding:20px;">
+            <p style="font-size:16px; margin-bottom:25px; line-height:1.5;">Bu RSS kaynağını listeden kaldırmak istediğine emin misin abi?</p>
+            <div style="display:flex; gap:12px;">
+                <button class="btn-full" onclick="executeDeleteRSS('${key}')" style="background:#ef4444; color:white; font-weight:bold;">EVET, SİL</button>
+                <button class="btn-full" onclick="openRSSManager()" style="background:var(--brd); color:var(--text);">VAZGEÇ</button>
+            </div>
+        </div>
+    `;
+}
+
+function openAddRSS() {
+    const m = document.getElementById('mdl');
+    m.innerHTML = `
+        <div class="modal-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button class="btn-icon" onclick="openRSSManager()" style="width:35px; height:35px;">⬅️</button>
+                <h2 style="font-size:1.1rem; font-weight:900;">YENİ RSS EKLE</h2>
+            </div>
+        </div>
+        
+        <div class="modal-body">
+            <div class="set-row">
+                <label class="set-label">RSS ADI</label>
+                <input type="text" id="rssName" placeholder="Örn: TRT Haber" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:14px;">
+            </div>
+            <div class="set-row">
+                <label class="set-label">RSS KAYNAĞI (URL)</label>
+                <input type="text" id="rssUrl" placeholder="https://..." style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:14px;">
+            </div>
+            <div class="set-row">
+                <label class="set-label">LOGO URL (İsteğe bağlı)</label>
+                <input type="text" id="rssLogo" placeholder="https://...png" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:14px;">
+            </div>
+            <div class="set-row">
+                <label class="set-label">KATEGORİ</label>
+                <select id="rssCat" style="width:100%; padding:15px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-weight:bold; font-size:14px;">
+                    <option value="TÜRKİYE">TÜRKİYE</option>
+                    <option value="DÜNYA">DÜNYA</option>
+                    <option value="GÜNDEM">GÜNDEM</option>
+                    <option value="TEKNOLOJİ">TEKNOLOJİ</option>
+                    <option value="SPOR">SPOR</option>
+                    <option value="OTOMOBİL">OTOMOBİL</option>
+                    <option value="DİĞER">DİĞER</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer" style="display:flex; gap:10px;">
+            <button class="btn-full" style="background:#888; flex:1;" onclick="openRSSManager()">İPTAL</button>
+            <button class="btn-full" style="flex:2;" onclick="saveNewRSS()">KAYDET</button>
+        </div>
+    `;
+}
+
+function saveNewRSS() {
+    const ad = document.getElementById('rssName').value;
+    const url = document.getElementById('rssUrl').value;
+    const kat = document.getElementById('rssCat').value;
+    const logo = document.getElementById('rssLogo').value;
+
+    if(!ad || !url) { alert("Lütfen tüm alanları doldur abi!"); return; }
+
+    const newRssRef = db.ref('rss_ayarlari').push();
+    newRssRef.set({
+        ad: ad,
+        url: url,
+        kategori: kat,
+        logo: logo,
+        eklenmeTarihi: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+        showToast("RSS Başarıyla Eklendi! 🚀");
+        openRSSManager();
+    }).catch((e) => {
+        alert("Hata oluştu abi: " + e.message);
+    });
+}
+
+function adjustSet(k, v) { 
+    if(k === 'size') sets.size = Math.max(8, (sets.size || 13) + v);
+    if(k === 'weight') sets.weight = Math.max(100, (sets.weight || 600) + v);
+    applySets(); 
+    openSettings(); 
+}
+
+function applySets() {
+    document.documentElement.style.setProperty('--news-size', sets.size + 'px');
+    document.documentElement.style.setProperty('--news-weight', sets.weight);
+    localStorage.setItem('khoj_sets', JSON.stringify(sets));
+}
+
+function quickAdjust(type, val) {
+    if(type === 'size') {
+        sets.chatSize = (sets.chatSize || 13) + val;
+        document.documentElement.style.setProperty('--chat-size', sets.chatSize + 'px');
+    } else {
+        sets.chatWeight = (sets.chatWeight || 600) + val;
+        document.documentElement.style.setProperty('--chat-weight', sets.chatWeight);
+    }
+    localStorage.setItem('khoj_sets', JSON.stringify(sets));
+}
+
+// YENİ: Kaynak barını oluştur
+function buildSourceBar() {
+    const sourceBar = document.getElementById('sourceBar');
+    if (!sourceBar) return;
+    
+    const sourceCounts = {};
+    news.forEach(item => {
+        if (item.source) {
+            sourceCounts[item.source] = (sourceCounts[item.source] || 0) + 1;
+        }
+    });
+    
+    const sourceList = Object.keys(sourceCounts);
+    let html = '';
+    sourceList.forEach(src => {
+        const activeClass = (activeSourceFilter === src) ? 'active' : '';
+        html += `<div class="source-item ${activeClass}" onclick="filterBySource('${src.replace(/'/g, "\\'")}')">${src} (${sourceCounts[src]})</div>`;
+    });
+    sourceBar.innerHTML = html;
+}
+
+// YENİ: Kaynağa göre filtrele
+function filterBySource(source) {
+    if (activeSourceFilter === source) {
+        activeSourceFilter = null;
+        document.querySelectorAll('.source-item').forEach(btn => btn.classList.remove('active'));
+    } else {
+        activeSourceFilter = source;
+        document.querySelectorAll('.source-item').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = Array.from(document.querySelectorAll('.source-item')).find(btn => btn.innerText.startsWith(source));
+        if (activeBtn) activeBtn.classList.add('active');
+        
+        // Kategori çubuğunda TÜMÜ'yü aktif yap
+        document.querySelectorAll('.cat-item').forEach(btn => btn.classList.remove('active'));
+        const tumBtn = Array.from(document.querySelectorAll('.cat-item')).find(btn => btn.innerText.trim() === 'TÜMÜ');
+        if (tumBtn) tumBtn.classList.add('active');
+    }
+    render();
+}
+
+// YENİ: Kaynak listesi modalını aç (tam ekran)
+function openSourceNewsList(sourceName) {
+    const sourceNews = news.filter(n => n.source === sourceName);
+    const sortedNews = sortNews([...sourceNews]);
+    const modalDiv = document.getElementById('mdl');
+    modalDiv.classList.remove('fullscreen-chat');
+    
+    modalDiv.innerHTML = `
+        <div style="position:sticky; top:0; background:var(--header-bg); backdrop-filter:blur(20px); border-bottom:1px solid var(--brd); padding:12px 16px; display:flex; justify-content:space-between; align-items:center; z-index:10;">
+            <h2 style="font-size:1rem; font-weight:800;">${sourceName}</h2>
+            <button class="btn-icon" onclick="closeM()" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
+        </div>
+        <div class="modal-body" style="padding:16px; display:flex; flex-direction:column; gap:16px;">
+            ${sortedNews.map((n, idx) => {
+                const realIdx = news.findIndex(x => x.title === n.title && x.source === n.source);
+                let displayDate = '';
+                if (n.pubDate) {
+                    const d = new Date(n.pubDate);
+                    if (!isNaN(d.getTime())) displayDate = d.toLocaleDateString('tr-TR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+                }
+                return `<div class="news-card" onclick="openDetail(${realIdx})" style="margin-bottom:0;">
+                    <img src="${n.thumbnail || 'https://mmt8129.github.io/Gem/rsslogo.png'}" onerror="this.src='https://mmt8129.github.io/Gem/rsslogo.png';">
+                    <div>
+                        <div class="news-meta">
+                            <span class="news-date-badge">${displayDate || 'Tarih yok'}</span>
+                            <span style="background:rgba(239,68,68,0.2); color:#ef4444; padding:4px 8px; border-radius:12px;">${n.category}</span>
+                        </div>
+                        <div class="news-title">${n.title}</div>
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>
+    `;
+    
+    pushModal({ type: 'sourceList', sourceName: sourceName });
+	document.body.style.overflow = 'hidden';
+    document.getElementById('ovl').style.display = 'flex';
+}
+
+// YENİ: Modal stack yönetimi
+function pushModal(state) {
+    modalStack.push(state);
+}
+
+function popModal() {
+    return modalStack.pop();
+}
+
+// Haberin kayıtlı olup olmadığını kontrol et
+function isNewsSaved(title) {
+    const saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+    return saved.some(item => item.title === title);
+}
+
+// Kayıtlı haberin sohbetini güncelle
+function updateSavedChat(title, newChat) {
+    let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+    const index = saved.findIndex(item => item.title === title);
+    if (index !== -1) {
+        saved[index].savedChat = newChat;
+        localStorage.setItem('khoj_saved_news', JSON.stringify(saved));
+    }
+}
+
+// Kayıtlı haberin fullContent'ini güncelle (gerekirse)
+function updateSavedFullContent(title, fullContent) {
+    let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+    const index = saved.findIndex(item => item.title === title);
+    if (index !== -1) {
+        saved[index].fullContent = fullContent;
+        localStorage.setItem('khoj_saved_news', JSON.stringify(saved));
+    }
+}
+
+
+function closeM(event) {
+    // Scroll kaymasını engelle
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    if (modalStack.length > 0) {
+        const prev = modalStack.pop();
+        
+        // Eğer stack'te hala eleman varsa, o modalı geri göster
+        if (modalStack.length > 0) {
+            const lastModal = modalStack[modalStack.length - 1];
+            
+            if (lastModal.type === 'sourceList' && lastModal.sourceName) {
+                // Kaynak listesini geri aç
+                const sourceNews = news.filter(n => n.source === lastModal.sourceName);
+                const sortedNews = sortNews([...sourceNews]);
+                const modalDiv = document.getElementById('mdl');
+                modalDiv.classList.remove('fullscreen-chat');
+                
+                modalDiv.innerHTML = `
+                    <div style="position:sticky; top:0; background:var(--header-bg); backdrop-filter:blur(20px); border-bottom:1px solid var(--brd); padding:12px 16px; display:flex; justify-content:space-between; align-items:center; z-index:10;">
+                        <h2 style="font-size:1rem; font-weight:800;">${lastModal.sourceName}</h2>
+                        <button class="btn-icon" onclick="event.stopPropagation(); closeM(event);" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
+                    </div>
+                    <div class="modal-body" style="padding:16px; display:flex; flex-direction:column; gap:16px;">
+                        ${sortedNews.map((n, idx) => {
+                            const realIdx = news.findIndex(x => x.title === n.title && x.source === n.source);
+                            let displayDate = '';
+                            if (n.pubDate) {
+                                const d = new Date(n.pubDate);
+                                if (!isNaN(d.getTime())) displayDate = d.toLocaleDateString('tr-TR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+                            }
+                            return `<div class="news-card" onclick="openDetail(${realIdx})" style="margin-bottom:0;">
+                                <img src="${n.thumbnail || 'https://mmt8129.github.io/Gem/rsslogo.png'}" onerror="this.src='https://mmt8129.github.io/Gem/rsslogo.png';">
+                                <div>
+                                    <div class="news-meta">
+                                        <span class="news-date-badge">${displayDate || 'Tarih yok'}</span>
+                                        <span style="background:rgba(239,68,68,0.2); color:#ef4444; padding:4px 8px; border-radius:12px;">${n.category}</span>
+                                    </div>
+                                    <div class="news-title">${n.title}</div>
+                                </div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                `;
+                document.getElementById('ovl').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                
+            } else if (lastModal.type === 'newsDetail' && lastModal.newsItem) {
+                // Haber detayını geri aç (push yapmadan)
+                active = lastModal.newsItem;
+                const isGeneralChat = (active.source === "KHOJ");
+                const m = document.getElementById('mdl');
+                if (isGeneralChat) m.classList.add('fullscreen-chat');
+                else m.classList.remove('fullscreen-chat');
+                
+                // Haber detayını yeniden oluştur
+                const savedNews = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+                const isSaved = savedNews.some(item => item.title === active?.title);
+                const saveBtnClass = isSaved ? 'btn-icon saved' : 'btn-icon';
+                
+                let displayDate = '';
+                if (active.pubDate) {
+                    const d = new Date(active.pubDate);
+                    if (!isNaN(d.getTime())) displayDate = d.toLocaleString('tr-TR', { day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' });
+                }
+                
+                const cleanDesc = active.description ? active.description.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim().substring(0, 1000) + "..." : "Haber içeriği yükleniyor...";
+                
+                if (isGeneralChat) {
+                    m.innerHTML = `<div class="modal-header" style="padding: 10px 16px;">
+                        <div style="display:flex; justify-content: space-between; align-items:center; width:100%;">
+                            <div style="font-weight: 800; font-size: 1rem; color: var(--primary);">✨ GENEL SOHBET</div>
+                            <div style="display:flex; align-items:center; gap:5px;">
+                                <button class="btn-icon size-btn" onclick="quickAdjust('size',1)">Y+</button>
+                                <button class="btn-icon size-btn" onclick="quickAdjust('size',-1)">Y-</button>
+                                <button class="btn-icon weight-btn" onclick="quickAdjust('weight',100)">K+</button>
+                                <button class="btn-icon weight-btn" onclick="quickAdjust('weight',-100)">K-</button>
+                                <button class="btn-icon" onclick="event.stopPropagation(); closeM(event);" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-body" style="padding: 0; overflow: hidden;">
+                        <div class="chat-box" id="cBox" style="height:100%; padding:16px; overflow-y:auto;">
+                            ${chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('')}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" id="uInp" placeholder="Bir şeyler sor..." style="flex:1; padding:14px; border-radius:30px; border:2px solid var(--brd);">
+                            <button class="btn-icon btn-save" id="sendBtn" style="width:50px;">➤</button>
+                        </div>
+                    </div>`;
+                } else {
+                    m.innerHTML = `<div class="modal-header" style="padding: 10px 15px;">
+                        <div style="display:flex; justify-content: space-between; align-items:center; width:100%;">
+                            <span class="news-source-badge" style="cursor:pointer;" onclick="openSourceNewsList('${active.source.replace(/'/g, "\\'")}')">${active.source}</span>
+                            <div style="display:flex; align-items:center; gap:5px;">
+                                <button class="btn-icon size-btn" onclick="quickAdjust('size',1)">Y+</button>
+                                <button class="btn-icon size-btn" onclick="quickAdjust('size',-1)">Y-</button>
+                                <button class="btn-icon weight-btn" onclick="quickAdjust('weight',100)">K+</button>
+                                <button class="btn-icon weight-btn" onclick="quickAdjust('weight',-100)">K-</button>
+                                <button class="btn-icon content-btn" onclick="quickAdjustContent('size',-1)">İ-</button>
+                                <button class="btn-icon content-btn" onclick="quickAdjustContent('size',1)">İ+</button>
+                                <button class="btn-icon" onclick="shareNews(active.title.replace(/'/g, ''), active.link)">📤</button>
+                                ${active.link ? `<button class="btn-icon" onclick="openFullNews('${active.link}')">🔗</button>` : ''}
+                                <button class="${saveBtnClass}" onclick="saveNews()" id="detailSaveBtn">💾</button>
+                                <button class="btn-icon" onclick="event.stopPropagation(); closeM(event);" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <h2 style="margin-bottom:15px;">${active.title}</h2>
+                        <div style="margin-bottom:15px;"><span class="news-date-badge">📅 ${displayDate || 'Tarih yok'}</span></div>
+                        <div id="dynamicContent" style="margin-bottom:20px; padding:15px; background:rgba(239,68,68,0.05); border-left:4px solid #ef4444;">${cleanDesc}</div>
+                        <img src="${active.thumbnail || 'https://mmt8129.github.io/Gem/rsslogo.png'}" style="width:100%; border-radius:15px; margin-bottom:20px;" onerror="this.src='https://mmt8129.github.io/Gem/rsslogo.png';">
+                        <div style="background:var(--card-bg); border:1px solid var(--brd); border-radius:12px;">
+                            <div style="background:var(--brd); padding:8px 15px; display:flex; justify-content:space-between;">
+                                <span>✨ YAPAY ZEKA ANALİZİ</span>
+                                <button onclick="document.getElementById('uInp').value='Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px;">✨ AI ile Özetle</button>
+                            </div>
+                            <div class="chat-box" id="cBox" style="min-height:200px; max-height:300px; padding:10px;">
+                                <div class="msg ai">Haber hakkında soru sorabilirsin...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" id="uInp" placeholder="Haberi analiz et..." style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd);">
+                            <button class="btn-icon btn-save" id="sendBtn" style="width:50px;">➤</button>
+                        </div>
+                    </div>`;
+                }
+                
+                const inp = document.getElementById('uInp');
+                if(inp) inp.addEventListener('keypress', (e) => { if(e.key === 'Enter') ask(); });
+                const sendBtn = document.getElementById('sendBtn');
+                if(sendBtn) sendBtn.onclick = ask;
+                
+                document.getElementById('ovl').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                
+            } else if (lastModal.type === 'search' && lastModal.query) {
+                performLocalNewsSearch(lastModal.query, true);
+            } else if (lastModal.type === 'settings') {
+                openSettings(true);
+            } else if (lastModal.type === 'rssManager') {
+                openRSSManager(true);
+            } else if (lastModal.type === 'savedList') {
+                openSavedList(true);
+            } else {
+                // Bilinmeyen tip, direkt kapat
+                document.getElementById('ovl').style.display = 'none';
+                document.getElementById('mdl').classList.remove('fullscreen-chat');
+                document.body.style.overflow = '';
+            }
+        } else {
+            // Stack boş, direkt kapat
+            document.getElementById('ovl').style.display = 'none';
+            document.getElementById('mdl').classList.remove('fullscreen-chat');
+            document.body.style.overflow = '';
+        }
+    } else {
+        // Stack zaten boş
+        document.getElementById('ovl').style.display = 'none';
+        document.getElementById('mdl').classList.remove('fullscreen-chat');
+        document.body.style.overflow = '';
+    }
+}
+
+// Bekleyen cevapları göster (ANCAK MESAJLARI SİLMEZ)
+function showPendingResponses() {
+    const pendingResponses = JSON.parse(localStorage.getItem('pending_ai_responses') || '[]');
+    if (pendingResponses.length === 0) return;
+    
+    const box = document.getElementById('cBox');
+    if (!box) return;
+    
+    // "Bekleyen cevaplar" başlığı
+    const header = document.createElement('div');
+    header.className = 'msg ai';
+    header.style.cssText = 'background:rgba(239,68,68,0.2); text-align:center; font-weight:bold; padding:10px; border-radius:12px; margin-bottom:15px;';
+    header.innerHTML = `📨 **${pendingResponses.length} YENİ CEVAP GELDİ** (aşağıda listeleniyor)`;
+    box.appendChild(header);
+    
+    // Her bekleyen cevabı göster
+    pendingResponses.forEach((item, index) => {
+        const date = new Date(item.timestamp).toLocaleString('tr-TR');
+        
+        const msg = document.createElement('div');
+        msg.className = 'msg ai notification';
+        msg.id = `pending-response-${item.id}`;  // <-- BURASI ÖNEMLİ (id ekle)
+        msg.style.cssText = 'background:rgba(239,68,68,0.1); border-left:4px solid #ef4444; margin-bottom:20px; border-radius:12px; padding:16px;';
+        
+        // Eğer zaten okunmuşsa normal göster
+        if (item.isRead) {
+            msg.classList.remove('notification');
+            msg.style.cssText = 'background:var(--card-bg); border-left:none; margin-bottom:12px; border-radius:12px; padding:12px;';
+            msg.innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                    <span style="font-size:11px; color:var(--muted);">${date}</span>
+                </div>
+                <div style="font-size:13px; margin-bottom:8px;">
+                    <strong>Siz:</strong> ${item.question}
+                </div>
+                <div style="padding:8px; background:var(--bg); border-radius:8px;">
+                    ${item.answer}
+                </div>
+            `;
+        } else {
+            // Okunmamışsa bildirim olarak göster
+            msg.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div>
+                        <span style="font-weight:bold; color:#ef4444; background:rgba(239,68,68,0.2); padding:4px 12px; border-radius:20px; font-size:12px;">📨 YENİ ${index+1}</span>
+                    </div>
+                    <span style="font-size:11px; color:gray; background:rgba(0,0,0,0.05); padding:4px 8px; border-radius:12px;">${date}</span>
+                </div>
+                <div style="font-size:13px; margin-bottom:12px; background:rgba(0,0,0,0.03); padding:10px; border-radius:8px;">
+                    <strong style="color:#ef4444;">Siz:</strong> ${item.question}
+                </div>
+                <div style="padding:12px; background:white; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+                    ${item.answer}
+                </div>
+                <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+                    <button onclick="markNotificationAsRead(${item.id})" 
+                        style="padding:6px 16px; background:#ef4444; color:white; border:none; border-radius:20px; font-size:12px; font-weight:bold; cursor:pointer; transition:all 0.2s;">
+                        ✓ Bildirimi Temizle
+                    </button>
+                </div>
+            `;
+        }
+        box.appendChild(msg);
+    });
+    
+    scrollToBottom('smooth');
+}
+
+
+
+// Cevabı okundu olarak işaretle
+function removePendingResponse(id) {
+    let pendingResponses = JSON.parse(localStorage.getItem('pending_ai_responses') || '[]');
+    pendingResponses = pendingResponses.filter(item => item.id !== id);
+    localStorage.setItem('pending_ai_responses', JSON.stringify(pendingResponses));
+    
+    // Rozeti güncelle
+    if (pendingResponses.length > 0) {
+        addNotificationBadge(pendingResponses.length);
+    } else {
+        const badge = document.getElementById('aiNotificationBadge');
+        if (badge) badge.remove();
+    }
+    
+    // Sayfayı yenilemeden gösterimi güncelle
+    const modal = document.getElementById('ovl');
+    if (modal.style.display === 'flex' && active && active.source === "KHOJ") {
+        // Aynı sayfada kalmak için mevcut sohbeti yeniden aç
+        const currentActive = active;
+        openGeneralChat();
+        setTimeout(() => {
+            showPendingResponses();
+        }, 300);
+    } else {
+        showToast('Cevap okundu olarak işaretlendi');
+    }
+}
+
+function markNotificationAsRead(id) {
+    let pendingResponses = JSON.parse(localStorage.getItem('pending_ai_responses') || '[]');
+    
+    // Bu id'yi "okundu" olarak işaretle (ama silme)
+    const updatedResponses = pendingResponses.map(item => {
+        if (item.id === id) {
+            return { ...item, isRead: true };
+        }
+        return item;
+    });
+    
+    localStorage.setItem('pending_ai_responses', JSON.stringify(updatedResponses));
+    
+    // Hala okunmamış bildirim var mı kontrol et
+    const unreadCount = updatedResponses.filter(item => !item.isRead).length;
+    
+    // Rozeti güncelle (sadece okunmamışları göster)
+    if (unreadCount > 0) {
+        addNotificationBadge(unreadCount);
+    } else {
+        const badge = document.getElementById('aiNotificationBadge');
+        if (badge) badge.remove();
+    }
+    
+    // Butonun yazısını değiştir (geri bildirim)
+    const btn = event.target;
+    btn.textContent = '✓ Temizlendi';
+    btn.style.background = '#22c55e';
+    btn.disabled = true;
+    
+    showToast('Bildirim temizlendi, mesaj duruyor');
+}
+
+
+// --- GÜNCELLENMİŞ openDetail FONKSİYONU (ÇOKLU RESİM GALERİLİ) ---
+function openDetail(idx) {
+    
+    if (idx !== -1 && idx !== -2) { active = news[idx]; }
+    
+    console.log("Haber Verisi:", active);
+    console.log("Tarih Alanı:", active.pubDate);
+    
+    const m = document.getElementById('mdl');
+    const isGeneralChat = (active && active.source === "KHOJ");
+    
+    // Tam ekran modu için class ekle/kaldır
+    if (isGeneralChat) {
+        m.classList.add('fullscreen-chat');
+    } else {
+        m.classList.remove('fullscreen-chat');
+    }
+    
+    const img = getBestImage(active, active.source);
+    
+    const hamTarih = active.pubDate || active.date || active.time || "";
+    console.log("Yakalanan Tarih:", hamTarih);
+
+    let displayDate = "";
+    if (active.pubDate) {
+        const d = new Date(active.pubDate);
+        if (!isNaN(d.getTime())) {
+            displayDate = d.toLocaleString('tr-TR', {
+                day: 'numeric', 
+                month: 'long', 
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+        } else {
+            displayDate = active.pubDate.split(' +')[0]; 
+        }
+    }
+
+    const cleanDesc = active.description ? active.description.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim().substring(0, 1000) + "..." : "Haber içeriği yükleniyor...";
+
+    if (document.activeElement) { document.activeElement.blur(); }
+
+    // Kayıtlı mı kontrol et
+    const savedNews = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+    const isSaved = savedNews.some(item => item.title === active?.title);
+    console.log("Haber kayıtlı mı?", isSaved);
+    
+    const saveBtnClass = isSaved ? 'btn-icon saved' : 'btn-icon';
+    const saveBtnTitle = isSaved ? 'Kayıtlı (güncelle)' : 'Kaydet';
+
+    // Resim galerisi için fonksiyon
+    const getGalleryHTML = () => {
+        let newsImages = [];
+        
+        // 1. Thumbnail varsa ekle
+        if (active.thumbnail && active.thumbnail !== 'logo.png' && active.thumbnail !== 'varsayilan-logo.png') {
+            newsImages.push(active.thumbnail);
+        }
+        
+        // 2. Açıklamadan resim bul
+        if (active.description) {
+            const imgRegex = /<img[^>]+src="([^">]+)"/g;
+            let match;
+            while ((match = imgRegex.exec(active.description)) !== null) {
+                if (!newsImages.includes(match[1])) {
+                    newsImages.push(match[1]);
+                }
+            }
+        }
+        
+        // 3. Hiç resim yoksa logo kullan
+        if (newsImages.length === 0) {
+            newsImages = [img];
+        }
+        
+        const mainImage = newsImages[0];
+        
+        // Ana resim
+        let galleryHtml = `
+            <img src="${mainImage}" 
+                 class="main-image"
+                 onclick='openGallery(${JSON.stringify(newsImages).replace(/'/g, "\\'")}, 0)'
+                 onerror="this.src='logo.png'"
+                 style="width:100%; border-radius:15px; margin-bottom:10px; cursor:pointer; transition:opacity 0.2s;"
+                 onmouseover="this.style.opacity='0.9'"
+                 onmouseout="this.style.opacity='1'"
+                 title="Büyütmek için tıkla">
+        `;
+        
+        // Birden fazla resim varsa küçük resimleri ekle
+        if (newsImages.length > 1) {
+            galleryHtml += `<div class="multi-image-gallery">`;
+            newsImages.forEach((imgUrl, index) => {
+                galleryHtml += `
+                    <img src="${imgUrl}" 
+                         class="gallery-thumb ${index === 0 ? 'active' : ''}"
+                         onclick='openGallery(${JSON.stringify(newsImages).replace(/'/g, "\\'")}, ${index})'
+                         onerror="this.src='logo.png'"
+                         title="Resim ${index + 1}">
+                `;
+            });
+            galleryHtml += `</div>`;
+        }
+        
+        return galleryHtml;
+    };
+
+    // Genel sohbet için tam ekran içerik
+    if (isGeneralChat) {
+        m.innerHTML = `
+            <div class="modal-header" style="padding: 10px 16px;">
+                <div style="display:flex; justify-content: space-between; align-items:center; width:100%;">
+                    <div style="font-weight: 800; font-size: 1rem; color: var(--primary); font-family: 'Orbitron'; display: flex; align-items: center; gap: 8px;">
+                        <span>✨ GENEL SOHBET</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:5px;" class="btn-icon-group">
+                        <button class="btn-icon size-btn" style="font-size:9px; width:28px; height:28px;" onclick="quickAdjust('size', 1)" title="Yazı büyüt">Y+</button>
+                        <button class="btn-icon size-btn" style="font-size:9px; width:28px; height:28px;" onclick="quickAdjust('size', -1)" title="Yazı küçült">Y-</button>
+                        <button class="btn-icon weight-btn" style="font-size:9px; width:28px; height:28px;" onclick="quickAdjust('weight', 100)" title="Kalınlaştır">K+</button>
+                        <button class="btn-icon weight-btn" style="font-size:9px; width:28px; height:28px;" onclick="quickAdjust('weight', -100)" title="İncelt">K-</button>
+                        <span style="width:1px; height:20px; background:var(--brd); margin:0 5px;"></span>
+                        <button class="btn-icon" style="width:28px; height:28px;" onclick="shareNews(active.title.replace(/'/g, ''), active.link)" title="Paylaş">📤</button>
+                        <button class="${saveBtnClass}" style="width:28px; height:28px;" onclick="saveNews()" title="${saveBtnTitle}" id="detailSaveBtn">💾</button>
+                        <button class="btn-icon" style="width:28px; height:28px; background:rgba(239,68,68,0.2); color:#ef4444;" onclick="closeM()" title="Kapat">✕</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body" style="padding: 0; overflow: hidden;">
+                <div style="background:var(--card-bg); height: 100%; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="chat-box" id="cBox" style="flex: 1; overflow-y: auto; border: none; border-radius: 0; min-height: auto; max-height: none; padding: 16px;">
+                        ${active.savedChat || chatHistory.map(msg => `<div class="msg ${msg.role === 'user' ? 'user' : 'ai'}">${msg.text}</div>`).join('')}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 12px 16px;">
+                <div style="display:flex; gap:10px; width:100%;">
+                    <input type="text" id="uInp" 
+                        placeholder="Bir şeyler sor veya sohbet et..." 
+                        style="flex:1; padding:14px 18px; border-radius: 30px; border: 2px solid var(--brd); background: var(--bg); color: var(--text); font-size: 16px;">
+                    <button class="btn-icon btn-save" id="sendBtn" style="width: 50px; height: 50px; border-radius: 50%;">➤</button>
+                </div>
+            </div>`;
+     } else {
+        // Normal haber detayı için içerik hazırlığı
+        let displayContent = cleanDesc;
+        if (active.fullContent) {
+            displayContent = active.fullContent;
+        }
+        
+        // Normal haber detayı
+        m.innerHTML = `
+            <div class="modal-header" style="padding: 10px 15px;">
+                <div style="display:flex; justify-content: space-between; align-items:center; width:100%;">
+                    <div style="font-weight: 800; font-size: 0.9rem; color: var(--primary); font-family: 'Orbitron'; display: flex; align-items: center; gap: 8px;">
+                        <span class="news-source-badge" style="cursor:pointer;" onclick="openSourceNewsList('${active.source.replace(/'/g, "\\'")}')">${active.source}</span>
+                        <span style="font-size: 0.7rem; color: var(--muted);">📰 HABER</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:5px;" class="btn-icon-group">
+                        <!-- Yazı boyutu kontrolleri -->
+                        <button class="btn-icon size-btn" style="font-size:9px; width:26px; height:26px;" onclick="quickAdjust('size', 1)" title="Yazı büyüt">Y+</button>
+                        <button class="btn-icon size-btn" style="font-size:9px; width:26px; height:26px;" onclick="quickAdjust('size', -1)" title="Yazı küçült">Y-</button>
+                        
+                        <!-- Kalınlık kontrolleri -->
+                        <button class="btn-icon weight-btn" style="font-size:9px; width:26px; height:26px;" onclick="quickAdjust('weight', 100)" title="Kalınlaştır">K+</button>
+                        <button class="btn-icon weight-btn" style="font-size:9px; width:26px; height:26px;" onclick="quickAdjust('weight', -100)" title="İncelt">K-</button>
+                        
+                        <!-- İçerik boyutu kontrolleri -->
+                        <button class="btn-icon content-btn" style="font-size:9px; width:26px; height:26px;" onclick="quickAdjustContent('size', -1)" title="İçerik küçült">İ-</button>
+                        <button class="btn-icon content-btn" style="font-size:9px; width:26px; height:26px;" onclick="quickAdjustContent('size', 1)" title="İçerik büyüt">İ+</button>
+                        
+                        <span style="width:1px; height:20px; background:var(--brd); margin:0 5px;"></span>
+                        
+                        <!-- Paylaş butonu -->
+                        <button class="btn-icon" style="width:26px; height:26px;" onclick="shareNews(active.title.replace(/'/g, ''), active.link)" title="Paylaş">📤</button>
+                        
+                        <!-- Kaydet butonu -->
+                        <button class="${saveBtnClass}" style="width:26px; height:26px;" onclick="saveNews()" title="${saveBtnTitle}" id="detailSaveBtn">💾</button>
+                        
+                        <!-- Haber linki butonu -->
+                        ${active.link ? `<button class="btn-icon" style="width:26px; height:26px;" onclick="openFullNews('${active.link}')" title="Habere git">🔗</button>` : ''}
+                        
+                        <!-- Kapat butonu -->
+                        <button class="btn-icon" style="width:26px; height:26px; background:rgba(239,68,68,0.2); color:#ef4444;" onclick="closeM()" title="Kapat">✕</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <h2 style="margin-bottom:15px; line-height:1.3; font-size:1.4em;">${active.title}</h2>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+                    <span style="font-size:0.8rem; color:var(--muted); background:rgba(0,0,0,0.05); padding:4px 12px; border-radius:20px;">📅 ${displayDate}</span>
+                </div>
+                <div id="dynamicContent" style="background:rgba(239, 68, 68, 0.05); border-left:4px solid #ef4444; padding:15px; margin-bottom:20px; border-radius:0 10px 10px 0;">
+                    <p style="font-size:14px; line-height:1.6; margin:0;">${cleanDesc}</p>
+                </div>
+                
+                <!-- RESİM GALERİSİ -->
+                ${getGalleryHTML()}
+                
+                <div style="background:var(--card-bg); border:1px solid var(--brd); border-radius:12px; overflow:hidden;">
+                    <div style="background:var(--brd); padding:8px 15px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:11px; font-weight:bold; color:var(--text); opacity:0.7;">YAPAY ZEKA ANALİZİ</span>
+                        <button onclick="document.getElementById('uInp').value='Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                            ✨ AI ile Özetle
+                        </button>
+                    </div>
+                    <div class="chat-box" id="cBox" style="min-height:250px; max-height:350px; overflow-y:auto; padding:10px;">
+    ${active.savedChat || '<div class="msg ai">Haber hakkında soru sorabilirsin...</div>'}
+</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="display:flex; gap:10px; width:100%;">
+                    <input type="text" id="uInp" 
+                        placeholder="Haberi analiz et veya soru sor..." 
+                        style="flex:1; padding:14px; border-radius:12px; border:2px solid var(--brd); background:var(--bg); color:var(--text); font-size:16px;">
+                    <button class="btn-icon btn-save" id="sendBtn" style="width:50px;">➤</button>
+                </div>
+            </div>`;
+    }
+
+    // İçerik çekme işlemi (sadece haberler için)
+    // openDetail içindeki fetch kısmı (orijinal linkten içerik çeken yer)
+if (!isGeneralChat && active.link) {
+    const myProxy = "https://wild-sky-08d7.06mmt8129.workers.dev/?url=";
+    fetch(myProxy + encodeURIComponent(active.link))
+        .then(res => res.text())
+        .then(html => {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            
+            // Tüm paragrafları al
+            let allParagraphs = Array.from(doc.querySelectorAll('p'))
+                .map(p => p.textContent.trim())
+                .filter(t => t.length > 40);
+            
+            // Önce ilk 12 paragrafı al
+            let first12 = allParagraphs.slice(0, 12);
+            
+            // StopWords listesi (sadece güvenli olanlar)
+            const stopWords = [
+                "diğer haberler", 
+                "bunlara da bakın", 
+                "ilginizi çekebilir", 
+                "okuyucularımız",
+                "bunları okudunuz mu",
+                "ilgili haberler",
+                "benzer haberler"
+            ];
+            
+            // 12 paragraf içinde stopWord var mı kontrol et
+            let lastValidIndex = first12.length;
+            for (let i = 0; i < first12.length; i++) {
+                let paragraphLower = first12[i].toLowerCase();
+                let shouldStop = false;
+                for (let word of stopWords) {
+                    if (paragraphLower.includes(word)) {
+                        shouldStop = true;
+                        break;
+                    }
+                }
+                if (shouldStop) {
+                    lastValidIndex = i;
+                    break;
+                }
+            }
+            
+            // Temiz paragrafları al
+            const cleanParagraphs = first12.slice(0, lastValidIndex);
+            const paragraphs = cleanParagraphs.join('<br><br>');
+            
+            if (paragraphs) { 
+                const dynamicContentDiv = document.getElementById('dynamicContent');
+                if (dynamicContentDiv) {
+                    dynamicContentDiv.innerHTML = `<p style="font-size:14px; line-height:1.6; margin:0;">${paragraphs}</p>`;
+                }
+                
+                // Eğer bu haber kayıtlıysa, fullContent'i de güncelle
+                if (isNewsSaved(active.title)) {
+                    updateSavedFullContent(active.title, paragraphs);
+                }
+            }
+        }).catch(e => console.log("İçerik çekilemedi:", e));
+}
+document.body.style.overflow = 'hidden';
+    document.getElementById('ovl').style.display = 'flex';
+    pushModal({ type: 'newsDetail', newsItem: active }); // YENİ: Stack'e ekle
+    
+    // Scroll listener'ı kur
+    const box = document.getElementById('cBox');
+    if (box) {
+        setupScrollListener();
+        setTimeout(() => scrollToBottom('auto'), 100);
+    }
+    
+    const inp = document.getElementById('uInp');
+    inp.addEventListener('keypress', (e) => { 
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            ask();
+        }
+    });
+    document.getElementById('sendBtn').onclick = ask;
+    
+    // setTimeout(focusInput, 300); // <-- Bu satırı yorum yap veya sil (klavye otomatik açılmasın)
+}
+
+// Haber detayında resimleri bul
+function extractImagesFromNews(newsItem) {
+    let images = [];
+    
+    // 1. Ana thumbnail varsa ekle
+    if (newsItem.thumbnail && newsItem.thumbnail !== 'logo.png' && newsItem.thumbnail !== 'varsayilan-logo.png') {
+        images.push(newsItem.thumbnail);
+    }
+    
+    // 2. Açıklamadan resimleri bul
+    if (newsItem.description) {
+        const imgRegex = /<img[^>]+src="([^">]+)"/g;
+        let match;
+        while ((match = imgRegex.exec(newsItem.description)) !== null) {
+            if (!images.includes(match[1])) {
+                images.push(match[1]);
+            }
+        }
+    }
+    
+    // 3. Eğer hiç resim yoksa, varsayılan logo
+    if (images.length === 0) {
+        images.push('logo.png');
+    }
+    
+    return images;
+}
+
+// openGallery fonksiyonunu güncelle
+function openGallery(images, startIndex) {
+    console.log("openGallery çağrıldı:", images, startIndex);
+    
+    if (!images || images.length === 0) {
+        console.log("Resim yok");
+        return;
+    }
+    
+    if (typeof images === 'string') {
+        try {
+            images = JSON.parse(images);
+        } catch (e) {
+            console.log("JSON parse hatası:", e);
+            return;
+        }
+    }
+    
+    currentImages = images;
+    currentImageIndex = startIndex;
+    
+    const viewer = document.getElementById('imageViewer');
+    const viewerImage = document.getElementById('viewerImage');
+    const thumbnailStrip = document.getElementById('thumbnailStrip');
+    const counter = document.getElementById('imageCounter');
+    const prevBtn = document.getElementById('prevImageBtn');
+    const nextBtn = document.getElementById('nextImageBtn');
+    
+    if (!viewer || !viewerImage) {
+        console.log("Görüntüleyici elemanları bulunamadı!");
+        return;
+    }
+    
+    // Zoom'u sıfırla
+    viewerImage.style.transform = 'scale(1)';
+    viewerImage.style.transition = 'transform 0.2s ease';
+    currentScale = 1;
+    initialDistance = 0;
+    
+    // Ana resmi göster
+    viewerImage.src = images[startIndex];
+    
+    // Pinch zoom'u ayarla
+    setTimeout(() => {
+        setupPinchZoom();
+    }, 100);
+    
+    // Sayaçı güncelle
+    if (counter) {
+        counter.textContent = `${startIndex + 1}/${images.length}`;
+    }
+    
+    // Önceki/sonraki butonlarını göster/gizle
+    if (prevBtn && nextBtn) {
+        if (images.length <= 1) {
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+        } else {
+            prevBtn.style.display = 'flex';
+            nextBtn.style.display = 'flex';
+        }
+    }
+    
+    // Küçük resimleri oluştur
+    if (thumbnailStrip) {
+        thumbnailStrip.innerHTML = '';
+        images.forEach((img, idx) => {
+            const thumb = document.createElement('img');
+            thumb.src = img;
+            thumb.className = `thumb-img ${idx === startIndex ? 'active' : ''}`;
+            thumb.onclick = (e) => {
+                e.stopPropagation();
+                navigateToImage(idx);
+            };
+            thumb.onerror = () => { thumb.src = 'logo.png'; };
+            thumbnailStrip.appendChild(thumb);
+        });
+    }
+    
+    viewer.classList.add('show');
+}
+
+// Galeride gezinme
+function navigateGallery(direction) {
+    if (currentImages.length <= 1) return;
+    
+    currentImageIndex += direction;
+    
+    // Döngüsel gezinme
+    if (currentImageIndex < 0) {
+        currentImageIndex = currentImages.length - 1;
+    } else if (currentImageIndex >= currentImages.length) {
+        currentImageIndex = 0;
+    }
+    
+    navigateToImage(currentImageIndex);
+}
+
+// navigateToImage fonksiyonunu güncelle (zoom'u sıfırla)
+function navigateToImage(index) {
+    if (index < 0 || index >= currentImages.length) return;
+    
+    currentImageIndex = index;
+    
+    const viewerImage = document.getElementById('viewerImage');
+    const counter = document.getElementById('imageCounter');
+    const thumbnails = document.querySelectorAll('.thumb-img');
+    
+    if (!viewerImage) return;
+    
+    // Zoom'u sıfırla (yeni resimde)
+    viewerImage.style.transform = 'scale(1)';
+    viewerImage.style.transition = 'transform 0.2s ease';
+    currentScale = 1;
+    initialDistance = 0;
+    
+    // Resmi güncelle
+    viewerImage.src = currentImages[index];
+    
+    // Sayaçı güncelle
+    if (counter) {
+        counter.textContent = `${index + 1}/${currentImages.length}`;
+    }
+    
+    // Küçük resimleri güncelle
+    thumbnails.forEach((thumb, idx) => {
+        if (idx === index) {
+            thumb.classList.add('active');
+            thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } else {
+            thumb.classList.remove('active');
+        }
+    });
+}
+
+// Resmi kaydet (güncellenmiş)
+async function downloadCurrentImage(event) {
+    event.stopPropagation();
+    
+    const viewerImage = document.getElementById('viewerImage');
+    const imageSrc = viewerImage.src;
+    
+    if (!imageSrc || imageSrc === '') return;
+    
+    const btn = document.getElementById('downloadImageBtn');
+    btn.style.transform = 'scale(1.2)';
+    setTimeout(() => btn.style.transform = 'scale(1)', 200);
+    
+    try {
+        const response = await fetch(imageSrc);
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = 'haber-resmi-' + Date.now() + '.jpg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        window.URL.revokeObjectURL(blobUrl);
+        showToast('✅ Resim kaydedildi!');
+        
+        btn.style.backgroundColor = '#22c55e';
+        setTimeout(() => btn.style.backgroundColor = '', 500);
+        
+    } catch (error) {
+        const a = document.createElement('a');
+        a.href = imageSrc;
+        a.download = 'haber-resmi-' + Date.now() + '.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast('✅ Resim kaydedildi!');
+    }
+}
+
+// Haber detayında hızlı içerik boyutu ayarı
+function quickAdjustContent(type, val) {
+    if(type === 'size') {
+        sets.contentSize = Math.max(10, Math.min(24, (sets.contentSize || 14) + val));
+        document.documentElement.style.setProperty('--content-size', sets.contentSize + 'px');
+    }
+    localStorage.setItem('khoj_sets', JSON.stringify(sets));
+    
+    // Toast ile bildir
+    showToast(`İçerik boyutu: ${sets.contentSize}px`);
+}
+
+// --- GROK + TAVILY ASK FONKSİYONU (GEMINI KALDIRILDI) ---
+async function ask() {
+    const inp = document.getElementById('uInp');
+    const box = document.getElementById('cBox');
+    if(!inp || !inp.value.trim()) return;
+    
+    let q = inp.value.trim();
+    let forceSearch = false;
+
+    // --- YILDIZ (*) KONTROLÜ ---
+    if (q.startsWith('*')) {
+        forceSearch = true;
+        q = q.substring(1).trim(); // Yıldızı kaldır, temiz soruyu al
+    }
+    
+    inp.value = '';
+    
+    // 1. KULLANICI MESAJI
+    const userMsg = document.createElement('div');
+    userMsg.className = 'msg user';
+    userMsg.textContent = (forceSearch ? '* ' : '') + q;
+    box.appendChild(userMsg);
+    scrollToBottom('smooth');
+    
+    // 2. AI MESAJI (BAŞLANGIÇ)
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'msg ai';
+    aiMsg.innerHTML = forceSearch ? '<span class="typing-cursor">▋</span> İnternette araştırıyorum...' : '<span class="typing-cursor">▋</span> Düşünüyorum...';
+    box.appendChild(aiMsg);
+    scrollToBottom('smooth');
+
+    try {
+        const grokKey = decryptAPIKey(ENCRYPTED_GROK_KEY);
+        const tavilyKey = decryptAPIKey(ENCRYPTED_TAVILY_KEY);
+        let context = "";
+
+        const suAnkiTarih = new Date().toLocaleString('tr-TR', { 
+            day: 'numeric', month: 'long', year: 'numeric', 
+            hour: '2-digit', minute: '2-digit', weekday: 'long' 
+        });
+
+        // --- TAVILY SADECE YILDIZ VARSA ÇALIŞIR ---
+        if (forceSearch && (!active || active.source === "KHOJ")) {
+            console.log("%c🌐 TAVILY AKTİF: Yıldız algılandı, internete çıkılıyor...", "color: #22c55e; font-weight: bold;");
+            
+            try {
+                const sRes = await fetch(`${PROXY_URL}?url=https://api.tavily.com/search`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        api_key: tavilyKey, 
+                        query: q, 
+                        search_depth: "basic", 
+                        max_results: 5 
+                    })
+                });
+                const sData = await sRes.json();
+                context = sData.results ? sData.results.map(r => r.content).join("\n---\n") : "";
+            } catch (searchError) {
+                console.error("Tavily Hatası:", searchError);
+            }
+        } else {
+            console.log("%c🧠 SADECE GROK: Yıldız yok, hafıza ve genel bilgi kullanılıyor.", "color: #3b82f6; font-weight: bold;");
+        }
+
+        // --- PROMPT HAZIRLAMA ---
+        let finalPrompt = q;
+        if (context) {
+            finalPrompt = `GÜNCEL İNTERNET VERİLERİ (${suAnkiTarih}):\n${context}\n\nSORU: ${q}`;
+       } else if (active && active.source !== "KHOJ") {
+    // Önce kayıtlı haberde fullContent var mı kontrol et
+    let haberIcerigi = '';
+    
+    if (active.fullContent) {
+        // Kayıtlı haberin tam içeriği
+        haberIcerigi = active.fullContent;
+    } else {
+        // Normal haber: dynamicContent'ten al (12 paragraf)
+        const dynamicContentDiv = document.getElementById('dynamicContent');
+        haberIcerigi = dynamicContentDiv?.innerText || active.description || '';
+    }
+    
+    finalPrompt = `HABER İÇERİĞİ:\n${active.title}\n${haberIcerigi}\n\nSORU: ${q}`;
+}
+
+        // --- GROK CEVAP ---
+        const chatRes = await fetch(`${PROXY_URL}?url=https://api.groq.com/openai/v1/chat/completions`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${grokKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                model: "llama-3.3-70b-versatile", 
+                messages: [
+                    {
+                        role: "system", 
+                        content: `Sen samimi bir arkadaşsın. Bugün: ${suAnkiTarih}. 
+                                  ÖNEMLİ: Sadece TÜRKÇE konuş, asla yabancı kelime (ingilizce, çince vb.) karıştırma! 
+                                  Her cevaba ABİ, diyerek başla. 🔹 ve emojiler kullan.`
+                    },
+                    ...chatHistory.map(m => ({role: m.role === 'user' ? 'user' : 'assistant', content: m.text})).slice(-3),
+                    {role: "user", content: finalPrompt}
+                ],
+                temperature: 0.3,
+                max_tokens: 1024
+            })
+        });
+
+        const chatData = await chatRes.json();
+        const reply = chatData.choices[0].message.content;
+        
+        // --- YAZMA ANİMASYONU ---
+        aiMsg.innerHTML = ''; 
+        const temizReply = metniTemizle(reply);
+        const tamCevap = temizReply.startsWith("ABİ") ? temizReply : "ABİ " + temizReply;
+        
+        const words = tamCevap.split(' ');
+        let currentText = '';
+        for (let i = 0; i < words.length; i++) {
+            currentText += words[i] + ' ';
+            aiMsg.innerHTML = currentText + '<span class="typing-cursor">▋</span>';
+            scrollToBottom('smooth');
+            await new Promise(resolve => setTimeout(resolve, 25)); 
+        }
+        aiMsg.innerHTML = tamCevap;
+		
+		// Eğer bu haber kayıtlıysa, sohbeti otomatik kaydet
+if (active && active.source !== "KHOJ" && isNewsSaved(active.title)) {
+    const updatedChat = document.getElementById('cBox').innerHTML;
+    updateSavedChat(active.title, updatedChat);
+    showToast("💾 Sohbet otomatik kaydedildi");
+}
+
+        // --- HAFIZA ---
+        if(!active || active.source === "KHOJ") { 
+            chatHistory.push({role: 'user', text: q});
+            chatHistory.push({role: 'ai', text: tamCevap});
+            if (chatHistory.length > 30) chatHistory = chatHistory.slice(-30);
+            localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory)); 
+        }
+
+    } catch (e) {
+        console.error("Hata:", e);
+        aiMsg.innerHTML = 'ABİ bir hata oldu, bağlantıyı kontrol et! 😕';
+    }
+}
+
+
+// Bekleyen cevapları listele (AYRI BİR MODALDA)
+function showPendingList() {
+    const pendingResponses = JSON.parse(localStorage.getItem('pending_ai_responses') || '[]');
+    if (pendingResponses.length === 0) {
+        showToast('Bekleyen cevap yok');
+        return;
+    }
+    
+    const m = document.getElementById('mdl');
+    let html = `
+        <div class="modal-header">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>📨 BEKLEYEN CEVAPLAR</h2>
+                <button class="btn-icon" onclick="closeM()" style="background:rgba(239,68,68,0.2); color:#ef4444;">❌</button>
+            </div>
+        </div>
+        <div class="modal-body" style="padding-bottom:20px;">
+    `;
+    
+    pendingResponses.reverse().forEach((item, index) => {
+        const date = new Date(item.timestamp).toLocaleString('tr-TR');
+        html += `
+            <div style="background:var(--card-bg); border:1px solid var(--brd); border-radius:12px; padding:15px; margin-bottom:15px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                    <span style="background:#ef4444; color:white; padding:4px 10px; border-radius:20px; font-size:11px;">${item.context}</span>
+                    <span style="font-size:10px; color:var(--muted);">${date}</span>
+                </div>
+                <div style="font-size:13px; margin-bottom:10px; background:rgba(0,0,0,0.05); padding:8px; border-radius:8px;">
+                    <strong>Soru:</strong> ${item.question}
+                </div>
+                <div style="font-size:14px; padding:10px; background:var(--bg); border-radius:8px; max-height:200px; overflow-y:auto;">
+                    ${item.answer}
+                </div>
+                <button onclick="removePendingItem(${item.id})" 
+                    style="width:100%; margin-top:10px; padding:8px; background:#22c55e; color:white; border:none; border-radius:8px; font-weight:bold;">
+                    ✓ Okundu olarak işaretle ve sil
+                </button>
+            </div>
+        `;
+    });
+    
+    html += `
+        </div>
+        <div class="modal-footer">
+            <button class="btn-full" onclick="clearAllPending()">TÜMÜNÜ TEMİZLE</button>
+        </div>
+    `;
+    
+    m.innerHTML = html;
+    document.body.style.overflow = 'hidden';
+	document.getElementById('ovl').style.display = 'flex';
+    pushModal({ type: 'pendingList' }); // YENİ: Stack'e ekle
+}
+
+// Tek bir bildirimi sil
+function removePendingItem(id) {
+    let pendingResponses = JSON.parse(localStorage.getItem('pending_ai_responses') || '[]');
+    pendingResponses = pendingResponses.filter(item => item.id !== id);
+    localStorage.setItem('pending_ai_responses', JSON.stringify(pendingResponses));
+    
+    // Rozeti güncelle
+    if (pendingResponses.length > 0) {
+        addNotificationBadge(pendingResponses.length);
+    } else {
+        const badge = document.getElementById('aiNotificationBadge');
+        if (badge) badge.remove();
+    }
+    
+    // Listeyi yenile
+    showPendingList();
+}
+
+// Tüm bildirimleri temizle
+function clearAllPending() {
+    localStorage.removeItem('pending_ai_responses');
+    const badge = document.getElementById('aiNotificationBadge');
+    if (badge) badge.remove();
+    closeM();
+    showToast('Tüm bildirimler temizlendi');
+}
+
+// Bildirim rozeti ekle
+function addNotificationBadge(count) {
+    const geminiBtn = document.querySelector('.btn-gemini');
+    if (!geminiBtn) return;
+    
+    const oldBadge = document.getElementById('aiNotificationBadge');
+    if (oldBadge) oldBadge.remove();
+    
+    if (count > 0) {
+        const badge = document.createElement('span');
+        badge.id = 'aiNotificationBadge';
+        badge.style.cssText = 'position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:10px; padding:2px 6px; border-radius:10px; font-weight:bold; min-width:18px; text-align:center; cursor:pointer;';
+        badge.textContent = count;
+        badge.onclick = function(e) {
+            e.stopPropagation();
+            showPendingList();
+        };
+        
+        geminiBtn.style.position = 'relative';
+        geminiBtn.appendChild(badge);
+    }
+}
+
+
+function askAI(prompt) {
+    const inp = document.getElementById('uInp');
+    if(inp) {
+        inp.value = prompt;
+        ask();
+    }
+}
+
+function openFullNews(url) {
+    const fullView = document.createElement('div');
+    fullView.id = 'fullNewsView';
+    fullView.style = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; flex-direction: column;`;
+    
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const headerBg = isDark ? '#1e293b' : '#f8f9fa';
+    const textColor = isDark ? '#f1f5f9' : '#1a1a1a';
+
+    fullView.innerHTML = `
+        <div style="padding: 10px; background: ${headerBg}; border-bottom: 1px solid var(--brd); display: flex; gap: 15px; align-items: center; color: ${textColor}">
+            <button onclick="document.getElementById('fullNewsView').remove()" 
+                style="padding: 8px 15px; border-radius: 8px; border: 1px solid var(--brd); background: var(--card-bg); color: var(--text); cursor: pointer;">❌ Kapat</button>
+            
+            <button onclick="triggerSummaryFromFull()" 
+                style="padding: 8px 15px; border-radius: 8px; border: none; background: #ef4444; color: white; cursor: pointer; font-weight: bold;">✨ Özetle</button>
+            
+            <span style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex:1;">${active.title}</span>
+        </div>
+        <iframe src="${url}" style="flex: 1; border: none; width: 100%; background: white !important;"></iframe>
+    `;
+    document.body.appendChild(fullView);
+}
+
+function triggerSummaryFromFull() {
+    const fv = document.getElementById('fullNewsView'); if(fv) fv.remove();
+    const inp = document.getElementById('uInp');
+    if(inp) { inp.value = "Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle."; ask(); }
+}
+
+function saveNews() {
+    let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+    const currentChat = document.getElementById('cBox') ? document.getElementById('cBox').innerHTML : "";
+    const fullContent = document.getElementById('dynamicContent')?.innerText || active.description || '';
+    
+    const newsToSave = { 
+        ...active, 
+        savedChat: currentChat, 
+        saveDate: new Date().toISOString(),
+        fullContent: fullContent  // <-- YENİ: 12 paragraf içerik de kaydediliyor
+    };
+    
+    const existingIndex = saved.findIndex(x => x.title === active.title);
+    
+    // Detaydaki butonu bul
+    const saveBtn = document.getElementById('detailSaveBtn');
+    
+    if (saveBtn) {
+        saveBtn.style.transform = 'scale(1.3)';
+        saveBtn.style.transition = 'transform 0.1s ease';
+    }
+    
+    if(existingIndex !== -1) { 
+        // Güncelleme
+        saved[existingIndex] = newsToSave; 
+        showToast("📝 Haber güncellendi!");
+        
+        if (saveBtn) {
+            saveBtn.classList.add('saved');
+            saveBtn.style.backgroundColor = '#22c55e';
+            saveBtn.title = 'Kayıtlı (güncelle)';
+            
+            saveBtn.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                saveBtn.style.transform = 'scale(1)';
+            }, 200);
+        }
+    } else { 
+        // Yeni kaydet
+        saved.push(newsToSave); 
+        showToast("💾 Haber kaydedildi!");
+        
+        if (saveBtn) {
+            saveBtn.classList.add('saved');
+            saveBtn.style.backgroundColor = '#22c55e';
+            saveBtn.title = 'Kayıtlı (güncelle)';
+            
+            // Yeşil flash
+            saveBtn.style.backgroundColor = '#22c55e';
+        }
+    }
+    
+    localStorage.setItem('khoj_saved_news', JSON.stringify(saved));
+    
+    // Rozeti güncelle
+    updateSavedButton();
+}
+
+// Farklı stiller için alternatif fonksiyon
+function updateSaveButtonStyle(btn, isSaved) {
+    if (isSaved) {
+        // Stil 1: Dolu yeşil buton
+        btn.classList.add('saved');
+        btn.style.backgroundColor = '#22c55e';
+        btn.style.color = 'white';
+        btn.style.border = 'none';
+        btn.title = 'Kayıtlı (güncelle)';
+    } else {
+        btn.classList.remove('saved', 'saved-outline');
+        btn.style.backgroundColor = '';
+        btn.style.color = '';
+        btn.style.border = '';
+        btn.title = 'Kaydet';
+    }
+}
+
+// Tüm kaydet butonlarını güncelle (detay açıldığında veya kaydetme yapıldığında)
+function updateAllSaveButtons() {
+    const saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+    
+    // Detaydaki butonu güncelle
+    const detailBtn = document.getElementById('detailSaveBtn');
+    if (detailBtn && active) {
+        const isSaved = saved.some(item => item.title === active.title);
+        if (isSaved) {
+            detailBtn.classList.add('saved');
+            detailBtn.style.backgroundColor = '#22c55e';
+            detailBtn.title = 'Kayıtlı (güncelle)';
+        } else {
+            detailBtn.classList.remove('saved');
+            detailBtn.style.backgroundColor = '';
+            detailBtn.title = 'Kaydet';
+        }
+    }
+}
+
+// Kaydedilenler butonunu güncelle
+function updateSavedButton() {
+    const saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+    const savedBtn = document.querySelector('.btn-save');
+    
+    if (savedBtn) {
+        // Önce eski rozeti temizle
+        const oldBadge = document.getElementById('savedBadge');
+        if (oldBadge) oldBadge.remove();
+        
+        if (saved.length > 0) {
+            // Yeni rozet ekle
+            const badge = document.createElement('span');
+            badge.id = 'savedBadge';
+            badge.style.cssText = 'position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:10px; padding:2px 6px; border-radius:10px; font-weight:bold; min-width:18px; text-align:center;';
+            badge.textContent = saved.length;
+            
+            savedBtn.style.position = 'relative';
+            savedBtn.appendChild(badge);
+        }
+    }
+}
+
+// Kayıtlı haber rozetini güncelle (opsiyonel)
+function updateSavedBadge() {
+    const saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+    const saveBtn = document.querySelector('.btn-icon.btn-save');
+    if (saveBtn && saved.length > 0) {
+        // Eğer rozet yoksa ekle
+        if (!document.getElementById('savedBadge')) {
+            const badge = document.createElement('span');
+            badge.id = 'savedBadge';
+            badge.style.cssText = 'position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:10px; padding:2px 6px; border-radius:10px; font-weight:bold;';
+            badge.textContent = saved.length;
+            saveBtn.style.position = 'relative';
+            saveBtn.appendChild(badge);
+        } else {
+            document.getElementById('savedBadge').textContent = saved.length;
+        }
+    }
+}
+
+function shareNews(title, link) {
+    if (navigator.share) {
+        navigator.share({
+            title: title,
+            text: title + "\n\nBu habere göz at:\n",
+            url: link
+        }).then(() => {
+            console.log('Paylaşıldı');
+        }).catch((error) => {
+            console.log('Paylaşım iptal edildi veya hata oluştu', error);
+        });
+    } else {
+        navigator.clipboard.writeText(title + " " + link).then(() => {
+            alert("Haber linki panoya kopyalandı!");
+        });
+    }
+}
+
+function openSavedList(fromStack = false) {
+    const saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]');
+    const m = document.getElementById('mdl');
+    m.classList.remove('fullscreen-chat');
+    
+    let html = '<div class="modal-header"><h2>💾 KAYDEDİLENLER</h2><button class="btn-icon" onclick="event.stopPropagation(); closeSavedList()" style="background:rgba(239,68,68,0.2); color:#ef4444;">❌</button></div>';
+    html += '<div class="modal-body">';
+    
+    if (saved.length === 0) {
+        html += "<p style='text-align:center; padding:40px; color:var(--muted);'>📭 Kayıtlı haber yok abi.</p>";
+    } else {
+        saved.forEach((n, i) => {
+            const date = n.saveDate ? new Date(n.saveDate).toLocaleDateString('tr-TR') : '';
+            html += `<div class="news-card" style="margin-bottom:10px; position:relative;">
+                <img src="${getBestImage(n, n.source)}" style="width:50px; height:50px; border-radius:10px;" onerror="this.src='logo.png'">
+                <div style="flex:1" onclick="openSavedDetail(${i})">
+                    <div class="news-meta">
+                        <span style="color:#ffcc00;">${n.source}</span>
+                        <span style="font-size:9px; margin-left:8px;">📅 ${date}</span>
+                    </div>
+                    <div class="news-title" style="font-size:0.9rem;">${n.title}</div>
+                </div>
+                <button onclick="deleteSaved(${i})" style="background:none; border:none; color:#ef4444; font-size:1.2rem; padding:10px; position:absolute; right:5px; top:50%; transform:translateY(-50%);">🗑️</button>
+            </div>`;
+        });
+    }
+    
+    html += '</div>';
+    html += '<div class="modal-footer"><button class="btn-full" onclick="closeSavedList()">KAPAT</button></div>';
+    
+    m.innerHTML = html;
+    document.getElementById('ovl').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    if (!fromStack) {
+        pushModal({ type: 'savedList' });
+    }
+}
+
+function closeSavedList() {
+    // Stack'ten savedList modalını çıkar
+    if (modalStack.length > 0 && modalStack[modalStack.length - 1].type === 'savedList') {
+        modalStack.pop();
+    }
+    
+    // Eğer stack'te başka modal varsa onu göster
+    if (modalStack.length > 0) {
+        const lastModal = modalStack[modalStack.length - 1];
+        if (lastModal.type === 'sourceList' && lastModal.sourceName) {
+            openSourceNewsList(lastModal.sourceName);
+        } else if (lastModal.type === 'newsDetail' && lastModal.newsItem) {
+            active = lastModal.newsItem;
+            openDetail(-2);
+        } else if (lastModal.type === 'search' && lastModal.query) {
+            performLocalNewsSearch(lastModal.query, true);
+        } else if (lastModal.type === 'settings') {
+            openSettings(true);
+        } else if (lastModal.type === 'rssManager') {
+            openRSSManager(true);
+        } else {
+            document.getElementById('ovl').style.display = 'none';
+            document.getElementById('mdl').classList.remove('fullscreen-chat');
+            document.body.style.overflow = '';
+        }
+    } else {
+        document.getElementById('ovl').style.display = 'none';
+        document.getElementById('mdl').classList.remove('fullscreen-chat');
+        document.body.style.overflow = '';
+    }
+}
+
+function showNewNewsBadge() {
+    if (document.getElementById('newNewsBadge')) return;
+
+    const badge = document.createElement('div');
+    badge.id = 'newNewsBadge';
+    badge.innerHTML = `🔥 Yeni haberler geldi! <span onclick="softRefresh(); this.parentElement.remove();">Tıkla ve Karıştır</span>`;
+    badge.style = "position:fixed; top:70px; left:50%; transform:translateX(-50%); background:var(--primary); color:#000; padding:10px 20px; border-radius:30px; font-weight:bold; z-index:1000; box-shadow:0 4px 15px rgba(0,0,0,0.3); cursor:pointer; animation: slideDown 0.5s;";
+    document.body.appendChild(badge);
+}
+
+function handleMainInput() {
+    const inp = document.getElementById('mainInp');
+    if (!inp || !inp.value.trim()) return;
+
+    const val = inp.value.trim();
+    
+    const searchRegex = /\*(.*?)\*/; 
+    const match = val.match(searchRegex);
+
+    if (match) {
+        const query = match[1].trim();
+        performLocalNewsSearch(query);
+    } else {
+        openGeneralChatWithText(val);
+    }
+    inp.value = '';
+}
+
+function performLocalNewsSearch(q, fromStack = false) {
+    const results = news.filter(n => n.title.toLowerCase().includes(q.toLowerCase()) || (n.description && n.description.toLowerCase().includes(q.toLowerCase())) );
+    activeSearchQuery = q; 
+    const m = document.getElementById('mdl');
+    let html = ` <div class="modal-header"> <div style="display:flex; justify-content:space-between; align-items:center; width:100%;"> <div> <h2 style="font-size:1.1rem;">🔍 ARAMA SONUÇLARI</h2> <p style="font-size:11px; opacity:0.7;">"${q}" kelimesi geçen haberler</p> </div> <span class="search-count">${results.length} HABER BULUNDU</span> <button class="btn-icon" onclick="event.stopPropagation(); closeSearch()" style="background:rgba(239,68,68,0.2); color:#ef4444;">❌</button> </div> </div> <div class="modal-body">`; 
+    if (results.length === 0) { html += `<p style="text-align:center; padding:40px; color:#888;">Aradığın kriterde haber bulamadım ABİ. 😔</p>`; } 
+    else { results.forEach(n => { const realIdx = news.findIndex(x => x.title === n.title); html += ` <div class="news-card" onclick="openDetail(${realIdx})" style="margin-bottom:10px; cursor:pointer;"> <img src="${n.thumbnail || 'logo.png'}" style="width:50px; height:50px;"> <div style="flex:1"> <div class="news-meta"><span>${n.source}</span></div> <div class="news-title" style="font-size:0.85rem;">${n.title}</div> </div> </div>`; }); } 
+    html += `</div><div class="modal-footer"> <button class="btn-full" onclick="closeSearch()">KAPAT</button> </div>`; 
+    m.innerHTML = html; 
+    document.getElementById('ovl').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    if (!fromStack) {
+        pushModal({ type: 'search', query: q });
+    }
+}
+
+function openGeneralChatWithText(text) { 
+    openGeneralChat(); 
+    setTimeout(() => { 
+        const chatInp = document.getElementById('uInp'); 
+        if (chatInp) { chatInp.value = text; ask(); } 
+    }, 300);
+}
+
+function deleteSaved(i) { 
+    let saved = JSON.parse(localStorage.getItem('khoj_saved_news') || '[]'); 
+    const deletedNews = saved[i]; // Silinen haberi hatırla
+    
+    saved.splice(i, 1); 
+    localStorage.setItem('khoj_saved_news', JSON.stringify(saved)); 
+    
+    // Ana ekrandaki rozeti güncelle
+    updateSavedButton();
+    
+    // Eğer şu an açık olan haber silindiyse, butonunu güncelle
+    if (active && deletedNews && active.title === deletedNews.title) {
+        const detailBtn = document.getElementById('detailSaveBtn');
+        if (detailBtn) {
+            detailBtn.classList.remove('saved');
+            detailBtn.style.backgroundColor = '';
+            detailBtn.title = 'Kaydet';
+        }
+        showToast("🗑️ Haber silindi!");
+    } else {
+        showToast("🗑️ Haber silindi!");
+    }
+    
+    // Eğer kaydedilenler listesi açıksa, listeyi yenile
+    const modalContent = document.getElementById('mdl').innerHTML;
+    if (modalContent.includes('KAYDEDİLENLER')) {
+        openSavedList(); // Listeyi yeniden aç (güncel haliyle)
+    }
+}
+function openSavedDetail(i) { active = JSON.parse(localStorage.getItem('khoj_saved_news'))[i]; openDetail(-2); }
+function openGeneralChat() { active = { title: "GENEL AI SOHBET", source: "KHOJ", description: "Her şeyi sorabilirsin abi." }; openDetail(-1); }
+function clearHistory() { chatHistory = []; localStorage.removeItem('khoj_ai_history'); closeM(); showToast("Sıfırlandı!"); }
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    if (!toast) {
+        // Toast yoksa oluştur
+        const newToast = document.createElement('div');
+        newToast.id = 'toast';
+        newToast.style.cssText = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--card-bg); color:var(--text); padding:10px 20px; border-radius:30px; border:1px solid var(--brd); font-weight:600; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.15); opacity:0; transition:opacity 0.3s ease; pointer-events:none;';
+        document.body.appendChild(newToast);
+        setTimeout(() => showToast(message), 100);
+        return;
+    }
+    
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    
+    clearTimeout(window.toastTimeout);
+    window.toastTimeout = setTimeout(() => {
+        toast.style.opacity = '0';
+    }, 2000);
+}
+
+// ==================== RESİM GÖRÜNTÜLEYİCİ ====================
+
+// Resim görüntüleyiciyi aç
+function openImageViewer(imageSrc) {
+    const viewer = document.getElementById('imageViewer');
+    const viewerImage = document.getElementById('viewerImage');
+    
+    if (!viewer || !viewerImage) return;
+    
+    viewerImage.src = imageSrc;
+    viewer.classList.add('show');
+    
+    // Yakınlaştırma için touch/pinch olayları
+    setupPinchZoom();
+}
+
+function closeImageViewer(event) {
+    // Eğer tıklanan öğe image-viewer'ın kendisi veya gallery-container ise kapat
+    // (yani resmin dışındaki alan)
+    if (event.target.classList.contains('image-viewer') || 
+        event.target.classList.contains('gallery-container')) {
+        
+        closeViewer();
+    }
+}
+
+// Yardımcı fonksiyon - viewer'ı kapat
+function closeViewer() {
+    const viewer = document.getElementById('imageViewer');
+    if (!viewer) return;
+    
+    viewer.classList.remove('show');
+    
+    // Zoom'u sıfırla
+    const viewerImage = document.getElementById('viewerImage');
+    if (viewerImage) {
+        viewerImage.style.transform = 'scale(1)';
+        viewerImage.style.transition = 'transform 0.2s ease';
+    }
+    
+    // Değişkenleri sıfırla
+    currentScale = 1;
+    initialDistance = 0;
+    currentImages = [];
+    currentImageIndex = 0;
+    
+    console.log("Galeri kapatıldı");
+}
+
+// ==================== YAKINLAŞTIRMA/UZAKLAŞTIRMA FONKSİYONLARI ====================
+let initialDistance = 0;
+let currentScale = 1;
+let lastTouchX = 0;
+let lastTouchY = 0;
+let isDragging = false;
+
+function setupPinchZoom() {
+    const viewerImage = document.getElementById('viewerImage');
+    if (!viewerImage) return;
+    
+    // Touch başlangıcı
+    viewerImage.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+            // İki parmakla dokunma - YAKINLAŞTIRMA
+            e.preventDefault();
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            initialDistance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Mevcut scale'i al
+            const transform = viewerImage.style.transform;
+            if (transform.includes('scale')) {
+                const match = transform.match(/scale\(([^)]+)\)/);
+                if (match) {
+                    currentScale = parseFloat(match[1]);
+                }
+            }
+            
+            console.log("Zoom başladı, mevcut scale:", currentScale);
+        } else if (e.touches.length === 1) {
+            // Tek parmakla dokunma - KAYDIRMA (sadece zoom yapıldıysa)
+            lastTouchX = e.touches[0].clientX;
+            lastTouchY = e.touches[0].clientY;
+            isDragging = true;
+        }
+    }, { passive: false });
+    
+    // Touch hareketi
+    viewerImage.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2) {
+            // İki parmak - YAKINLAŞTIRMA/UZAKLAŞTIRMA
+            e.preventDefault();
+            
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const currentDistance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (initialDistance > 0) {
+                // Scale hesapla: 0.5x ile 3x arası (uzaklaştırma da olsun)
+                let scale = (currentDistance / initialDistance) * currentScale;
+                scale = Math.max(0.5, Math.min(3, scale)); // Min 0.5x, max 3x
+                
+                // Scale'i uygula
+                viewerImage.style.transform = `scale(${scale})`;
+                viewerImage.style.transition = 'none'; // Anında zoom
+            }
+        } else if (e.touches.length === 1 && isDragging && currentScale > 1) {
+            // Tek parmak - KAYDIRMA (sadece zoom yapıldıysa)
+            e.preventDefault();
+            
+            const touchX = e.touches[0].clientX;
+            const touchY = e.touches[0].clientY;
+            
+            const deltaX = touchX - lastTouchX;
+            const deltaY = touchY - lastTouchY;
+            
+            // Mevcut transform'u al
+            let transform = viewerImage.style.transform;
+            let translateX = 0, translateY = 0;
+            
+            if (transform.includes('translate')) {
+                const matches = transform.match(/translate\(([^,]+)px,\s*([^)]+)px\)/);
+                if (matches) {
+                    translateX = parseFloat(matches[1]) || 0;
+                    translateY = parseFloat(matches[2]) || 0;
+                }
+            }
+            
+            // Yeni pozisyon
+            translateX += deltaX;
+            translateY += deltaY;
+            
+            viewerImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
+            
+            lastTouchX = touchX;
+            lastTouchY = touchY;
+        }
+    }, { passive: false });
+    
+    // Touch bitişi - BURASI KRİTİK: Scale'i KALICI yap
+    viewerImage.addEventListener('touchend', (e) => {
+        if (e.touches.length === 0) {
+            // İki parmak kalktığında mevcut scale'i KORU
+            const transform = viewerImage.style.transform;
+            if (transform.includes('scale')) {
+                const match = transform.match(/scale\(([^)]+)\)/);
+                if (match) {
+                    currentScale = parseFloat(match[1]);
+                    console.log("Zoom bitti, yeni scale:", currentScale);
+                }
+            }
+            
+            initialDistance = 0;
+            isDragging = false;
+            
+            // Smooth transition ekle (kaydırma için)
+            viewerImage.style.transition = 'transform 0.2s ease';
+        } else if (e.touches.length === 1) {
+            // Bir parmak kaldıysa kaydırmaya devam et
+            lastTouchX = e.touches[0].clientX;
+            lastTouchY = e.touches[0].clientY;
+        }
+    }, { passive: true });
+    
+    // Çift tıklama ile zoom sıfırlama
+    viewerImage.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        viewerImage.style.transform = 'scale(1)';
+        viewerImage.style.transition = 'transform 0.3s ease';
+        currentScale = 1;
+        initialDistance = 0;
+        console.log("Zoom sıfırlandı");
+    });
+}
+
+// ==================== ANDROID GERİ BUTONU KESİN ÇÖZÜM ====================
+
+history.pushState(null, null, location.href);
+
+window.addEventListener('popstate', function(e) {
+    if (document.getElementById('ovl').style.display === 'flex') {
+        e.preventDefault();
+        history.pushState(null, null, location.href);
+        closeM();
+        return false;
+    } else {
+        history.pushState(null, null, location.href);
+    }
+});
+
+document.addEventListener('backbutton', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (document.getElementById('ovl').style.display === 'flex') {
+        closeM();
+    }
+    return false;
+}, false);
+
+function wrapModalOpen(originalFn) {
+    return function() {
+        history.pushState(null, null, location.href);
+        return originalFn.apply(this, arguments);
+    };
+}
+
+const modalFunctions = [
+    'openDetail', 
+    'openSettings', 
+    'openRSSManager', 
+    'openSavedList', 
+    'openSourceNewsList', 
+    'showPendingList', 
+    'performLocalNewsSearch',
+    'openAddRSS',
+    'editRSS',
+    'openSourceListModal'
+];
+modalFunctions.forEach(fnName => {
+    if (typeof window[fnName] === 'function') {
+        const original = window[fnName];
+        window[fnName] = function() {
+            history.pushState(null, null, location.href);
+            return original.apply(this, arguments);
+        };
+    }
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        updateSavedButton();
+    }, 500);
+});
+
+</script>
+</body>
+</html>
