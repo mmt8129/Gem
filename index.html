@@ -2889,10 +2889,10 @@ function closeM(event) {
                         <div style="background:var(--card-bg); border:1px solid var(--brd); border-radius:12px;">
                             <div style="background:var(--brd); padding:8px 15px; display:flex; justify-content:space-between;">
                                 <span>✨ YAPAY ZEKA ANALİZİ</span>
-                                <button onclick="document.getElementById('uInp').value='Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px;">✨ AI ile Özetle</button>
+                                <button onclick="document.getElementById('uInp').value='Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.'; ask();" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:20px;">✨ Haberi Özetle</button>
                             </div>
                             <div class="chat-box" id="cBox" style="min-height:200px; max-height:300px; padding:10px;">
-                                <div class="msg ai">Haber hakkında soru sorabilirsin...</div>
+                                <div class="msg ai">Haber hakkında bilmek istediğin bir şey var mı?</div>
                             </div>
                         </div>
                     </div>
@@ -3688,7 +3688,7 @@ async function ask() {
                 messages: [
                     {
                         role: "system", 
-                        content: `Sen samimi bir arkadaşsın. Bugün: ${suAnkiTarih}. 
+                        content: `Sen bir arkadaşsın. Bugün: ${suAnkiTarih}. 
                                   ÖNEMLİ: Sadece TÜRKÇE konuş, asla yabancı kelime (ingilizce, çince vb.) karıştırma! 
                                   Her cevaba ABİ, diyerek başla. 🔹 ve emojiler kullan.`
                     },
