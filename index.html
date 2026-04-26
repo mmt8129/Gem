@@ -1,0 +1,2879 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <!-- HTML head kısmına ekleyin -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * self 'unsafe-inline' 'unsafe-eval' blob: data: gap:; object-src * self blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;">
+    <title>Gemini Pro Dashboard v7</title>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <!-- Toast bildirimleri için -->
+<div id="toast" style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--card-bg); color:var(--text); padding:10px 20px; border-radius:30px; border:1px solid var(--brd); font-weight:600; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.15); opacity:0; transition:opacity 0.3s ease; pointer-events:none;">✅ Kaydedildi!</div>
+	<style>
+
+/* ============================= */
+/* 🍎 APPLE NEWS MODERN UI      */
+/* 9 TEMA (Light, Dark + 7 Yeni) */
+/* ============================= */
+
+/* ========= ANA DEĞİŞKENLER (Varsayılan) ========= */
+:root {
+    --news-size:1rem;
+    --news-weight:700;
+    --chat-size:15px;
+    --chat-weight:500;
+    --content-size:15px;
+    --content-line-height:1.6;
+}
+
+/* ========= 1. AÇIK TEMA (Varsayılan Light) ========= */
+[data-theme="light"] {
+    --primary:#e11d48;
+    --bg:#f5f5f7;
+    --text:#1d1d1f;
+    --muted:#6e6e73;
+    --card-bg:#ffffff;
+    --brd:#e5e5ea;
+    --header-bg:rgba(255,255,255,0.85);
+    --size-color: #ef4444;
+    --weight-color: #3b82f6;
+    --content-color: #22c55e;
+    --btn-bg-light: rgba(0,0,0,0.05);
+    --btn-bg-size: rgba(239,68,68,0.1);
+    --btn-bg-weight: rgba(59,130,246,0.1);
+    --btn-bg-content: rgba(34,197,94,0.1);
+    --btn-text: #1d1d1f;
+    --btn-hover: rgba(0,0,0,0.08);
+}
+
+/* ========= 2. KOYU TEMA (Mevcut Dark) ========= */
+[data-theme="dark"] {
+    --primary:#e11d48;
+    --bg:#000000;
+    --text:#f5f5f7;
+    --muted:#8e8e93;
+    --card-bg:#1c1c1e;
+    --brd:#2c2c2e;
+    --header-bg:rgba(0,0,0,0.85);
+    --size-color: #ff6b6b;
+    --weight-color: #6b9eff;
+    --content-color: #6bff6b;
+    --btn-bg-light: rgba(255,255,255,0.08);
+    --btn-bg-size: rgba(255,107,107,0.15);
+    --btn-bg-weight: rgba(107,158,255,0.15);
+    --btn-bg-content: rgba(107,255,107,0.15);
+    --btn-text: #f5f5f7;
+    --btn-hover: rgba(255,255,255,0.1);
+}
+
+/* ========= 3. GECE MAVİSİ (Night Blue) ========= */
+[data-theme="nightblue"] {
+    --primary:#3B82F6;
+    --bg:#0A1628;
+    --text:#E2E8F0;
+    --muted:#94A3B8;
+    --card-bg:#0F1A2E;
+    --brd:#1E293B;
+    --header-bg:rgba(10,22,40,0.85);
+    --size-color: #60A5FA;
+    --weight-color: #818CF8;
+    --content-color: #34D399;
+    --btn-bg-light: rgba(59,130,246,0.1);
+    --btn-bg-size: rgba(96,165,250,0.15);
+    --btn-bg-weight: rgba(129,140,248,0.15);
+    --btn-bg-content: rgba(52,211,153,0.15);
+    --btn-text: #E2E8F0;
+    --btn-hover: rgba(59,130,246,0.15);
+}
+
+/* ========= 4. SABAH ESİNTİSİ (Morning Breeze) ========= */
+[data-theme="morning"] {
+    --primary:#0891B2;
+    --bg:#F0F9FF;
+    --text:#1E293B;
+    --muted:#64748B;
+    --card-bg:#FFFFFF;
+    --brd:#BAE6FD;
+    --header-bg:rgba(240,249,255,0.85);
+    --size-color: #EC4899;
+    --weight-color: #06B6D4;
+    --content-color: #10B981;
+    --btn-bg-light: rgba(0,0,0,0.04);
+    --btn-bg-size: rgba(236,72,153,0.1);
+    --btn-bg-weight: rgba(6,182,212,0.1);
+    --btn-bg-content: rgba(16,185,129,0.1);
+    --btn-text: #1E293B;
+    --btn-hover: rgba(0,0,0,0.06);
+}
+
+[data-theme="morning-dark"] {
+    --primary:#06B6D4;
+    --bg:#0F172A;
+    --text:#F1F5F9;
+    --muted:#94A3B8;
+    --card-bg:#1E293B;
+    --brd:#334155;
+    --header-bg:rgba(15,23,42,0.85);
+    --size-color: #F472B6;
+    --weight-color: #22D3EE;
+    --content-color: #34D399;
+    --btn-bg-light: rgba(6,182,212,0.1);
+    --btn-bg-size: rgba(244,114,182,0.15);
+    --btn-bg-weight: rgba(34,211,238,0.15);
+    --btn-bg-content: rgba(52,211,153,0.15);
+    --btn-text: #F1F5F9;
+    --btn-hover: rgba(6,182,212,0.12);
+}
+
+/* ========= 5. KUM VE DENİZ (Sand & Sea) ========= */
+[data-theme="sandsea"] {
+    --primary:#E76F51;
+    --bg:#FFF8F0;
+    --text:#2B2D2E;
+    --muted:#7A6B5A;
+    --card-bg:#FFFFFF;
+    --brd:#F4A261;
+    --header-bg:rgba(255,248,240,0.85);
+    --size-color: #E9C46A;
+    --weight-color: #2A9D8F;
+    --content-color: #E76F51;
+    --btn-bg-light: rgba(0,0,0,0.04);
+    --btn-bg-size: rgba(233,196,106,0.15);
+    --btn-bg-weight: rgba(42,157,143,0.1);
+    --btn-bg-content: rgba(231,111,81,0.1);
+    --btn-text: #2B2D2E;
+    --btn-hover: rgba(0,0,0,0.06);
+}
+
+[data-theme="sandsea-dark"] {
+    --primary:#F4A261;
+    --bg:#1A1A1A;
+    --text:#EAE2B7;
+    --muted:#A8A29E;
+    --card-bg:#2D2D2D;
+    --brd:#5C4D3C;
+    --header-bg:rgba(26,26,26,0.85);
+    --size-color: #E9C46A;
+    --weight-color: #2A9D8F;
+    --content-color: #E76F51;
+    --btn-bg-light: rgba(244,162,97,0.1);
+    --btn-bg-size: rgba(233,196,106,0.15);
+    --btn-bg-weight: rgba(42,157,143,0.12);
+    --btn-bg-content: rgba(231,111,81,0.12);
+    --btn-text: #EAE2B7;
+    --btn-hover: rgba(244,162,97,0.12);
+}
+
+/* ========= 6. ORMAN GÖLGESİ (Forest Shade) ========= */
+[data-theme="forest"] {
+    --primary:#2D6A4F;
+    --bg:#F4F9F4;
+    --text:#1B3B2B;
+    --muted:#5A6B5A;
+    --card-bg:#FFFFFF;
+    --brd:#A7C7A7;
+    --header-bg:rgba(244,249,244,0.85);
+    --size-color: #D4A373;
+    --weight-color: #40916C;
+    --content-color: #52B788;
+    --btn-bg-light: rgba(0,0,0,0.04);
+    --btn-bg-size: rgba(212,163,115,0.12);
+    --btn-bg-weight: rgba(64,145,108,0.1);
+    --btn-bg-content: rgba(82,183,136,0.1);
+    --btn-text: #1B3B2B;
+    --btn-hover: rgba(0,0,0,0.05);
+}
+
+[data-theme="forest-dark"] {
+    --primary:#52B788;
+    --bg:#0D1F0D;
+    --text:#D8F3DC;
+    --muted:#8CA88C;
+    --card-bg:#1A2E1A;
+    --brd:#2D4A2D;
+    --header-bg:rgba(13,31,13,0.85);
+    --size-color: #D4A373;
+    --weight-color: #74C69D;
+    --content-color: #95D5B2;
+    --btn-bg-light: rgba(82,183,136,0.1);
+    --btn-bg-size: rgba(212,163,115,0.12);
+    --btn-bg-weight: rgba(116,198,157,0.12);
+    --btn-bg-content: rgba(149,213,178,0.12);
+    --btn-text: #D8F3DC;
+    --btn-hover: rgba(82,183,136,0.12);
+}
+
+/* ========= 7. TOZ PEMBE (Dusty Rose) ========= */
+[data-theme="rose"] {
+    --primary:#D47B86;
+    --bg:#FFF5F7;
+    --text:#4A2B3A;
+    --muted:#8C6A7A;
+    --card-bg:#FFFFFF;
+    --brd:#F7C8D4;
+    --header-bg:rgba(255,245,247,0.85);
+    --size-color: #E8A2B0;
+    --weight-color: #B86B7A;
+    --content-color: #A15C6E;
+    --btn-bg-light: rgba(0,0,0,0.04);
+    --btn-bg-size: rgba(232,162,176,0.12);
+    --btn-bg-weight: rgba(184,107,122,0.1);
+    --btn-bg-content: rgba(161,92,110,0.1);
+    --btn-text: #4A2B3A;
+    --btn-hover: rgba(0,0,0,0.05);
+}
+
+[data-theme="rose-dark"] {
+    --primary:#D47B86;
+    --bg:#2D1B2E;
+    --text:#FFE4EC;
+    --muted:#B897A8;
+    --card-bg:#3D2A3E;
+    --brd:#5C3D5E;
+    --header-bg:rgba(45,27,46,0.85);
+    --size-color: #FFB7C5;
+    --weight-color: #E8A2B0;
+    --content-color: #D47B86;
+    --btn-bg-light: rgba(212,123,134,0.1);
+    --btn-bg-size: rgba(255,183,197,0.12);
+    --btn-bg-weight: rgba(232,162,176,0.12);
+    --btn-bg-content: rgba(212,123,134,0.12);
+    --btn-text: #FFE4EC;
+    --btn-hover: rgba(212,123,134,0.12);
+}
+
+/* ========= 8. LAVANTA RÜYASI (Lavender Dream) ========= */
+[data-theme="lavender"] {
+    --primary:#8B5CF6;
+    --bg:#F5F0FF;
+    --text:#2D1B4E;
+    --muted:#7A6B8A;
+    --card-bg:#FFFFFF;
+    --brd:#D9C6FF;
+    --header-bg:rgba(245,240,255,0.85);
+    --size-color: #C084FC;
+    --weight-color: #A78BFA;
+    --content-color: #8B5CF6;
+    --btn-bg-light: rgba(0,0,0,0.04);
+    --btn-bg-size: rgba(192,132,252,0.12);
+    --btn-bg-weight: rgba(167,139,250,0.1);
+    --btn-bg-content: rgba(139,92,246,0.1);
+    --btn-text: #2D1B4E;
+    --btn-hover: rgba(0,0,0,0.05);
+}
+
+[data-theme="lavender-dark"] {
+    --primary:#A78BFA;
+    --bg:#1A1025;
+    --text:#E9D5FF;
+    --muted:#A994C2;
+    --card-bg:#2D1F3A;
+    --brd:#4A3655;
+    --header-bg:rgba(26,16,37,0.85);
+    --size-color: #D8B4FE;
+    --weight-color: #C084FC;
+    --content-color: #A78BFA;
+    --btn-bg-light: rgba(167,139,250,0.1);
+    --btn-bg-size: rgba(216,180,254,0.12);
+    --btn-bg-weight: rgba(192,132,252,0.12);
+    --btn-bg-content: rgba(167,139,250,0.12);
+    --btn-text: #E9D5FF;
+    --btn-hover: rgba(167,139,250,0.12);
+}
+
+/* ========= 9. GRİ ELEGANCE (Gray Elegance) ========= */
+[data-theme="gray"] {
+    --primary:#6B7280;
+    --bg:#FFFFFF;
+    --text:#1F2937;
+    --muted:#6B7280;
+    --card-bg:#F9FAFB;
+    --brd:#E5E7EB;
+    --header-bg:rgba(255,255,255,0.85);
+    --size-color: #9CA3AF;
+    --weight-color: #6B7280;
+    --content-color: #4B5563;
+    --btn-bg-light: rgba(0,0,0,0.04);
+    --btn-bg-size: rgba(156,163,175,0.12);
+    --btn-bg-weight: rgba(107,114,128,0.1);
+    --btn-bg-content: rgba(75,85,99,0.1);
+    --btn-text: #1F2937;
+    --btn-hover: rgba(0,0,0,0.05);
+}
+
+[data-theme="gray-dark"] {
+    --primary:#9CA3AF;
+    --bg:#111827;
+    --text:#F3F4F6;
+    --muted:#9CA3AF;
+    --card-bg:#1F2937;
+    --brd:#374151;
+    --header-bg:rgba(17,24,39,0.85);
+    --size-color: #D1D5DB;
+    --weight-color: #9CA3AF;
+    --content-color: #6B7280;
+    --btn-bg-light: rgba(156,163,175,0.1);
+    --btn-bg-size: rgba(209,213,219,0.12);
+    --btn-bg-weight: rgba(156,163,175,0.12);
+    --btn-bg-content: rgba(107,114,128,0.12);
+    --btn-text: #F3F4F6;
+    --btn-hover: rgba(156,163,175,0.12);
+}
+
+/* ========= RESET ========= */
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+    -webkit-tap-highlight-color:transparent;
+}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    height:100vh;
+    overflow:hidden;
+}
+
+/* ========= HEADER ========= */
+.header{
+    position:fixed;
+    top:0;
+    width:100%;
+    height:70px;
+    background:var(--header-bg);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--brd);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 16px;
+    z-index:1001;
+}
+
+.header-left,.header-right{
+    display:flex;
+    gap:8px;
+    flex:1;
+}
+
+.header-right{justify-content:flex-end;}
+.header-center{text-align:center;flex:1.5;}
+
+.time-text{
+    font-size:1.3rem;
+    font-weight:600;
+}
+
+.date-text{
+    font-size:0.7rem;
+    color:var(--muted);
+    font-weight:500;
+}
+
+/* ========= ICON BUTON ========= */
+
+.btn-icon.saved {
+    background: #22c55e !important;
+    color: white !important;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+}
+
+.btn-icon.saved:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.7);
+}
+
+#savedBadge {
+    animation: badgePop 0.3s ease;
+}
+
+.btn-icon.saved::after {
+    content: '✓';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    font-size: 10px;
+    background: white;
+    color: #22c55e;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border: 1px solid #22c55e;
+}
+
+.btn-icon.saved-outline {
+    border: 2px solid #22c55e !important;
+    box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.3);
+    position: relative;
+}
+
+.btn-save.has-saved {
+    position: relative;
+}
+
+.btn-save.has-saved::after {
+    content: attr(data-count);
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 12px;
+    min-width: 18px;
+    text-align: center;
+}
+
+.btn-icon{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:none;
+    background: var(--btn-bg-light);
+    cursor:pointer;
+    font-size:1.1rem;
+    transition: all 0.2s ease;
+    color: var(--btn-text);
+}
+
+.btn-icon.size-btn {
+    background: color-mix(in srgb, var(--size-color) 20%, transparent);
+    color:  var(--size-color);
+    border: 1px solid color-mix(in srgb, var(--size-color) 30%, transparent);
+}
+
+.btn-icon.weight-btn {
+    background: color-mix(in srgb, var(--weight-color) 20%, transparent);
+    color: var(--weight-color);
+    border: 1px solid color-mix(in srgb, var(--weight-color) 30%, transparent);
+}
+
+.btn-icon.content-btn {
+    background: color-mix(in srgb, var(--content-color) 20%, transparent);
+    color: var(--content-color);
+    border: 1px solid color-mix(in srgb, var(--content-color) 30%, transparent);
+}
+
+.btn-icon:hover {
+    background: var(--btn-hover) !important;
+    transform: scale(1.05);
+}
+
+@keyframes badgePop {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.btn-gemini{background:var(--primary)!important;color:#fff!important;border:none!important;}
+.btn-save{background:var(--primary)!important;color:#fff!important;border:none!important;}
+
+/* ========= CATEGORY BAR ========= */
+.category-bar{
+    position:fixed;
+    top:70px;
+    width:100%;
+    display:flex;
+    gap:10px;
+    padding:10px 16px;
+    overflow-x:auto;
+    background:var(--bg);
+    border-bottom:1px solid var(--brd);
+    z-index:1000;
+}
+
+/* ========= SOURCE BAR ========= */
+.source-bar{
+    position:fixed;
+    top:125px;
+    width:100%;
+    display:flex;
+    gap:10px;
+    padding:10px 16px;
+    overflow-x:auto;
+    background:var(--bg);
+    border-bottom:1px solid var(--brd);
+    z-index:999;
+}
+
+.category-bar::-webkit-scrollbar,
+.source-bar::-webkit-scrollbar{display:none;}
+
+.cat-item{
+    font-size:0.8rem;
+    font-weight:600;
+    padding:6px 14px;
+    border-radius:20px;
+    background:#ededf0;
+    color:#000;
+    white-space:nowrap;
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+.source-item{
+    font-size:0.8rem;
+    font-weight:600;
+    padding:6px 14px;
+    border-radius:20px;
+    background:#ededf0;
+    color:#000;
+    white-space:nowrap;
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+[data-theme="dark"] .cat-item.active,
+[data-theme="dark"] .source-item.active {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+.cat-item.active,
+.source-item.active{
+    background:var(--primary);
+    color:#fff;
+}
+
+[data-theme="dark"] .cat-item,
+[data-theme="dark"] .source-item{
+    background:#2c2c2e;
+    color:#fff;
+}
+
+/* Diğer temalar için kategori butonları */
+[data-theme="nightblue"] .cat-item,
+[data-theme="nightblue"] .source-item,
+[data-theme="morning"] .cat-item,
+[data-theme="morning-dark"] .cat-item,
+[data-theme="sandsea"] .cat-item,
+[data-theme="sandsea-dark"] .cat-item,
+[data-theme="forest"] .cat-item,
+[data-theme="forest-dark"] .cat-item,
+[data-theme="rose"] .cat-item,
+[data-theme="rose-dark"] .cat-item,
+[data-theme="lavender"] .cat-item,
+[data-theme="lavender-dark"] .cat-item,
+[data-theme="gray"] .cat-item,
+[data-theme="gray-dark"] .cat-item,
+[data-theme="morning"] .source-item,
+[data-theme="morning-dark"] .source-item,
+[data-theme="sandsea"] .source-item,
+[data-theme="sandsea-dark"] .source-item,
+[data-theme="forest"] .source-item,
+[data-theme="forest-dark"] .source-item,
+[data-theme="rose"] .source-item,
+[data-theme="rose-dark"] .source-item,
+[data-theme="lavender"] .source-item,
+[data-theme="lavender-dark"] .source-item,
+[data-theme="gray"] .source-item,
+[data-theme="gray-dark"] .source-item {
+    background: color-mix(in srgb, var(--primary) 25%, var(--card-bg));
+    color: var(--text);
+}
+
+[data-theme="nightblue"] .cat-item.active,
+[data-theme="morning"] .cat-item.active,
+[data-theme="morning-dark"] .cat-item.active,
+[data-theme="sandsea"] .cat-item.active,
+[data-theme="sandsea-dark"] .cat-item.active,
+[data-theme="forest"] .cat-item.active,
+[data-theme="forest-dark"] .cat-item.active,
+[data-theme="rose"] .cat-item.active,
+[data-theme="rose-dark"] .cat-item.active,
+[data-theme="lavender"] .cat-item.active,
+[data-theme="lavender-dark"] .cat-item.active,
+[data-theme="gray"] .cat-item.active,
+[data-theme="gray-dark"] .cat-item.active,
+[data-theme="nightblue"] .source-item.active,
+[data-theme="morning"] .source-item.active,
+[data-theme="morning-dark"] .source-item.active,
+[data-theme="sandsea"] .source-item.active,
+[data-theme="sandsea-dark"] .source-item.active,
+[data-theme="forest"] .source-item.active,
+[data-theme="forest-dark"] .source-item.active,
+[data-theme="rose"] .source-item.active,
+[data-theme="rose-dark"] .source-item.active,
+[data-theme="lavender"] .source-item.active,
+[data-theme="lavender-dark"] .source-item.active,
+[data-theme="gray"] .source-item.active,
+[data-theme="gray-dark"] .source-item.active {
+    background: var(--primary);
+    color: #fff;
+}
+
+[data-theme="dark"] .btn-icon.saved {
+    background: #22c55e !important;
+    color: white !important;
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+}
+
+/* ========= NEWS FEED ========= */
+#newsFeed{
+    margin-top:185px !important;
+    height:calc(100vh - 185px);
+    overflow-y:auto;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    padding-bottom:120px !important;
+}
+  
+  body.tv-guide-active #newsFeed {
+    padding: 0 !important;
+    margin-top: 100px !important;
+    height: calc(100vh - 125px) !important;
+}
+
+/* ========= NEWS CARD ========= */
+.news-card{
+    background:var(--card-bg);
+    border-radius:24px;
+    padding:18px;
+    display:flex;
+    flex-direction: column-reverse;
+    gap:18px;
+    border:1px solid var(--brd);
+    transition: all 0.2s ease;
+    margin-bottom:16px;
+}
+
+.news-card:active {
+    transform: scale(0.99);
+}
+
+.news-card:hover{
+    transform:scale(1.01);
+}
+
+.news-card img{
+    width:100%;
+    height:230px;
+    border-radius:18px;
+    object-fit:cover;
+}
+
+.news-title{
+    font-size:var(--news-size)!important;
+    font-weight:var(--news-weight)!important;
+    line-height:1.4;
+    margin-top:4px;
+}
+
+.news-meta{
+    font-size:0.8rem;
+    color:var(--muted);
+    font-weight:600;
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.news-source-badge {
+    background:var(--primary);
+    color:white;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:0.7rem;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.news-date-badge {
+    background:rgba(255,255,255,0.1);
+    padding:4px 8px;
+    border-radius:12px;
+    font-size:0.65rem;
+}
+
+/* ========= ALT ARAMA BAR ========= */
+.bottom-banner{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    display:flex;
+    gap:10px;
+    padding:12px 16px;
+    background:var(--header-bg);
+    backdrop-filter:blur(20px);
+    border-top:1px solid var(--brd);
+    z-index:2000;
+}
+
+.bottom-banner input{
+    flex:1;
+    padding:12px 16px;
+    border-radius:22px;
+    border:1px solid var(--brd);
+    background:#f2f2f7;
+    font-size:14px;
+}
+
+[data-theme="dark"] .bottom-banner input{
+    background:#2c2c2e;
+    color:#fff;
+}
+
+.bottom-banner button{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:none;
+    background:var(--primary);
+    color:#fff;
+    font-size:1rem;
+    cursor:pointer;
+}
+
+/* ========= MODAL ========= */
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.4);
+    backdrop-filter:blur(10px);
+    display:none;
+    z-index:5000;
+    justify-content:center;
+    align-items:flex-end;
+}
+
+.modal{
+    width:100% !important;
+    height:92vh !important;
+    background:var(--bg);
+    border-radius: 0px 0px 0 0;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+}
+
+.modal-header{
+    padding:18px;
+    border-bottom:1px solid var(--brd);
+}
+
+.modal-header .btn-icon {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.9rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.modal-header .btn-icon-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.modal-header .btn-icon-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--brd);
+    margin: 0 2px;
+}
+
+@media (max-width: 480px) {
+    .modal-header .btn-icon {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 0.85rem !important;
+    }
+
+    .modal-header h2 {
+        font-size: 0.9rem !important;
+    }
+}
+
+.modal-body{
+    flex:1;
+    overflow-y:auto;
+    padding:18px;
+}
+
+.modal-footer{
+    padding:14px;
+    border-top:1px solid var(--brd);
+}
+
+/* ========= CHAT ========= */
+.chat-box{
+    background:var(--card-bg);
+    border-radius:0px;
+    padding:3px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.msg{
+    padding:12px 36px;
+    border-radius:2px;
+    font-size:var(--chat-size);
+    font-weight:var(--chat-weight);
+}
+
+.msg.user{
+    background:var(--primary);
+    color:#fff;
+    align-self:flex-end;
+}
+
+.msg.ai{
+    background: transparent;
+    border-radius: 2px 2px 2px 0px;
+}
+
+[data-theme="dark"] .msg.ai{
+    background:#2c2c2e;
+}
+
+/* ========= FULL BUTTON ========= */
+.btn-full{
+    width:100%;
+    padding:14px;
+    border-radius:20px;
+    border:none;
+    background:var(--primary);
+    color:#fff;
+    font-weight:600;
+    cursor:pointer;
+}
+
+/* ========= TOAST ========= */
+#toast{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--card-bg);
+    color:var(--text);
+    padding:10px 20px;
+    border-radius:20px;
+    border:1px solid var(--brd);
+    font-weight:600;
+    z-index:9999;
+}
+
+/* Yazıyor animasyonu */
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px;
+    background: #e9e9eb;
+    border-radius: 8px;
+    width: fit-content;
+    margin: 8px 0;
+}
+
+[data-theme="dark"] .typing-indicator {
+    background: #2c2c2e;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background: #888;
+    border-radius: 50%;
+    animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+    30% { transform: translateY(-10px); opacity: 1; }
+}
+
+/* ========= AYARLAR PANELİ ========= */
+.set-row{
+    margin-bottom:20px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.set-label{
+    font-size:0.75rem;
+    font-weight:600;
+    color:var(--text);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+}
+
+.set-ctrl{
+    display:flex;
+    align-items:center;
+    background:rgba(255,255,255,0.8);
+    border:1px solid rgba(60,60,67,0.3);
+    border-radius:16px;
+    height:55px;
+    overflow:hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    backdrop-filter: blur(10px);
+    transition: 0.2s ease;
+    color:black;
+}
+
+.set-ctrl button{
+    flex:1;
+    height:100%;
+    border:none;
+    background:transparent;
+    font-size:1.4rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s ease, transform .15s ease;
+    color:black;
+    border-radius: 16px;
+}
+
+.set-ctrl button:hover{
+    background:rgba(0,0,0,0.05);
+    transform: scale(0.98);
+    color:black;
+}
+
+.set-ctrl span{
+    flex:2;
+    text-align:center;
+    font-weight:600;
+    font-size:0.95rem;
+    border-left:1px solid rgba(60,60,67,0.3);
+    border-right:1px solid rgba(60,60,67,0.3);
+    color:#1c1c1e;
+}
+
+.modal-footer textarea {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 2px solid var(--brd);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    resize: none;
+    min-height: 50px;
+    max-height: 120px;
+    overflow-y: auto;
+    font-family: inherit;
+}
+
+.chat-box {
+    scroll-behavior: smooth;
+    overflow-y: auto !important;
+}
+
+/* Tam ekran sohbet modu */
+.modal.fullscreen-chat {
+    width: 100% !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    background: var(--bg);
+}
+
+.modal.fullscreen-chat .modal-body {
+    padding: 0 !important;
+    height: calc(100vh - 130px) !important;
+    overflow: hidden !important;
+}
+
+.modal.fullscreen-chat .chat-box {
+    border: none !important;
+    border-radius: 0 !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
+    background: transparent !important;
+    padding: 15px !important;
+}
+
+.modal.fullscreen-chat .modal-footer {
+    background: var(--header-bg);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--brd);
+    padding: 12px 16px !important;
+}
+
+.modal.fullscreen-chat .modal-header {
+    background: var(--header-bg);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--brd);
+}
+
+.modal.fullscreen-chat .news-meta,
+.modal.fullscreen-chat h2,
+.modal.fullscreen-chat img:not(.chat-box img) {
+    display: none !important;
+}
+
+.modal.fullscreen-chat .chat-box .msg {
+    max-width: 100%;
+    margin-bottom: 12px;
+}
+
+.dot-animation {
+    display: inline-block;
+    animation: dotPulse 1.5s infinite;
+}
+
+@keyframes dotPulse {
+    0% { opacity: 0.2; }
+    20% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+
+/* Çoklu resim galerisi */
+.multi-image-gallery {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 5px 0 15px 0;
+    margin-bottom: 20px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+}
+
+.multi-image-gallery::-webkit-scrollbar {
+    height: 4px;
+}
+
+.multi-image-gallery::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+.gallery-thumb {
+    flex: 0 0 auto;
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    opacity: 0.8;
+}
+
+.gallery-thumb:hover,
+.gallery-thumb:active {
+    opacity: 1;
+    border-color: var(--primary);
+    transform: scale(1.05);
+}
+
+.gallery-thumb.active {
+    opacity: 1;
+    border-color: var(--primary);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+.main-image {
+    width: 100%;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    max-height: 300px;
+    object-fit: cover;
+}
+
+/* Resim görüntüleyici */
+.image-viewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.2s ease;
+}
+
+.image-viewer.show {
+    display: flex;
+}
+
+.image-viewer .gallery-container {
+    position: relative;
+    width: 90%;
+    height: 80%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(20, 20, 20, 0.3);
+    border-radius: 24px;
+    padding: 10px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.image-viewer .main-viewer-image {
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: zoomIn 0.2s ease;
+    cursor: grab;
+    transition: transform 0.1s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.image-viewer .main-viewer-image:active {
+    cursor: grabbing;
+}
+
+.image-viewer .main-viewer-image.zoomed {
+    transform: scale(var(--zoom-scale, 1.5));
+}
+
+.image-viewer .thumbnail-strip {
+    position: absolute;
+    bottom: -60px;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 30px;
+    margin: 10px auto;
+    width: fit-content;
+    max-width: 90%;
+    scrollbar-width: thin;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.image-viewer .thumbnail-strip::-webkit-scrollbar {
+    height: 4px;
+}
+
+.image-viewer .thumbnail-strip::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+.image-viewer .thumb-img {
+    flex: 0 0 auto;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.image-viewer .thumb-img:hover,
+.image-viewer .thumb-img.active {
+    opacity: 1;
+    border-color: var(--primary);
+    transform: scale(1.05);
+}
+
+.image-viewer .nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10001;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.image-viewer .nav-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.image-viewer .nav-btn.prev {
+    left: 10px;
+}
+
+.image-viewer .nav-btn.next {
+    right: 10px;
+}
+
+.image-viewer .counter {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 10001;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.image-viewer .download-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10001;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.image-viewer .close-hint {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    white-space: nowrap;
+}
+
+.image-viewer .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 60px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 59, 48, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10001;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.image-viewer .close-btn:hover,
+.image-viewer .close-btn:active {
+    background: rgb(255, 59, 48);
+    transform: scale(1.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* ========= SIRALAMA MENÜSÜ ========= */
+.sort-menu {
+    position: fixed;
+    top: 70px;
+    right: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--brd);
+    border-radius: 16px;
+    padding: 8px;
+    z-index: 2000;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    min-width: 200px;
+    display: none;
+}
+
+.sort-menu.show {
+    display: block;
+    animation: slideDown 0.2s ease;
+}
+
+.sort-item {
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s;
+    color: var(--text);
+}
+
+.sort-item:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.sort-item.active {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.sort-item span:first-child {
+    font-size: 1.2rem;
+}
+
+.sort-icon {
+    margin-left: auto;
+    color: var(--primary);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.btn-sort.active {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+.modal-body h2 {
+    font-size: calc(var(--content-size) + 0.4rem) !important;
+    line-height: var(--content-line-height) !important;
+}
+
+#dynamicContent p,
+.modal-body p {
+    font-size: var(--content-size) !important;
+    line-height: var(--content-line-height) !important;
+}
+
+.modal-body .news-meta,
+.modal-body [style*="background:#ef4444"] {
+    font-size: calc(var(--content-size) - 2px) !important;
+}
+
+/* ========= TV REHBERİ ÖZEL STİLLERİ (TEMAYA UYUMLU) ========= */
+.tv-guide-wrapper {
+    width: 100%;
+    height: calc(100vh - 185px);
+    overflow-y: auto;
+    padding: 0px;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+}
+
+.tv-guide-container {
+    display: flex;
+    flex: 1;
+    height: 220%;
+    min-height: 100% !important;
+    max-height: none;
+    background: var(--card-bg);
+    border-radius: 0 !important;
+    border: none !important;
+    overflow: hidden;
+}
+
+.tv-sidebar {
+    width: 120px;
+    background: var(--card-bg);
+    border-right: 1px solid var(--brd);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.tv-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+.tv-sidebar::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+.tv-tab-button {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--brd);
+    color: var(--text);
+    padding: 14px 6px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+
+.tv-tab-button:hover {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.tv-tab-button.active {
+    background: var(--primary);
+    color: white;
+}
+
+.tv-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    min-width: 400px;
+}
+
+.tv-header {
+    padding: 12px;
+    font-weight: 800;
+    background: var(--primary);
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.tv-content {
+    padding: 8px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* TV Rehberi aktifken source bar'ı gizle */
+body.tv-guide-active .source-bar {
+    display: none !important;
+}
+
+/* TV Rehberi için scroll */
+.tv-guide-wrapper::-webkit-scrollbar,
+.tv-main::-webkit-scrollbar {
+    width: 4px;
+}
+.tv-guide-wrapper::-webkit-scrollbar-thumb,
+.tv-main::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+    </style>
+</head>
+<body>   
+
+  <header class="header">
+    <div class="header-left">
+        <button class="btn-icon" onclick="openSettings()">⚙️</button>
+        <button class="btn-icon" id="themeBtn" onclick="toggleTheme()">🌙</button>
+    </div>
+    <div class="header-center">
+        <span class="time-text" id="clk">00:00</span>
+        <span class="date-text" id="dt">YÜKLENİYOR</span>
+    </div>
+    <div class="header-right">
+        <button class="btn-icon btn-sort" onclick="openSortMenu()" title="Sıralama" id="sortBtn">🔽</button>
+        <button class="btn-icon btn-gemini" onclick="openGeneralChat()">✨</button>
+        <button class="btn-icon btn-save" onclick="openSavedList()">💾</button>
+        <button class="btn-icon" onclick="softRefresh()">🔄</button>
+    </div>
+</header>
+
+<div class="category-bar" id="catBar">
+    <!-- 🆕 TV REHBERİ KATEGORİSİ - EN BAŞTA -->
+    <div class="cat-item" onclick="filterCat('TV_REHBERI')">📺 TV REHBERİ</div>
+    <div class="cat-item active" onclick="filterCat('TÜMÜ')">TÜMÜ</div>
+    <div class="cat-item" onclick="filterCat('TÜRKİYE')">TÜRKİYE</div>
+    <div class="cat-item" onclick="filterCat('DÜNYA')">DÜNYA</div>
+    <div class="cat-item" onclick="filterCat('GÜNDEM')">GÜNDEM</div>
+    <div class="cat-item" onclick="filterCat('TEKNOLOJİ')">TEKNOLOJİ</div>
+    <div class="cat-item" onclick="filterCat('SPOR')">SPOR</div>
+    <div class="cat-item" onclick="filterCat('OTOMOBİL')">OTOMOBİL</div>
+    <!-- 🆕 YENİ: DİĞER KATEGORİSİ -->
+    <div class="cat-item" onclick="filterCat('DİĞER')">DİĞER</div>
+</div>
+
+<!-- YENİ: KAYNAK BUTONLARI SATIRI -->
+<div class="source-bar" id="sourceBar"></div>
+
+    <main id="newsFeed"></main>
+    <div class="overlay" id="ovl"><div class="modal" id="mdl"></div></div>
+
+  <!-- Yeni Alt Banner -->
+    <div class="bottom-banner">
+        <input type="text" id="mainInp" placeholder="Sohbet et veya *haber ara*..." 
+               onkeypress="if(event.key==='Enter') handleMainInput()">
+        <button onclick="handleMainInput()">➤</button>
+    </div>
+
+  <!-- Resim Görüntüleyici - güncel HTML -->
+<div class="image-viewer" id="imageViewer" onclick="closeImageViewer(event)">
+    <div class="gallery-container">
+        <!-- Kapat butonu (sağ üstte) -->
+        <button class="close-btn" onclick="closeViewer(); event.stopPropagation();" title="Kapat">✕</button>
+
+        <!-- Önceki buton -->
+        <button class="nav-btn prev" id="prevImageBtn" onclick="navigateGallery(-1); event.stopPropagation();">◀</button>
+
+        <!-- Ana resim -->
+        <img id="viewerImage" class="main-viewer-image" src="" alt="Haber Resmi" draggable="false">
+
+        <!-- Sonraki buton -->
+        <button class="nav-btn next" id="nextImageBtn" onclick="navigateGallery(1); event.stopPropagation();">▶</button>
+
+        <!-- Sayaç -->
+        <div class="counter" id="imageCounter">1/1</div>
+
+        <!-- İndirme butonu -->
+        <button class="download-btn" id="downloadImageBtn" onclick="downloadCurrentImage(event)" title="Resmi Kaydet">⬇️</button>
+
+        <!-- Alt küçük resimler -->
+        <div class="thumbnail-strip" id="thumbnailStrip"></div>
+
+        <!-- Kapatma ipucu -->
+        <div class="close-hint">⬅️ Resmin dışına tıkla veya ESC'ye bas</div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+
+// --- 1. AI ENGINE AYARLARI (GROK & TAVILY) - GEMINI KALDIRILDI ---
+const PROXY_URL = "https://autumn-dew-1884.06mmt8129.workers.dev/"; 
+const ENCRYPTED_GROK_KEY = 'g*s*k*_*o*R*j*m*G*d*W*Q*K*p*0*i*9*c*0*B*l*k*M*B*W*G*d*y*b*3*F*Y*a*8*l*Q*l*X*R*6*t*4*1*l*m*x*p*Z*h*o*H*H*x*V*v*x'; 
+const ENCRYPTED_TAVILY_KEY = 't*v*l*y*-*d*e*v*-*1*1*N*X*v*w*-*8*S*h*U*8*b*3*i*l*v*i*W*1*a*H*w*5*b*V*V*9*g*q*h*I*T*6*5*K*3*C*4*1*F*r*i*E*q*4*g*1*Q'; 
+
+// Anahtar Çözücü
+function decryptAPIKey(key) {
+    return key.split('*').join('');
+}
+
+// --- FIREBASE AYARLARI ---
+const fbCfg = { 
+    apiKey: "AIzaSyBr57bmspJo8r_4IdkBNI_DhULYf0ynCQs", 
+    databaseURL: "https://gen-lang-client-0253857481-default-rtdb.firebaseio.com", 
+    projectId: "gen-lang-client-0253857481" 
+};
+
+if (!firebase.apps.length) firebase.initializeApp(fbCfg);
+const db = firebase.database();
+
+// --- DEĞİŞKENLER VE HAFIZA ---
+let sets = JSON.parse(localStorage.getItem('khoj_sets')) || { size: 13, weight: 600, speed: 20, newsLimit: 10 };
+let visibleCount = sets.newsLimit || 10;
+let chatHistory = JSON.parse(localStorage.getItem('khoj_ai_history')) || [];
+let news = [];
+let active = null;
+let activeSearchQuery = null;
+let autoScrollEnabled = true;
+let currentNewsLimit = parseInt(localStorage.getItem('news_limit')) || 10;
+let displayedNewsCount = {};
+let allCachedNews = JSON.parse(localStorage.getItem('khoj_cache')) || {};
+
+// YENİ: Kaynak filtresi için değişken
+let activeSourceFilter = null;
+
+// YENİ: Modal stack için
+let modalStack = [];
+
+// 📺 TV Rehberi için değişkenler
+let tvCurrentChannel = '293';
+let tvCurrentChannelName = 'TRT 1';
+
+function softRefresh() {
+    showToast("🔄 Yeni haberler getiriliyor...");
+
+    // Önbelleği temizle (1 saat beklemesin diye)
+    localStorage.removeItem('khoj_news_cache');
+    localStorage.removeItem('khoj_news_time');
+
+    // Firebase'den RSS'leri al ve yeni haberleri çek
+    db.ref('rss_ayarlari').once('value', snap => {
+        rssListesi = snap.val() || {};
+        if (Object.keys(rssListesi).length > 0) {
+            // Yeni haberleri çek
+            fetchAllNews().then(() => {
+                showToast("✅ Haberler güncellendi!");
+            });
+        }
+    });
+}
+
+let currentImages = []; // Tüm resimlerin listesi
+let currentImageIndex = 0; // Şu anki resim indeksi
+
+// Haber detayında resimleri bul
+function extractImagesFromNews(newsItem) {
+    let images = [];
+
+    // 1. Ana thumbnail varsa ekle
+    if (newsItem.thumbnail && newsItem.thumbnail !== 'logo.png') {
+        images.push(newsItem.thumbnail);
+    }
+
+    // 2. Açıklamadan resimleri bul
+    if (newsItem.description) {
+        const imgRegex = /<img[^>]+src="([^">]+)"/g;
+        let match;
+        while ((match = imgRegex.exec(newsItem.description)) !== null) {
+            if (!images.includes(match[1])) {
+                images.push(match[1]);
+            }
+        }
+    }
+
+    // 3. RSS'den gelen diğer resimler (eğer varsa)
+    if (newsItem.images && Array.isArray(newsItem.images)) {
+        newsItem.images.forEach(img => {
+            if (!images.includes(img)) {
+                images.push(img);
+            }
+        });
+    }
+
+    // Eğer hiç resim yoksa, varsayılan logo
+    if (images.length === 0) {
+        images.push('logo.png');
+    }
+
+    return images;
+}
+
+// TEMA SİSTEMİ
+function toggleTheme() {
+    // Tüm temalar (light, dark + 7 yeni tema)
+    const themes = [
+        'light', 'dark',
+        'nightblue', 'morning', 'morning-dark',
+        'sandsea', 'sandsea-dark',
+        'forest', 'forest-dark',
+        'rose', 'rose-dark',
+        'lavender', 'lavender-dark',
+        'gray', 'gray-dark'
+    ];
+
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme') || 'light';
+    let nextIndex = (themes.indexOf(current) + 1) % themes.length;
+    const next = themes[nextIndex];
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('khoj_theme', next);
+
+    // Her tema için farklı emoji
+    const icons = {
+        'light': '☀️',
+        'dark': '🌙',
+        'nightblue': '🌃',
+        'morning': '🌅',
+        'morning-dark': '🌌',
+        'sandsea': '🏖️',
+        'sandsea-dark': '🌊',
+        'forest': '🌲',
+        'forest-dark': '🌳',
+        'rose': '🌸',
+        'rose-dark': '🌹',
+        'lavender': '💜',
+        'lavender-dark': '🟣',
+        'gray': '⚪',
+        'gray-dark': '⚫'
+    };
+
+    document.getElementById('themeBtn').innerText = icons[next] || '🎨';
+    showToast(`🎨 Tema: ${next.toUpperCase()}`);
+}
+
+// Tema Hafızası
+(function() {
+    const saved = localStorage.getItem('khoj_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    window.addEventListener('DOMContentLoaded', () => {
+        const icons = {
+            'light': '☀️', 'dark': '🌙', 'nightblue': '🌃',
+            'morning': '🌅', 'morning-dark': '🌌', 'sandsea': '🏖️',
+            'sandsea-dark': '🌊', 'forest': '🌲', 'forest-dark': '🌳',
+            'rose': '🌸', 'rose-dark': '🌹', 'lavender': '💜',
+            'lavender-dark': '🟣', 'gray': '⚪', 'gray-dark': '⚫'
+        };
+        document.getElementById('themeBtn').innerText = icons[saved] || '☀️';
+    });
+})();
+
+function updateTime() {
+    const n = new Date();
+    const clk = document.getElementById('clk');
+    const dt = document.getElementById('dt');
+    if(clk) clk.innerText = n.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+    if(dt) dt.innerText = n.toLocaleDateString('tr-TR', {day:'numeric', month:'long'}).toUpperCase();
+}
+setInterval(updateTime, 1000); updateTime(); applySets();
+
+// --- 2.5 SIRALAMA SİSTEMİ ---
+let sortConfig = {
+    type: localStorage.getItem('khoj_sort_type') || 'date', // 'date', 'source', 'title'
+    direction: localStorage.getItem('khoj_sort_dir') || 'desc' // 'asc', 'desc'
+};
+
+// Sıralama menüsünü aç
+function openSortMenu() {
+    // Varolan menüyü kaldır
+    const existingMenu = document.getElementById('sortMenu');
+    if (existingMenu) existingMenu.remove();
+
+    // Menüyü oluştur
+    const menu = document.createElement('div');
+    menu.id = 'sortMenu';
+    menu.className = 'sort-menu';
+
+    const sortOptions = [
+        { type: 'date', label: 'Tarihe Göre', icon: '📅', desc: '🔽 Yeniden Eskiye', asc: '🔼 Eskiden Yeniye' },
+        { type: 'source', label: 'Kaynağa Göre', icon: '📰', desc: '🔽 Z\'den A\'ya', asc: '🔼 A\'dan Z\'ye' },
+        { type: 'title', label: 'Başlığa Göre', icon: '📝', desc: '🔽 Z\'den A\'ya', asc: '🔼 A\'dan Z\'ye' }
+    ];
+
+    let menuHTML = '';
+    sortOptions.forEach(opt => {
+        const isActive = sortConfig.type === opt.type;
+        const currentDir = isActive ? sortConfig.direction : 'desc';
+
+        menuHTML += `
+            <div class="sort-item ${isActive ? 'active' : ''}" onclick="changeSort('${opt.type}')">
+                <span>${opt.icon}</span>
+                <span style="flex:1;">${opt.label}</span>
+                <span class="sort-icon" onclick="event.stopPropagation(); toggleSortDirection('${opt.type}')">
+                    ${isActive ? (sortConfig.direction === 'desc' ? '🔽' : '🔼') : '🔽'}
+                </span>
+            </div>
+        `;
+    });
+
+    menu.innerHTML = menuHTML;
+    document.body.appendChild(menu);
+
+    // Menüyü göster
+    setTimeout(() => menu.classList.add('show'), 10);
+
+    // Butonu aktif yap
+    const sortBtn = document.getElementById('sortBtn');
+    if (sortBtn) sortBtn.classList.add('active');
+
+    // Dışarı tıklayınca kapat
+    setTimeout(() => {
+        document.addEventListener('click', function closeSortMenu(e) {
+            if (!menu.contains(e.target) && e.target.id !== 'sortBtn') {
+                menu.classList.remove('show');
+                document.getElementById('sortBtn')?.classList.remove('active');
+                setTimeout(() => menu.remove(), 200);
+                document.removeEventListener('click', closeSortMenu);
+            }
+        });
+    }, 100);
+}
+
+// Sıralama tipini değiştir
+function changeSort(type) {
+    sortConfig.type = type;
+    localStorage.setItem('khoj_sort_type', type);
+
+    // Menüyü güncelle ve render'ı yenile
+    openSortMenu(); // Menüyü yeniden aç (aktif öğeyi göstermek için)
+    render(); // Haberleri yeniden sırala ve göster
+
+    showToast(`📊 ${getSortLabel(type)} ile sıralanıyor`);
+}
+
+// Sıralama yönünü değiştir (asc/desc)
+function toggleSortDirection(type) {
+    // Eğer farklı bir tipe tıklandıysa, önce tipi değiştir
+    if (type !== sortConfig.type) {
+        sortConfig.type = type;
+        sortConfig.direction = 'desc'; // Varsayılan
+    } else {
+        // Aynı tip için yönü değiştir
+        sortConfig.direction = sortConfig.direction === 'desc' ? 'asc' : 'desc';
+    }
+
+    localStorage.setItem('khoj_sort_type', sortConfig.type);
+    localStorage.setItem('khoj_sort_dir', sortConfig.direction);
+
+    // Menüyü güncelle
+    openSortMenu();
+    render(); // Haberleri yeniden sırala ve göster
+
+    const dirText = sortConfig.direction === 'desc' ? 'Azalan' : 'Artan';
+    showToast(`📊 ${getSortLabel(sortConfig.type)} (${dirText})`);
+}
+
+// Sıralama etiketini getir
+function getSortLabel(type) {
+    const labels = {
+        'date': 'Tarih',
+        'source': 'Kaynak',
+        'title': 'Başlık'
+    };
+    return labels[type] || type;
+}
+
+// Haberleri sırala (render fonksiyonu içinde kullanılacak)
+function sortNews(newsArray) {
+    return [...newsArray].sort((a, b) => {
+        let comparison = 0;
+
+        switch(sortConfig.type) {
+            case 'date':
+                // Tarihe göre sırala
+                const dateA = a.pubDate ? new Date(a.pubDate).getTime() : 0;
+                const dateB = b.pubDate ? new Date(b.pubDate).getTime() : 0;
+                comparison = dateA - dateB;
+                break;
+
+            case 'source':
+                // Kaynağa göre sırala
+                comparison = (a.source || '').localeCompare(b.source || '');
+                break;
+
+            case 'title':
+                // Başlığa göre sırala
+                comparison = (a.title || '').localeCompare(b.title || '');
+                break;
+
+            default:
+                return 0;
+        }
+
+        // Yönü uygula (desc: büyükten küçüğe, asc: küçükten büyüğe)
+        return sortConfig.direction === 'desc' ? -comparison : comparison;
+    });
+}
+
+function metniTemizle(hamMetin) {
+    let temiz = hamMetin.replace(/␃🔚␗/g, '').replace(/\{"organic":[\s\S]*?\}\}/g, '').replace(/\{"peopleAlso":[\s\S]*?\}\}/g, '').replace(/"organic":\s*\[[\s\S]*?\]/g, '').replace(/"codeContext":\s*\{[\s\S]*?\}/g, '').replace(/"position":\s*\d+/g, '').replace(/\{.*?\}/g, '');
+    const ilkHarf = temiz.search(/[A-ZİĞÜŞÖÇ]/);
+    if (ilkHarf !== -1) { temiz = temiz.substring(ilkHarf); }
+    temiz = temiz.replace(/[\s\}\]奉",:]{2,}$/g, '');
+    temiz = temiz.replace(/^#{1,6}\s+(.*)$/gm, '<b style="color:#ef4444; font-size:1.1em;">$1</b>');
+    return temiz.replace(/\[\d+\]\(.*?\)/g, '').replace(/\*\*(.*?)\*\*/g, '<b style="color:#ef4444;">$1</b>').replace(/^\s*[\-\*]\s+/gm, '🔹 ').replace(/\n/g, '<br>');
+}
+
+// --- YAZIYOR ANİMASYONU VE OTOMATİK KAYDIRMA FONKSİYONLARI ---
+function showTypingIndicator() {
+    const box = document.getElementById('cBox');
+    if (!box) return;
+
+    hideTypingIndicator();
+
+    const indicator = document.createElement('div');
+    indicator.id = 'typingIndicator';
+    indicator.className = 'typing-indicator';
+    indicator.innerHTML = '<span></span><span></span><span></span>';
+    box.appendChild(indicator);
+
+    scrollToBottom('smooth');
+}
+
+function hideTypingIndicator() {
+    const existing = document.getElementById('typingIndicator');
+    if (existing) existing.remove();
+}
+
+function scrollToBottom(behavior = 'smooth') {
+    const box = document.getElementById('cBox');
+    if (!box || !autoScrollEnabled) return;
+
+    box.scrollTo({
+        top: box.scrollHeight,
+        behavior: behavior
+    });
+}
+
+function focusInput() {
+    const inp = document.getElementById('uInp');
+    if (inp) {
+        inp.focus();
+        setTimeout(() => inp.focus(), 100);
+    }
+}
+
+function setupScrollListener() {
+    const box = document.getElementById('cBox');
+    if (!box) return;
+
+    box.removeEventListener('scroll', scrollHandler);
+    box.addEventListener('scroll', scrollHandler);
+}
+
+function scrollHandler() {
+    const box = document.getElementById('cBox');
+    if (!box) return;
+
+    const isAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 50;
+    autoScrollEnabled = isAtBottom;
+}
+
+// --- 2. HABERLER ---
+let rssListesi = {};
+
+async function fetchAllNews() {
+    news = []; 
+    const proxyUrl = "https://wild-sky-08d7.06mmt8129.workers.dev/?url=";
+
+    const cachedData = localStorage.getItem('khoj_news_cache');
+    const cacheTime = localStorage.getItem('khoj_news_time');
+    const now = new Date().getTime();
+    const birSaat = 60 * 60 * 1000;
+
+    if (cachedData && cacheTime && (now - cacheTime < birSaat)) {
+        console.log("Haberler hafızadan yükleniyor...");
+        news = JSON.parse(cachedData);
+        render();
+        buildSourceBar(); // YENİ: Kaynak barını güncelle
+        return;
+    }
+
+    document.getElementById('newsFeed').innerHTML = '<div style="text-align:center; padding:50px; color:var(--text);">Haberler Cloudflare hattından geliyor...</div>';
+
+    for (const id in rssListesi) {
+        const rss = rssListesi[id];
+        try {
+            console.log(`${rss.ad} yükleniyor...`);
+            const response = await fetch(proxyUrl + encodeURIComponent(rss.url));
+            const xmlText = await response.text();
+
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+
+            const items = xmlDoc.querySelectorAll("item, entry");
+            console.log(`${rss.ad}: ${items.length} haber bulundu`);
+
+            items.forEach((el, index) => {
+                const title = el.querySelector("title")?.textContent || "";
+                let link = el.querySelector("link")?.textContent || 
+                          el.querySelector("link")?.getAttribute("href") || "";
+
+                const date = el.querySelector("pubDate")?.textContent || 
+                          el.querySelector("dc\\:date")?.textContent ||
+                          el.querySelector("date")?.textContent || 
+                          el.querySelector("lastBuildDate")?.textContent || 
+                          "";
+
+                // === GELİŞTİRİLMİŞ RESİM BULMA ===
+                let img = "";
+
+                // 1. Mynet özel etiketleri (ipimage, img640x360, img300x300)
+                const mynetImg = el.querySelector("ipimage")?.textContent || 
+                                el.querySelector("img640x360")?.textContent ||
+                                el.querySelector("img300x300")?.textContent;
+                if (mynetImg) {
+                    img = mynetImg;
+                    console.log(`${rss.ad} - Mynet ipimage bulundu:`, img.substring(0, 50));
+                }
+
+                // 2. Media content (standart RSS)
+                if (!img) {
+                    const mediaContent = el.querySelector("media\\:content") || 
+                                        el.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "content")[0];
+                    if (mediaContent) {
+                        img = mediaContent.getAttribute("url") || mediaContent.getAttribute("src") || "";
+                    }
+                }
+
+                // 3. Media thumbnail
+                if (!img) {
+                    const mediaThumb = el.querySelector("media\\:thumbnail") || 
+                                      el.getElementsByTagNameNS("http://search.yahoo.com/mrss/", "thumbnail")[0];
+                    if (mediaThumb) {
+                        img = mediaThumb.getAttribute("url") || mediaThumb.getAttribute("src") || "";
+                    }
+                }
+
+                // 4. Enclosure
+                if (!img) {
+                    const enclosure = el.querySelector("enclosure");
+                    if (enclosure && enclosure.getAttribute("type")?.startsWith("image/")) {
+                        img = enclosure.getAttribute("url") || "";
+                    }
+                }
+
+                // 5. Content:encoded içindeki ilk resmi bul
+                if (!img) {
+                    const contentEncoded = el.querySelector("content\\:encoded") || 
+                                         el.getElementsByTagNameNS("http://purl.org/rss/1.0/modules/content/", "encoded")[0];
+                    if (contentEncoded?.textContent) {
+                        // Tüm img etiketlerini bul
+                        const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+                        const matches = [...contentEncoded.textContent.matchAll(imgRegex)];
+
+                        // İkon veya logo olmayan ilk resmi al
+                        for (const match of matches) {
+                            const imgUrl = match[1];
+                            if (!imgUrl.includes('icon') && !imgUrl.includes('logo') && !imgUrl.includes('avatar')) {
+                                img = imgUrl;
+                                break;
+                            }
+                        }
+
+                        // Eğer hala bulunamadıysa, ilk resmi al
+                        if (!img && matches.length > 0) {
+                            img = matches[0][1];
+                        }
+                    }
+                }
+
+                // 6. Description içindeki resmi bul (ShiftDelete için)
+                if (!img) {
+                    const description = el.querySelector("description");
+                    if (description?.textContent) {
+                        // HTML entity'leri düzelt
+                        let descText = description.textContent
+                            .replace(/</g, '<')
+                            .replace(/>/g, '>')
+                            .replace(/"/g, '"')
+                            .replace(/&/g, '&');
+
+                        // img etiketlerini ara
+                        const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+                        const matches = [...descText.matchAll(imgRegex)];
+
+                        for (const match of matches) {
+                            const imgUrl = match[1];
+                            if (imgUrl && !imgUrl.includes('data:image') && !imgUrl.includes('icon')) {
+                                img = imgUrl;
+                                break;
+                            }
+                        }
+
+                        // Eğer hala bulunamadıysa, doğrudan resim URL'si ara
+                        if (!img) {
+                            const urlMatch = descText.match(/(https?:\/\/[^\s"']+\.(jpg|jpeg|png|gif|webp))/i);
+                            if (urlMatch) {
+                                img = urlMatch[1];
+                            }
+                        }
+                    }
+                }
+
+                // 7. image etiketi
+                if (!img) {
+                    const imageTag = el.querySelector("image url, image");
+                    if (imageTag) {
+                        img = imageTag.textContent || imageTag.getAttribute("url") || "";
+                    }
+                }
+
+                // === URL DÜZENLEMELERİ ===
+                if (img) {
+                    // HTML entity'leri temizle
+                    img = img.replace(/&/g, '&')
+                             .replace(/</g, '<')
+                             .replace(/>/g, '>')
+                             .replace(/"/g, '"')
+                             .replace(/'/g, "'");
+
+                    // Tırnak işaretlerini temizle
+                    img = img.replace(/['"]/g, '');
+
+                    // Göreceli URL'leri tam URL'ye çevir
+                    if (img.startsWith('/')) {
+                        try {
+                            const baseUrl = new URL(rss.url).origin;
+                            img = baseUrl + img;
+                        } catch (e) {
+                            const domainMatch = rss.url.match(/^(https?:\/\/[^\/]+)/);
+                            if (domainMatch) {
+                                img = domainMatch[1] + img;
+                            }
+                        }
+                    }
+
+                    // HTTP'yi HTTPS yap (güvenli bağlantı için)
+                    if (img.startsWith('http:')) {
+                        img = 'https:' + img.substring(5);
+                    }
+
+                    // URL'de boşluk varsa encode et
+                    img = img.replace(/ /g, '%20');
+                }
+
+                // === VARSAYILAN LOGO ===
+                const defaultLogo = rss.logo || "https://mmt8129.github.io/Gem/rsslogo.png";
+
+                if (title && title.length > 5) {
+                    const newsItem = {
+                        title: title.trim(),
+                        link: link.trim(),
+                        source: rss.ad,
+                        category: rss.kategori || "GÜNDEM",
+                        pubDate: date,
+                        thumbnail: img || defaultLogo
+                    };
+
+                    news.push(newsItem);
+
+                    // Debug için log
+                    if (!img) {
+                        console.log(`⚠️ ${rss.ad} - Resim bulunamadı! Başlık: ${title.substring(0, 50)}`);
+                    } else if (index < 3) {
+                        console.log(`✅ ${rss.ad} - Resim bulundu: ${img.substring(0, 50)}`);
+                    }
+                }
+            });
+
+        } catch (e) {
+            console.log(`${rss.ad} bağlantı sorunu:`, e);
+        }
+    }
+
+    // Haberleri karıştır
+    news.sort(() => Math.random() - 0.5);
+
+    // Önbelleğe al
+    localStorage.setItem('khoj_news_cache', JSON.stringify(news));
+    localStorage.setItem('khoj_news_time', new Date().getTime());
+
+    console.log(`Toplam ${news.length} haber yüklendi`);
+    render(); 
+    buildSourceBar(); // YENİ: Kaynak barını oluştur
+}
+
+db.ref('rss_ayarlari').on('value', snap => {
+    rssListesi = snap.val() || {};
+    if (Object.keys(rssListesi).length > 0) {
+        fetchAllNews();
+    }
+});
+
+setInterval(updateTime, 1000);
+updateTime();
+
+// Render fonksiyonunda resim yüklenirken hata kontrolü
+function renderNewsCard(item) {
+    return `
+        <div class="news-card" onclick="window.open('${item.link}', '_blank')">
+            <div class="news-image-container">
+                <img 
+                    src="${item.thumbnail}" 
+                    alt="${item.title}" 
+                    class="news-image"
+                    onerror="this.onerror=null; this.src='${item.sourceLogo || 'https://mmt8129.github.io/Gem/rsslogo.png'}'; this.classList.add('fallback-image');"
+                    loading="lazy"
+                >
+            </div>
+            <div class="news-content">
+                <div class="news-source">${item.source}</div>
+                <h3 class="news-title">${item.title}</h3>
+                <div class="news-category">${item.category}</div>
+            </div>
+        </div>
+    `;
+}
+
+// 📺 TV REHBERİ FONKSİYONLARI
+function buildTVGuide() {
+    const newsFeed = document.getElementById('newsFeed');
+    newsFeed.innerHTML = `
+        <div class="tv-guide-wrapper">
+            <div class="tv-guide-container">
+                <div class="tv-sidebar" id="tvSidebar">
+                    <button class="tv-tab-button active" onclick="tvShowChannel('293', 'TRT 1', event)">TRT 1</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('1114', 'ATV', event)">ATV</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('1118', 'STAR', event)">STAR TV</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('1117', 'KANAL D', event)">KANAL D</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('1120', 'SHOW TV', event)">SHOW TV</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('1121', 'NOW TV', event)">NOW</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('1115', 'KANAL 7', event)">KANAL 7</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('1119', 'TV 8', event)">TV 8</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('1141', '360', event)">360</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('1116', 'TEVE 2', event)">TEVE 2</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('3484', 'TV4', event)">TV 4</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('2276', 'SİNEMA TV', event)">SİNEMA TV</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('2280', 'SİNEMA AİLE', event)">SİNEMA AİLE</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('2278', 'SİNEMA AKSİYON', event)">SİNEMA AKSİYON</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('2282', 'SİNEMA 1001', event)">SİNEMA 1001</button>
+                    <button class="tv-tab-button" onclick="tvShowChannel('2284', 'KOMEDİ 2', event)">SİNEMA KOMEDİ</button>
+                </div>
+                <div class="tv-main">
+                    <div class="tv-header" id="tvChannelHeader">TRT 1</div>
+                    <div class="tv-content" id="tvContent">
+                        <div id="tvprofil-box" data-channels="293" data-lang="tr" data-country="tr" data-css="https://box.tvprofil.com/css/tvbox/shema3.css">
+                            <a id="tvp-tvprogram" target="_new" href="https://tvprofil.com">Yükleniyor...</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // TV scriptini yükle
+    tvLoadScript();
+}
+
+function tvLoadScript() {
+    var oldScript = document.getElementById('tvprofil-box-js');
+    if (oldScript) oldScript.remove();
+    
+    var js = document.createElement('script');
+    js.id = 'tvprofil-box-js';
+    js.src = 'https://box.tvprofil.com/js/tvbox.js';
+    document.body.appendChild(js);
+}
+
+function tvShowChannel(id, name, evt) {
+    tvCurrentChannel = id;
+    tvCurrentChannelName = name;
+    
+    // Header'ı güncelle
+    const header = document.getElementById('tvChannelHeader');
+    if (header) header.innerText = name;
+    
+    // Butonları güncelle
+    const buttons = document.querySelectorAll('.tv-tab-button');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    if (evt && evt.currentTarget) {
+        evt.currentTarget.classList.add('active');
+    }
+    
+    // İçeriği güncelle
+    const container = document.getElementById('tvContent');
+    if (container) {
+        container.innerHTML = '<div id="tvprofil-box" data-channels="' + id + '" data-lang="tr" data-country="tr" data-css="https://box.tvprofil.com/css/tvbox/shema3.css"><a id="tvp-tvprogram" target="_new" href="https://tvprofil.com">' + name + ' Yükleniyor...</a></div>';
+        tvLoadScript();
+    }
+}
+
+function filterCat(cat) {
+    // 📺 TV REHBERİ özel durumu
+    if (cat === 'TV_REHBERI') {
+        // Tüm kategori butonlarından active'ı kaldır
+        document.querySelectorAll('.cat-item').forEach(item => item.classList.remove('active'));
+        // TV REHBERİ butonunu aktif yap
+        const tvBtn = Array.from(document.querySelectorAll('.cat-item')).find(el => el.innerText.includes('TV REHBERİ'));
+        if (tvBtn) tvBtn.classList.add('active');
+        
+        // Haberleri gizle, TV rehberini göster
+        buildTVGuide();
+        
+        // Source bar'ı gizle
+        document.getElementById('sourceBar').style.display = 'none';
+        document.body.classList.add('tv-guide-active');
+        return;
+    }
+    
+    // Normal kategoriler için
+    document.body.classList.remove('tv-guide-active');
+    document.getElementById('sourceBar').style.display = '';
+    
+    const items = document.querySelectorAll('.cat-item');
+    items.forEach(item => item.classList.remove('active'));
+
+    items.forEach(item => {
+        if (item.innerText.trim() === cat) {
+            item.classList.add('active');
+        }
+    });
+
+    console.log("Seçilen yeni kategori:", cat);
+
+    // Kategori değişince scroll'u en başa al
+    const newsFeed = document.getElementById('newsFeed');
+    if (newsFeed) {
+        newsFeed.scrollTop = 0;
+    }
+
+    render(); 
+}
+
+function render() {
+    const f = document.getElementById('newsFeed');
+    if(!f) return;
+
+    const activeBtn = document.querySelector('.cat-item.active');
+    const currentCategory = activeBtn ? activeBtn.innerText.trim().toUpperCase() : "TÜMÜ";
+
+    // Kategoriye göre filtrele
+    let filteredNews = news.filter(n => {
+        if (currentCategory === "TÜMÜ") return true;
+        const haberKategorisi = n.category ? n.category.trim().toUpperCase() : "";
+        return haberKategorisi === currentCategory;
+    });
+
+    // YENİ: Kaynak filtresini uygula
+    if (activeSourceFilter) {
+        filteredNews = filteredNews.filter(n => n.source === activeSourceFilter);
+    }
+
+    // SIRALAMA UYGULA
+    filteredNews = sortNews(filteredNews);
+
+    if (filteredNews.length === 0) {
+        f.innerHTML = `
+            <div style="text-align:center; padding:50px; color:var(--text);">
+                <div style="font-size:48px; margin-bottom:20px;">📂</div>
+                <div style="font-size:18px; font-weight:600;">${currentCategory} kategorisinde haber yok</div>
+                <div style="font-size:14px; color:var(--muted); margin-top:10px;">Farklı bir kategori seçmeyi dene</div>
+            </div>`;
+        return;
+    }
+
+    const displayedNews = filteredNews.slice(0, visibleCount);
+
+    f.innerHTML = displayedNews.map((n) => {
+        const realIdx = news.findIndex(x => x.title === n.title);
+
+        // Tarihi formatla
+        let displayDate = '';
+        if (n.pubDate) {
+            const d = new Date(n.pubDate);
+            if (!isNaN(d.getTime())) {
+                displayDate = d.toLocaleDateString('tr-TR', { 
+                    day: 'numeric', 
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } else {
+                displayDate = n.pubDate.substring(0, 16);
+            }
+        }
+
+    return `
+    <div class="news-card" onclick="openDetail(${realIdx})">
+        <img src="${n.thumbnail || 'https://mmt8129.github.io/Gem/rsslogo.png'}" 
+             onerror="this.onerror=null; this.src='https://mmt8129.github.io/Gem/rsslogo.png';"
+             loading="lazy">
+        <div style="flex:1">
+            <div class="news-meta">
+                <span class="news-source-badge" onclick="event.stopPropagation(); openSourceNewsList('${n.source.replace(/'/g, "\\'")}')">${n.source}</span>
+                <span class="news-date-badge">${displayDate || 'Tarih yok'}</span>
+                <span style="background:rgba(239,68,68,0.2); color:#ef4444; padding:4px 8px; border-radius:12px; font-size:0.65rem; font-weight:700; margin-left:auto;">${n.category}</span>
+            </div>
+            <div class="news-title">${n.title}</div>
+        </div>
+    </div>`;
+    }).join('');
+
+    if (filteredNews.length > visibleCount) {
+        f.innerHTML += `
+            <div id="loadMoreArea" style="text-align:center; padding:20px 10px 40px 10px;">
+                <button class="btn-full" style="background:var(--primary); color:white; font-weight:bold; padding:16px; border-radius:30px;" onclick="loadMoreNews()">
+                    ➕ DAHA FAZLA GÖSTER (${filteredNews.length - visibleCount} HABER DAHA)
+                </button>
+            </div>`;
+    }
+}
+
+function closeSearch() {
+    activeSearchQuery = null;
+
+    // Stack'ten search modalını çıkar
+    if (modalStack.length > 0 && modalStack[modalStack.length - 1].type === 'search') {
+        modalStack.pop();
+    }
+
+    // Eğer stack'te başka modal varsa onu göster
+    if (modalStack.length > 0) {
+        const lastModal = modalStack[modalStack.length - 1];
+        if (lastModal.type === 'sourceList' && lastModal.sourceName) {
+            openSourceNewsList(lastModal.sourceName);
+        } else if (lastModal.type === 'newsDetail' && lastModal.newsItem) {
+            active = lastModal.newsItem;
+            openDetail(-2);
+        } else if (lastModal.type === 'settings') {
+            openSettings();
+        } else if (lastModal.type === 'rssManager') {
+            openRSSManager();
+        } else if (lastModal.type === 'savedList') {
+            openSavedList();
+        } else {
+            document.getElementById('ovl').style.display = 'none';
+            document.getElementById('mdl').classList.remove('fullscreen-chat');
+            document.body.style.overflow = '';
+        }
+    } else {
+        document.getElementById('ovl').style.display = 'none';
+        document.getElementById('mdl').classList.remove('fullscreen-chat');
+        document.body.style.overflow = '';
+    }
+}
+
+function loadMoreNews() {
+    const artisMiktari = (sets && sets.newsLimit) ? sets.newsLimit : 10;
+    visibleCount += artisMiktari;
+    render();
+}
+
+function getBestImage(item, sourceName) {
+    if (item.enclosure && item.enclosure.link) return item.enclosure.link;
+    if (item.thumbnail) return item.thumbnail;
+
+    if (item.description && item.description.includes('<img')) {
+        const match = /<img[^>]+src="([^">]+)"/g.exec(item.description);
+        if (match && match[1]) return match[1];
+    }
+
+    let kaynakLogosu = "";
+    Object.values(rssListesi).forEach(r => {
+        if(r.ad === sourceName) kaynakLogosu = r.logo;
+    });
+
+    return kaynakLogosu || `https://ui-avatars.com/api/?name=${sourceName}&background=random&color=fff&size=200`;
+}
+
+function openSettings(fromStack = false) {
+    const m = document.getElementById('mdl');
+    m.classList.remove('fullscreen-chat');
+    m.innerHTML = `
+        <div class="modal-header">
+            <h2>AYARLAR</h2>
+            <button class="btn-icon" onclick="event.stopPropagation(); closeSettingsModal()" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="set-row">
+                <div class="set-label">Haber Başlık Boyutu</div>
+                <div class="set-ctrl">
+                    <button onclick="changeSet('size', -1)">−</button>
+                    <span>${sets.size}px</span>
+                    <button onclick="changeSet('size', 1)">+</button>
+                </div>
+            </div>
+            <div class="set-row">
+                <div class="set-label">Haber Başlık Kalınlığı</div>
+                <div class="set-ctrl">
+                    <button onclick="changeSet('weight', -100)">−</button>
+                    <span>${sets.weight}</span>
+                    <button onclick="changeSet('weight', 100)">+</button>
+                </div>
+            </div>
+            <div class="set-row">
+                <div class="set-label">İçerik Boyutu</div>
+                <div class="set-ctrl">
+                    <button onclick="changeSet('speed', -1)">−</button>
+                    <span>${sets.speed}px</span>
+                    <button onclick="changeSet('speed', 1)">+</button>
+                </div>
+            </div>
+            <div class="set-row">
+                <div class="set-label">Gösterilecek Haber Sayısı</div>
+                <div class="set-ctrl">
+                    <button onclick="changeSet('newsLimit', -5)">−</button>
+                    <span>${sets.newsLimit}</span>
+                    <button onclick="changeSet('newsLimit', 5)">+</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById('ovl').style.display = 'flex';
+}
+
+function changeSet(key, delta) {
+    if (key === 'size') sets.size = Math.max(10, Math.min(30, sets.size + delta));
+    if (key === 'weight') sets.weight = Math.max(300, Math.min(900, sets.weight + delta));
+    if (key === 'speed') sets.speed = Math.max(10, Math.min(24, sets.speed + delta));
+    if (key === 'newsLimit') sets.newsLimit = Math.max(5, Math.min(50, sets.newsLimit + delta));
+    
+    localStorage.setItem('khoj_sets', JSON.stringify(sets));
+    applySets();
+    openSettings();
+}
+
+function applySets() {
+    document.documentElement.style.setProperty('--news-size', sets.size + 'px');
+    document.documentElement.style.setProperty('--news-weight', sets.weight);
+    document.documentElement.style.setProperty('--content-size', sets.speed + 'px');
+    visibleCount = sets.newsLimit;
+}
+
+function closeSettingsModal() {
+    document.getElementById('ovl').style.display = 'none';
+}
+
+// Toast bildirimi
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.innerText = msg;
+    toast.style.opacity = '1';
+    setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+}
+
+// Kaynak barını oluştur
+function buildSourceBar() {
+    const sourceBar = document.getElementById('sourceBar');
+    if (!sourceBar) return;
+    
+    const sources = [...new Set(news.map(n => n.source))].sort();
+    
+    sourceBar.innerHTML = '<div class="source-item active" onclick="filterSource(null)">TÜM KAYNAKLAR</div>' +
+        sources.map(s => `<div class="source-item" onclick="filterSource('${s.replace(/'/g, "\\'")}')">${s}</div>`).join('');
+}
+
+function filterSource(source) {
+    activeSourceFilter = source;
+    
+    // Butonları güncelle
+    document.querySelectorAll('.source-item').forEach(item => {
+        item.classList.remove('active');
+        if ((source === null && item.innerText === 'TÜM KAYNAKLAR') || 
+            (source !== null && item.innerText === source)) {
+            item.classList.add('active');
+        }
+    });
+    
+    document.getElementById('newsFeed').scrollTop = 0;
+    render();
+}
+
+// Genel sohbet modalı
+function openGeneralChat() {
+    const m = document.getElementById('mdl');
+    m.classList.add('fullscreen-chat');
+    m.innerHTML = `
+        <div class="modal-header">
+            <h2>✨ Grok ile Sohbet</h2>
+            <button class="btn-icon" onclick="closeChat()" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="chat-box" id="cBox"></div>
+        </div>
+        <div class="modal-footer" style="display:flex; gap:10px;">
+            <textarea id="uInp" placeholder="Mesajınızı yazın..." onkeypress="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); sendMsg(); }"></textarea>
+            <button class="btn-icon btn-gemini" onclick="sendMsg()" style="width:44px; height:44px;">➤</button>
+        </div>
+    `;
+    document.getElementById('ovl').style.display = 'flex';
+    
+    setTimeout(() => {
+        const cBox = document.getElementById('cBox');
+        if (cBox && chatHistory.length === 0) {
+            cBox.innerHTML = '<div class="msg ai">Merhaba! Size nasıl yardımcı olabilirim?</div>';
+        } else if (cBox && chatHistory.length > 0) {
+            cBox.innerHTML = chatHistory.map(msg => 
+                `<div class="msg ${msg.role}">${msg.content}</div>`
+            ).join('');
+        }
+        setupScrollListener();
+        focusInput();
+    }, 100);
+}
+
+function closeChat() {
+    document.getElementById('ovl').style.display = 'none';
+    document.getElementById('mdl').classList.remove('fullscreen-chat');
+}
+
+async function sendMsg() {
+    const inp = document.getElementById('uInp');
+    const box = document.getElementById('cBox');
+    if (!inp || !box) return;
+    
+    const text = inp.value.trim();
+    if (!text) return;
+    
+    inp.value = '';
+    
+    // Kullanıcı mesajını ekle
+    box.innerHTML += `<div class="msg user">${text}</div>`;
+    chatHistory.push({ role: 'user', content: text });
+    localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory));
+    
+    scrollToBottom();
+    showTypingIndicator();
+    
+    try {
+        const grokKey = decryptAPIKey(ENCRYPTED_GROK_KEY);
+        const response = await fetch(PROXY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                apiKey: grokKey,
+                messages: chatHistory.slice(-10)
+            })
+        });
+        
+        const data = await response.json();
+        hideTypingIndicator();
+        
+        if (data.choices && data.choices[0]) {
+            const aiMsg = data.choices[0].message.content;
+            box.innerHTML += `<div class="msg ai">${aiMsg}</div>`;
+            chatHistory.push({ role: 'assistant', content: aiMsg });
+            localStorage.setItem('khoj_ai_history', JSON.stringify(chatHistory));
+        }
+    } catch (e) {
+        hideTypingIndicator();
+        box.innerHTML += '<div class="msg ai">⚠️ Bağlantı hatası oluştu.</div>';
+    }
+    
+    scrollToBottom();
+    focusInput();
+}
+
+// Ana input handler
+function handleMainInput() {
+    const inp = document.getElementById('mainInp');
+    if (!inp) return;
+    
+    const text = inp.value.trim();
+    if (!text) return;
+    
+    inp.value = '';
+    
+    if (text.startsWith('*') && text.endsWith('*')) {
+        // Haber arama
+        const query = text.slice(1, -1).trim();
+        searchNews(query);
+    } else {
+        // Sohbete yönlendir
+        openGeneralChat();
+        setTimeout(() => {
+            const uInp = document.getElementById('uInp');
+            if (uInp) {
+                uInp.value = text;
+                sendMsg();
+            }
+        }, 300);
+    }
+}
+
+function searchNews(query) {
+    activeSearchQuery = query.toLowerCase();
+    showToast(`🔍 "${query}" aranıyor...`);
+    
+    // TÜMÜ kategorisine geç
+    document.querySelectorAll('.cat-item').forEach(item => item.classList.remove('active'));
+    const tumuBtn = Array.from(document.querySelectorAll('.cat-item')).find(el => el.innerText === 'TÜMÜ');
+    if (tumuBtn) tumuBtn.classList.add('active');
+    
+    document.getElementById('sourceBar').style.display = '';
+    document.body.classList.remove('tv-guide-active');
+    
+    const filtered = news.filter(n => 
+        n.title.toLowerCase().includes(activeSearchQuery) ||
+        (n.source && n.source.toLowerCase().includes(activeSearchQuery))
+    );
+    
+    const f = document.getElementById('newsFeed');
+    f.scrollTop = 0;
+    
+    if (filtered.length === 0) {
+        f.innerHTML = `<div style="text-align:center; padding:50px; color:var(--text);">🔍 "${query}" için sonuç bulunamadı</div>`;
+        return;
+    }
+    
+    f.innerHTML = filtered.map((n, i) => {
+        const realIdx = news.findIndex(x => x.title === n.title);
+        let displayDate = '';
+        if (n.pubDate) {
+            const d = new Date(n.pubDate);
+            if (!isNaN(d.getTime())) {
+                displayDate = d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+            }
+        }
+        return `
+        <div class="news-card" onclick="openDetail(${realIdx})">
+            <img src="${n.thumbnail || 'https://mmt8129.github.io/Gem/rsslogo.png'}" 
+                 onerror="this.onerror=null; this.src='https://mmt8129.github.io/Gem/rsslogo.png';"
+                 loading="lazy">
+            <div>
+                <div class="news-meta">
+                    <span class="news-source-badge">${n.source}</span>
+                    <span class="news-date-badge">${displayDate || 'Tarih yok'}</span>
+                </div>
+                <div class="news-title">${n.title}</div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function openDetail(index) {
+    if (index < 0 || index >= news.length) return;
+    const item = news[index];
+    active = index;
+    
+    const m = document.getElementById('mdl');
+    m.classList.remove('fullscreen-chat');
+    
+    let displayDate = '';
+    if (item.pubDate) {
+        const d = new Date(item.pubDate);
+        if (!isNaN(d.getTime())) {
+            displayDate = d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+    }
+    
+    m.innerHTML = `
+        <div class="modal-header">
+            <h2>${item.title}</h2>
+            <div class="btn-icon-group">
+                <button class="btn-icon" onclick="openDetailInChat()" title="Sohbette Aç">💬</button>
+                <span class="btn-icon-divider"></span>
+                <button class="btn-icon" onclick="window.open('${item.link}', '_blank')" title="Kaynağa Git">🔗</button>
+                <button class="btn-icon" onclick="event.stopPropagation(); closeDetail()" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="news-meta">
+                <span class="news-source-badge">${item.source}</span>
+                <span class="news-date-badge">${displayDate || 'Tarih yok'}</span>
+                <span style="background:rgba(239,68,68,0.2); color:#ef4444; padding:4px 8px; border-radius:12px; font-size:0.65rem; font-weight:700;">${item.category}</span>
+            </div>
+            <img src="${item.thumbnail || 'https://mmt8129.github.io/Gem/rsslogo.png'}" 
+                 style="width:100%; border-radius:16px; margin:10px 0;"
+                 onerror="this.onerror=null; this.src='https://mmt8129.github.io/Gem/rsslogo.png';">
+            <div id="dynamicContent">
+                <p>Haberin tam içeriğini okumak için kaynağa gidebilirsiniz.</p>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('ovl').style.display = 'flex';
+}
+
+function closeDetail() {
+    document.getElementById('ovl').style.display = 'none';
+}
+
+function openDetailInChat() {
+    if (active === null || !news[active]) return;
+    const item = news[active];
+    
+    const m = document.getElementById('mdl');
+    m.classList.add('fullscreen-chat');
+    m.innerHTML = `
+        <div class="modal-header">
+            <h2>💬 Haber Hakkında Sohbet</h2>
+            <button class="btn-icon" onclick="closeChat()" style="background:rgba(239,68,68,0.2); color:#ef4444;">✕</button>
+        </div>
+        <div class="modal-body">
+            <div style="padding:10px; background:var(--card-bg); border-radius:12px; margin-bottom:10px; font-size:0.85rem; color:var(--muted);">
+                📰 <b>${item.source}</b> - ${item.title}
+            </div>
+            <div class="chat-box" id="cBox">
+                <div class="msg ai">Bu haber hakkında konuşabiliriz: "${item.title}". Ne öğrenmek istersiniz?</div>
+            </div>
+        </div>
+        <div class="modal-footer" style="display:flex; gap:10px;">
+            <textarea id="uInp" placeholder="Haber hakkında soru sor..." onkeypress="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); sendMsg(); }"></textarea>
+            <button class="btn-icon btn-gemini" onclick="sendMsg()" style="width:44px; height:44px;">➤</button>
+        </div>
+    `;
+    
+    chatHistory = [
+        { role: 'system', content: `Kullanıcı şu haber hakkında soru soruyor: "${item.title}" - Kaynak: ${item.source}` }
+    ];
+    
+    setTimeout(() => {
+        setupScrollListener();
+        focusInput();
+    }, 100);
+}
+
+function openSavedList() {
+    showToast('💾 Kaydedilenler (Yapım aşamasında)');
+}
+
+function openSourceNewsList(sourceName) {
+    activeSourceFilter = sourceName;
+    
+    document.querySelectorAll('.cat-item').forEach(item => item.classList.remove('active'));
+    const tumuBtn = Array.from(document.querySelectorAll('.cat-item')).find(el => el.innerText === 'TÜMÜ');
+    if (tumuBtn) tumuBtn.classList.add('active');
+    
+    document.getElementById('sourceBar').style.display = '';
+    document.body.classList.remove('tv-guide-active');
+    
+    // Source bar butonlarını güncelle
+    document.querySelectorAll('.source-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.innerText === sourceName) item.classList.add('active');
+    });
+    
+    document.getElementById('newsFeed').scrollTop = 0;
+    render();
+    showToast(`📰 ${sourceName} haberleri`);
+}
+
+// Placeholder fonksiyonlar
+function openRSSManager() {
+    showToast('RSS Yöneticisi (Yapım aşamasında)');
+}
+
+function closeImageViewer(event) {
+    if (event.target === document.getElementById('imageViewer')) {
+        document.getElementById('imageViewer').classList.remove('show');
+    }
+}
+
+function closeViewer() {
+    document.getElementById('imageViewer').classList.remove('show');
+}
+
+function navigateGallery(dir) {
+    // Placeholder
+}
+
+function downloadCurrentImage(event) {
+    event.stopPropagation();
+    // Placeholder
+}
+
+</script>
+</body>
+</html>
