@@ -740,8 +740,9 @@ if (disabledSources.includes(id)) continue;
                 updateCarouselUI(total); };
             window.prevSlide = () => { carouselIndex = (carouselIndex - 1 + total) % total;
                 updateCarouselUI(total); };
+            
             function startTimer() { clearInterval(carouselTimer);
-                carouselTimer = setInterval(() => nextSlide(), 7000); }
+                carouselTimer = setInterval(() => nextSlide(), 990000); }
             startTimer();
         }
 
