@@ -24,7 +24,6 @@
             --danger: #dc3545;
             --success: #198754;
             --star: #f0c040;
-            --header-h: auto;
         }
 
         * {
@@ -38,13 +37,14 @@
             height: 100%;
             height: 100dvh;
             overflow: hidden;
+            position: fixed;
+            width: 100%;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg);
             color: var(--text);
-            height: 100dvh;
             max-width: 480px;
             margin: 0 auto;
             display: flex;
@@ -810,7 +810,7 @@
 <body>
 
     <!-- ANA SAYFA -->
-    <div id="mainPage">
+    <div id="mainPage" style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
         <header class="header">
             <div class="header-top">
                 <span class="header-title" onclick="openSettingsModal()">📰 Haber Akışı</span>
@@ -1137,7 +1137,6 @@
             document.getElementById('detailText').innerHTML =
                 '<p style="color:var(--text-muted);">İçerik yükleniyor...</p>';
 
-            // Reset AI banner
             document.getElementById('aiBannerBody').innerHTML = '';
             document.getElementById('aiBannerBody').classList.remove('show');
             document.getElementById('aiChatRow').classList.remove('show');
@@ -1149,7 +1148,6 @@
 
             updateDetailStarBtn();
 
-            // Fetch full content
             if (n.link) {
                 fetch(PROXY_URL + encodeURIComponent(n.link))
                     .then(r => r.text())
@@ -1194,10 +1192,8 @@
         function toggleDetailStar() {
             if (!currentDetailNews) return;
             if (detailStarred) {
-                savedNews = savedNews.filter(s => !(s.title === currentDetailNews.title && s.link === currentDetailNews
-                    .link));
+                savedNews = savedNews.filter(s => !(s.title === currentDetailNews.title && s.link === currentDetailNews.link));
             } else {
-                // Tam içerik + AI özetiyle kaydet
                 const toSave = {
                     ...currentDetailNews,
                     savedAt: new Date().toISOString(),
@@ -1247,16 +1243,13 @@
             btn.disabled = true;
             btn.textContent = 'Özetleniyor...';
 
-            // Auto-expand
             aiBannerOpen = true;
             banner.classList.add('expanded');
             body.classList.add('show');
-            body.innerHTML =
-                '<div class="ai-summary-loading"><div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> AI düşünüyor...</div>';
+            body.innerHTML = '<div class="ai-summary-loading"><div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> AI düşünüyor...</div>';
 
             const fullContent = detailContentText || currentDetailNews.description || '';
-            const prompt =
-                `Aşağıdaki haberi, en önemli 3-5 madde halinde, her madde en fazla 1 cümle olacak şekilde, Türkçe olarak özetle. Her maddenin başına "🔹" koy:\n\nBaşlık: ${currentDetailNews.title}\n\nİçerik: ${fullContent}`;
+            const prompt = `Aşağıdaki haberi, en önemli 3-5 madde halinde, her madde en fazla 1 cümle olacak şekilde, Türkçe olarak özetle. Her maddenin başına "🔹" koy:\n\nBaşlık: ${currentDetailNews.title}\n\nİçerik: ${fullContent}`;
 
             try {
                 const res = await fetch(`${GEMINI_URL}?key=${decryptAPIKey(ENCRYPTED_KEY)}`, {
@@ -1279,9 +1272,7 @@
                 chatRow.classList.add('show');
                 document.getElementById('aiChatInput').focus();
 
-                // Kaydedilmiş haberse AI özetini güncelle
-                const savedIdx = savedNews.findIndex(s => s.title === currentDetailNews.title && s.link ===
-                    currentDetailNews.link);
+                const savedIdx = savedNews.findIndex(s => s.title === currentDetailNews.title && s.link === currentDetailNews.link);
                 if (savedIdx !== -1) {
                     savedNews[savedIdx].aiSummary = aiSummaryText;
                     savedNews[savedIdx].fullContent = detailContentText;
@@ -1304,16 +1295,14 @@
             body.innerHTML += `<p style="font-weight:600;margin-top:10px;color:var(--accent);">🟢 Sen: ${text}</p>`;
             input.value = '';
             const typingId = 'aiTyping-' + Date.now();
-            body.innerHTML +=
-                `<div class="ai-summary-loading" id="${typingId}"><div class="spinner" style="width:14px;height:14px;border-width:2px;"></div> Düşünüyor...</div>`;
+            body.innerHTML += `<div class="ai-summary-loading" id="${typingId}"><div class="spinner" style="width:14px;height:14px;border-width:2px;"></div> Düşünüyor...</div>`;
             body.scrollTop = body.scrollHeight;
             const banner = document.getElementById('aiBanner');
             banner.classList.add('expanded');
             aiBannerOpen = true;
 
             const fullContent = detailContentText || currentDetailNews.description || '';
-            const prompt =
-                `Aşağıdaki haber içeriğine dayanarak sorulan soruyu Türkçe olarak cevapla. Kısa ve net ol:\n\nHaber Başlığı: ${currentDetailNews.title}\n\nHaber İçeriği: ${fullContent}\n\nAI Özeti: ${aiSummaryText}\n\nSoru: ${text}`;
+            const prompt = `Aşağıdaki haber içeriğine dayanarak sorulan soruyu Türkçe olarak cevapla. Kısa ve net ol:\n\nHaber Başlığı: ${currentDetailNews.title}\n\nHaber İçeriği: ${fullContent}\n\nAI Özeti: ${aiSummaryText}\n\nSoru: ${text}`;
 
             try {
                 const res = await fetch(`${GEMINI_URL}?key=${decryptAPIKey(ENCRYPTED_KEY)}`, {
@@ -1331,8 +1320,7 @@
                 }
                 const typing = document.getElementById(typingId);
                 if (typing) typing.remove();
-                body.innerHTML +=
-                    `<p style="background:var(--accent-light);padding:10px;border-radius:8px;margin-top:4px;">🤖 ${cevap}</p>`;
+                body.innerHTML += `<p style="background:var(--accent-light);padding:10px;border-radius:8px;margin-top:4px;">🤖 ${cevap}</p>`;
                 body.scrollTop = body.scrollHeight;
             } catch (e) {
                 const typing = document.getElementById(typingId);
@@ -1379,15 +1367,12 @@
             document.getElementById('detailTitle').textContent = n.title;
             document.getElementById('detailMeta').textContent = n.source + ' · Kaydedildi';
 
-            // Tam içeriği göster
             if (detailContentText) {
-                document.getElementById('detailText').innerHTML = detailContentText.split('\n\n').map(p =>
-                    `<p>${p}</p>`).join('');
+                document.getElementById('detailText').innerHTML = detailContentText.split('\n\n').map(p => `<p>${p}</p>`).join('');
             } else {
                 document.getElementById('detailText').innerHTML = '<p>' + (n.description || '') + '</p>';
             }
 
-            // AI özetini göster
             const body = document.getElementById('aiBannerBody');
             const chatRow = document.getElementById('aiChatRow');
             const banner = document.getElementById('aiBanner');
@@ -1457,7 +1442,7 @@
             renderNewsList();
         }
 
-        // ==================== RSS MODAL (scroll korumalı) ====================
+        // ==================== RSS MODAL ====================
         function openRSSModal() {
             let html = '';
             if (Object.keys(rssData).length === 0) {
@@ -1482,9 +1467,8 @@
             showModal('📡 RSS Kaynakları', html, [
                 { text: '+ Ekle', onClick: 'openAddRSS()' },
                 { text: 'Kapat', onClick: 'closeModal()', primary: true }
-            ], true);
+            ]);
 
-            // Scroll pozisyonunu geri yükle
             setTimeout(() => {
                 const modalBody = document.querySelector('#modalContainer .modal-body');
                 if (modalBody && rssModalScrollPos > 0) {
@@ -1563,7 +1547,6 @@
         }
 
         function toggleRSS(id) {
-            // Scroll pozisyonunu kaydet
             const modalBody = document.querySelector('#modalContainer .modal-body');
             if (modalBody) {
                 rssModalScrollPos = modalBody.scrollTop;
@@ -1576,7 +1559,6 @@
             }
             localStorage.setItem('haberai_disabled', JSON.stringify(disabledSources));
 
-            // Butonu anında güncelle, sayfayı yenileme
             const toggleBtn = document.getElementById('toggle-btn-' + id);
             const isDisabled = disabledSources.includes(id);
             if (toggleBtn) {
@@ -1588,7 +1570,7 @@
         }
 
         // ==================== MODAL SYSTEM ====================
-        function showModal(title, bodyHTML, buttons, keepScroll) {
+        function showModal(title, bodyHTML, buttons) {
             const container = document.getElementById('modalContainer');
             const footerHTML = buttons.map(b => {
                 const cls = b.primary ? ' btn-primary' : (b.danger ? ' btn-danger' : '');
@@ -1634,14 +1616,13 @@
             if (e.target === this) closeModal();
         });
 
-        // Search input clear on empty
         document.getElementById('searchInput').addEventListener('input', function() {
             if (!this.value.trim() && searchMode) {
                 clearSearch();
             }
         });
 
-                // ==================== PWA ====================
+        // ==================== PWA ====================
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/Gem/sw.js').catch(() => {});
         }
