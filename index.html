@@ -33,7 +33,8 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        html, body {
+        html,
+        body {
             height: 100%;
             height: 100dvh;
             overflow: hidden;
@@ -52,7 +53,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* MAIN PAGE */
         #mainPage {
             display: flex;
             flex-direction: column;
@@ -61,7 +61,6 @@
             overflow: hidden;
         }
 
-        /* HEADER */
         .header {
             flex-shrink: 0;
             padding: 12px 16px 8px;
@@ -122,7 +121,6 @@
             display: block;
         }
 
-        /* SEARCH BAR */
         .search-bar {
             display: flex;
             gap: 6px;
@@ -158,7 +156,6 @@
             color: #fff;
         }
 
-        /* CATEGORY NAV */
         .category-nav {
             display: flex;
             gap: 4px;
@@ -190,7 +187,6 @@
             border-color: var(--text);
         }
 
-        /* NEWS LIST */
         .news-list {
             flex: 1;
             overflow-y: auto;
@@ -245,7 +241,6 @@
             margin-top: 4px;
         }
 
-        /* EMPTY / LOADING */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -272,7 +267,6 @@
             }
         }
 
-        /* LOAD MORE */
         .load-more {
             text-align: center;
             padding: 20px;
@@ -294,7 +288,6 @@
             color: #fff;
         }
 
-        /* SEARCH RESULTS */
         .search-results {
             padding: 8px 0;
         }
@@ -338,7 +331,6 @@
             margin-top: 2px;
         }
 
-        /* DETAIL PAGE */
         .detail-page {
             position: fixed;
             inset: 0;
@@ -433,7 +425,6 @@
             margin-bottom: 12px;
         }
 
-        /* AI BANNER */
         .ai-banner {
             position: fixed;
             bottom: 0;
@@ -478,8 +469,13 @@
             animation: pulse 2s infinite;
         }
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
         }
         .btn-summarize {
             font-size: 0.68rem;
@@ -565,7 +561,6 @@
             border-color: var(--accent);
         }
 
-        /* MODAL */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -590,8 +585,12 @@
             animation: slideUp 0.3s ease;
         }
         @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
         }
         .modal-header {
             display: flex;
@@ -631,7 +630,6 @@
             flex-shrink: 0;
         }
 
-        /* FORMS */
         .form-group {
             margin-bottom: 14px;
         }
@@ -644,7 +642,8 @@
             margin-bottom: 6px;
             display: block;
         }
-        .form-input, .form-select {
+        .form-input,
+        .form-select {
             width: 100%;
             padding: 12px 14px;
             border: 1px solid var(--border);
@@ -656,11 +655,11 @@
             outline: none;
             transition: border-color 0.2s ease;
         }
-        .form-input:focus, .form-select:focus {
+        .form-input:focus,
+        .form-select:focus {
             border-color: var(--accent);
         }
 
-        /* BUTTONS */
         .btn {
             font-size: 0.75rem;
             font-weight: 600;
@@ -675,10 +674,22 @@
             flex: 1;
             text-align: center;
         }
-        .btn:active { transform: scale(0.97); }
-        .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-        .btn-danger { color: var(--danger); border-color: var(--danger); }
-        .btn-danger:active { background: var(--danger); color: #fff; }
+        .btn:active {
+            transform: scale(0.97);
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        .btn-danger {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+        .btn-danger:active {
+            background: var(--danger);
+            color: #fff;
+        }
         .btn-sm {
             font-size: 0.66rem;
             padding: 6px 12px;
@@ -686,7 +697,6 @@
             letter-spacing: 0.03em;
         }
 
-        /* RSS ITEM */
         .rss-item {
             display: flex;
             align-items: center;
@@ -698,13 +708,31 @@
             gap: 10px;
             background: var(--bg);
         }
-        .rss-item-info { flex: 1; min-width: 0; }
-        .rss-item-name { font-size: 0.8rem; font-weight: 600; display: block; }
-        .rss-item-cat { font-size: 0.65rem; color: var(--accent); font-weight: 600; letter-spacing: 0.04em; }
-        .rss-item-actions { display: flex; gap: 4px; flex-shrink: 0; }
-        .rss-item-actions .btn-sm { flex: none; min-width: 32px; }
+        .rss-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .rss-item-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: block;
+        }
+        .rss-item-cat {
+            font-size: 0.65rem;
+            color: var(--accent);
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+        .rss-item-actions {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .rss-item-actions .btn-sm {
+            flex: none;
+            min-width: 32px;
+        }
 
-        /* SAVED ITEM */
         .saved-item {
             display: flex;
             align-items: center;
@@ -714,8 +742,13 @@
             cursor: pointer;
             gap: 10px;
         }
-        .saved-item:active { opacity: 0.6; }
-        .saved-item-info { flex: 1; min-width: 0; }
+        .saved-item:active {
+            opacity: 0.6;
+        }
+        .saved-item-info {
+            flex: 1;
+            min-width: 0;
+        }
         .saved-item-source {
             font-size: 0.65rem;
             font-weight: 600;
@@ -723,9 +756,11 @@
             letter-spacing: 0.04em;
             text-transform: uppercase;
         }
-        .saved-item-title { font-size: 0.82rem; font-weight: 600; }
+        .saved-item-title {
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
 
-        /* TOAST */
         .toast {
             position: fixed;
             bottom: 24px;
@@ -744,13 +779,22 @@
             pointer-events: none;
             white-space: nowrap;
         }
-        .toast.show { opacity: 1; }
+        .toast.show {
+            opacity: 1;
+        }
 
-        ::-webkit-scrollbar { width: 0; height: 0; }
+        ::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
 
         @media (display-mode: standalone) {
-            body { padding-top: env(safe-area-inset-top); }
-            .ai-banner { padding-bottom: env(safe-area-inset-bottom); }
+            body {
+                padding-top: env(safe-area-inset-top);
+            }
+            .ai-banner {
+                padding-bottom: env(safe-area-inset-bottom);
+            }
         }
     </style>
 </head>
@@ -834,12 +878,20 @@
 
         function decryptAPIKey(e) { return e.replace(/\*/g, ''); }
 
-        let news = [], rssData = {}, currentCategory = 'all',
+        let news = [],
+            rssData = {},
+            currentCategory = 'all',
             visibleCount = parseInt(localStorage.getItem('haberai_visible_count') || '10'),
             savedNews = JSON.parse(localStorage.getItem('haberai_saved') || '[]'),
             disabledSources = JSON.parse(localStorage.getItem('haberai_disabled') || '[]'),
-            currentDetailNews = null, detailStarred = false, searchMode = false, searchResults = [],
-            aiBannerOpen = false, aiSummaryText = '', detailContentText = '', rssModalScrollPos = 0;
+            currentDetailNews = null,
+            detailStarred = false,
+            searchMode = false,
+            searchResults = [],
+            aiBannerOpen = false,
+            aiSummaryText = '',
+            detailContentText = '',
+            rssModalScrollPos = 0;
 
         const CATEGORIES = ['TÜMÜ', 'TÜRKİYE', 'DÜNYA', 'GÜNDEM', 'TEKNOLOJİ', 'SPOR', 'OTOMOBİL', 'DİĞER'];
 
@@ -861,14 +913,20 @@
 
         async function fetchAllNews() {
             news = [];
-            const ck = 'haberai_news_cache_v4', ctk = 'haberai_news_time_v4';
-            const cached = localStorage.getItem(ck), ct = localStorage.getItem(ctk), now = Date.now();
-            if (cached && ct && (now - ct < 30 * 60 * 1000)) { news = JSON.parse(cached); renderNewsList(); return; }
+            const ck = 'haberai_news_cache_v4',
+                ctk = 'haberai_news_time_v4';
+            const cached = localStorage.getItem(ck),
+                ct = localStorage.getItem(ctk),
+                now = Date.now();
+            if (cached && ct && (now - ct < 30 * 60 * 1000)) { news = JSON.parse(cached);
+                renderNewsList(); return; }
             if (Object.keys(rssData).length === 0) {
-                document.getElementById('newsList').innerHTML = '<div class="empty-state">Henüz RSS kaynağı eklenmedi.<br>Başlığa tıklayarak ekleyebilirsiniz.</div>';
+                document.getElementById('newsList').innerHTML =
+                    '<div class="empty-state">Henüz RSS kaynağı eklenmedi.<br>Başlığa tıklayarak ekleyebilirsiniz.</div>';
                 return;
             }
-            document.getElementById('newsList').innerHTML = '<div class="loading"><div class="spinner"></div>Haberler yükleniyor...</div>';
+            document.getElementById('newsList').innerHTML =
+                '<div class="loading"><div class="spinner"></div>Haberler yükleniyor...</div>';
             const active = Object.entries(rssData).filter(([id]) => !disabledSources.includes(id));
             await Promise.all(active.map(async ([id, r]) => {
                 try {
@@ -877,19 +935,26 @@
                     const doc = new DOMParser().parseFromString(xml, 'text/xml');
                     doc.querySelectorAll('item, entry').forEach(el => {
                         const t = el.querySelector('title')?.textContent?.trim() || '';
-                        const l = el.querySelector('link')?.textContent || el.querySelector('link')?.getAttribute('href') || '';
-                        const d = el.querySelector('pubDate')?.textContent || el.querySelector('dc\\:date')?.textContent || '';
+                        const l = el.querySelector('link')?.textContent || el.querySelector('link')
+                            ?.getAttribute('href') || '';
+                        const d = el.querySelector('pubDate')?.textContent || el.querySelector(
+                            'dc\\:date')?.textContent || '';
                         const desc = el.querySelector('description')?.textContent || '';
                         let img = '';
                         const mc = el.querySelector('media\\:content');
                         if (mc) img = mc.getAttribute('url') || '';
                         if (!img) {
                             const enc = el.querySelector('enclosure');
-                            if (enc && enc.getAttribute('type')?.startsWith('image/')) img = enc.getAttribute('url') || '';
+                            if (enc && enc.getAttribute('type')?.startsWith('image/')) img = enc
+                                .getAttribute('url') || '';
                         }
-                        if (!img && desc) { const m = desc.match(/<img[^>]+src=["']([^"']+)["'][^>]*>/i); if (m) img = m[1]; }
+                        if (!img && desc) { const m = desc.match(
+                                /<img[^>]+src=["']([^"']+)["'][^>]*>/i); if (m) img = m[1]; }
                         if (!img && r.logo) img = r.logo;
-                        if (t.length > 5) news.push({ id: 'n' + Date.now() + Math.random().toString(36).substr(2, 6), title: t, link: l, source: r.ad, category: r.kategori || 'DİĞER', date: d, pubDate: d, thumbnail: img, image: img, description: desc.replace(/<[^>]*>/g, '').substring(0, 200) });
+                        if (t.length > 5) news.push({ id: 'n' + Date.now() + Math.random().toString(36)
+                                .substr(2, 6), title: t, link: l, source: r.ad, category: r.kategori ||
+                                'DİĞER', date: d, pubDate: d, thumbnail: img, image: img,
+                                description: desc.replace(/<[^>]*>/g, '').substring(0, 200) });
                     });
                 } catch (e) {}
             }));
@@ -899,24 +964,32 @@
             renderNewsList();
         }
 
-        function refreshNews() { localStorage.removeItem('haberai_news_cache_v4'); fetchAllNews(); showToast('🔄 Yenilendi'); }
+        function refreshNews() { localStorage.removeItem('haberai_news_cache_v4');
+            fetchAllNews();
+            showToast('🔄 Yenilendi'); }
 
         function doSearch() {
             const q = document.getElementById('searchInput').value.trim().toLowerCase();
-            if (!q) { searchMode = false; renderNewsList(); return; }
+            if (!q) { searchMode = false;
+                renderNewsList(); return; }
             searchMode = true;
-            searchResults = news.filter(n => n.title.toLowerCase().includes(q) || n.source.toLowerCase().includes(q) || (n.description && n.description.toLowerCase().includes(q)));
+            searchResults = news.filter(n => n.title.toLowerCase().includes(q) || n.source.toLowerCase().includes(
+                q) || (n.description && n.description.toLowerCase().includes(q)));
             renderSearchResults(q);
         }
 
         function renderSearchResults(q) {
             const list = document.getElementById('newsList');
-            if (!searchResults.length) { list.innerHTML = `<div class="search-result-count">"${q}" için 0 sonuç</div><div class="empty-state">Eşleşen haber bulunamadı.</div>`; return; }
-            list.innerHTML = `<div class="search-result-count">"${q}" için ${searchResults.length} sonuç</div><div class="search-results">${searchResults.map(n => `<div class="search-result-item" onclick="openDetail('${n.id}')">${n.thumbnail ? `<img class="search-result-img" src="${n.thumbnail}" loading="lazy" onerror="this.style.display='none';">` : ''}<div><div class="search-result-title">${n.title}</div><div class="search-result-source">${n.source} · ${timeAgo(n.date)}</div></div></div>`).join('')}</div>`;
+            if (!searchResults.length) { list.innerHTML =
+                    `<div class="search-result-count">"${q}" için 0 sonuç</div><div class="empty-state">Eşleşen haber bulunamadı.</div>`; return; }
+            list.innerHTML =
+                `<div class="search-result-count">"${q}" için ${searchResults.length} sonuç</div><div class="search-results">${searchResults.map(n => `<div class="search-result-item" onclick="openDetail('${n.id}')">${n.thumbnail ? `<img class="search-result-img" src="${n.thumbnail}" loading="lazy" onerror="this.style.display='none';">` : ''}<div><div class="search-result-title">${n.title}</div><div class="search-result-source">${n.source} · ${timeAgo(n.date)}</div></div></div>`).join('')}</div>`;
             list.scrollTop = 0;
         }
 
-        function clearSearch() { searchMode = false; document.getElementById('searchInput').value = ''; renderNewsList(); }
+        function clearSearch() { searchMode = false;
+            document.getElementById('searchInput').value = '';
+            renderNewsList(); }
 
         function renderNewsList() {
             if (searchMode) return;
@@ -925,12 +998,19 @@
             f.sort((a, b) => new Date(b.date) - new Date(a.date));
             const displayed = f.slice(0, visibleCount);
             const list = document.getElementById('newsList');
-            if (!displayed.length) { list.innerHTML = '<div class="empty-state">Bu kategoride haber bulunamadı.</div>'; return; }
-            list.innerHTML = displayed.map(n => `<div class="news-item" onclick="openDetail('${n.id}')">${n.thumbnail ? `<img class="news-img" src="${n.thumbnail}" loading="lazy" onerror="this.style.display='none';">` : ''}<div class="news-content"><div class="news-source">${n.source}</div><div class="news-title">${n.title}</div><div class="news-meta">${timeAgo(n.date)}</div></div></div>`).join('') + (f.length > visibleCount ? `<div class="load-more"><button class="btn-load" onclick="loadMore()">Daha Fazla (${f.length - visibleCount})</button></div>` : '');
+            if (!displayed.length) { list.innerHTML =
+                    '<div class="empty-state">Bu kategoride haber bulunamadı.</div>'; return; }
+            list.innerHTML = displayed.map(n =>
+                    `<div class="news-item" onclick="openDetail('${n.id}')">${n.thumbnail ? `<img class="news-img" src="${n.thumbnail}" loading="lazy" onerror="this.style.display='none';">` : ''}<div class="news-content"><div class="news-source">${n.source}</div><div class="news-title">${n.title}</div><div class="news-meta">${timeAgo(n.date)}</div></div></div>`)
+                .join('') + (f.length > visibleCount ?
+                    `<div class="load-more"><button class="btn-load" onclick="loadMore()">Daha Fazla (${f.length - visibleCount})</button></div>` :
+                    '');
             updateSavedBadge();
         }
 
-        function loadMore() { visibleCount += 10; localStorage.setItem('haberai_visible_count', visibleCount); renderNewsList(); }
+        function loadMore() { visibleCount += 10;
+            localStorage.setItem('haberai_visible_count', visibleCount);
+            renderNewsList(); }
 
         function timeAgo(d) {
             if (!d) return '';
@@ -941,6 +1021,29 @@
             return new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
         }
 
+        // ==================== ANDROID GERİ TUŞU ====================
+        let pageHistory = [];
+
+        function pushPage(page) {
+            pageHistory.push(page);
+            history.pushState({ page: page }, '', location.href);
+        }
+
+        window.addEventListener('popstate', function(e) {
+            if (pageHistory.length === 0) {
+                history.pushState({ page: 'main' }, '', location.href);
+                return;
+            }
+            const lastPage = pageHistory.pop();
+            if (lastPage === 'detail') {
+                closeDetail();
+            } else if (lastPage === 'modal') {
+                closeModal();
+            }
+        });
+
+        history.pushState({ page: 'main' }, '', location.href);
+
         // ==================== DETAIL ====================
         function openDetail(id) {
             const n = news.find(n => n.id === id);
@@ -949,7 +1052,7 @@
             detailStarred = savedNews.some(s => s.title === n.title && s.link === n.link);
             aiSummaryText = '';
             detailContentText = '';
-
+            pushPage('detail');
             const dp = document.getElementById('detailPage');
             dp.classList.add('show');
             document.getElementById('detailScroll').scrollTop = 0;
@@ -958,8 +1061,10 @@
             document.getElementById('detailImage').style.display = n.image ? '' : 'none';
             document.getElementById('detailCategory').textContent = (n.category || '').toUpperCase();
             document.getElementById('detailTitle').textContent = n.title;
-            document.getElementById('detailMeta').textContent = `${n.source} · ${new Date(n.pubDate).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'})}`;
-            document.getElementById('detailText').innerHTML = '<p style="color:var(--text-muted);">İçerik yükleniyor...</p>';
+            document.getElementById('detailMeta').textContent =
+                `${n.source} · ${new Date(n.pubDate).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'})}`;
+            document.getElementById('detailText').innerHTML =
+                '<p style="color:var(--text-muted);">İçerik yükleniyor...</p>';
             document.getElementById('aiBannerBody').innerHTML = '';
             document.getElementById('aiBannerBody').classList.remove('show');
             document.getElementById('aiChatRow').classList.remove('show');
@@ -969,14 +1074,19 @@
             aiBannerOpen = false;
             document.getElementById('aiChatInput').value = '';
             updateDetailStarBtn();
-
             if (n.link) {
                 fetch(PROXY_URL + encodeURIComponent(n.link)).then(r => r.text()).then(html => {
                     const doc = new DOMParser().parseFromString(html, 'text/html');
-                    const ps = Array.from(doc.querySelectorAll('p')).map(p => p.textContent.trim()).filter(t => t.length > 40).slice(0, 6);
-                    if (ps.length) { detailContentText = ps.join('\n\n'); document.getElementById('detailText').innerHTML = ps.map(p => `<p>${p}</p>`).join(''); }
-                    else { detailContentText = n.description || ''; document.getElementById('detailText').innerHTML = '<p>' + (n.description || 'İçerik bulunamadı.') + '</p>'; }
-                }).catch(() => { detailContentText = n.description || ''; document.getElementById('detailText').innerHTML = '<p>' + (n.description || 'İçerik yüklenemedi.') + '</p>'; });
+                    const ps = Array.from(doc.querySelectorAll('p')).map(p => p.textContent.trim()).filter(
+                        t => t.length > 40).slice(0, 6);
+                    if (ps.length) { detailContentText = ps.join('\n\n');
+                        document.getElementById('detailText').innerHTML = ps.map(p => `<p>${p}</p>`).join(
+                            ''); } else { detailContentText = n.description || '';
+                        document.getElementById('detailText').innerHTML = '<p>' + (n.description ||
+                            'İçerik bulunamadı.') + '</p>'; }
+                }).catch(() => { detailContentText = n.description || '';
+                    document.getElementById('detailText').innerHTML = '<p>' + (n.description ||
+                        'İçerik yüklenemedi.') + '</p>'; });
             } else { detailContentText = n.description || ''; }
         }
 
@@ -993,8 +1103,9 @@
 
         function toggleDetailStar() {
             if (!currentDetailNews) return;
-            if (detailStarred) { savedNews = savedNews.filter(s => !(s.title === currentDetailNews.title && s.link === currentDetailNews.link)); }
-            else { savedNews.push({ ...currentDetailNews, savedAt: new Date().toISOString(), fullContent: detailContentText, aiSummary: aiSummaryText }); }
+            if (detailStarred) { savedNews = savedNews.filter(s => !(s.title === currentDetailNews.title && s.link ===
+                    currentDetailNews.link)); } else { savedNews.push({ ...currentDetailNews, savedAt: new Date()
+                        .toISOString(), fullContent: detailContentText, aiSummary: aiSummaryText }); }
             detailStarred = !detailStarred;
             localStorage.setItem('haberai_saved', JSON.stringify(savedNews));
             updateDetailStarBtn();
@@ -1011,60 +1122,98 @@
         // ==================== AI BANNER ====================
         function toggleAIBanner() {
             aiBannerOpen = !aiBannerOpen;
-            const b = document.getElementById('aiBanner'), bd = document.getElementById('aiBannerBody'), cr = document.getElementById('aiChatRow');
-            if (aiBannerOpen) { b.classList.add('expanded'); bd.classList.add('show'); if (aiSummaryText) cr.classList.add('show'); }
-            else { b.classList.remove('expanded'); bd.classList.remove('show'); cr.classList.remove('show'); }
+            const b = document.getElementById('aiBanner'),
+                bd = document.getElementById('aiBannerBody'),
+                cr = document.getElementById('aiChatRow');
+            if (aiBannerOpen) { b.classList.add('expanded');
+                bd.classList.add('show'); if (aiSummaryText) cr.classList.add('show'); } else { b.classList.remove(
+                    'expanded');
+                bd.classList.remove('show');
+                cr.classList.remove('show'); }
         }
 
         async function summarizeNews() {
             if (!currentDetailNews) return;
-            const btn = document.getElementById('btnSummarize'), bd = document.getElementById('aiBannerBody'), cr = document.getElementById('aiChatRow'), b = document.getElementById('aiBanner');
-            btn.disabled = true; btn.textContent = 'Özetleniyor...';
-            aiBannerOpen = true; b.classList.add('expanded'); bd.classList.add('show');
-            bd.innerHTML = '<div class="ai-summary-loading"><div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> AI düşünüyor...</div>';
+            const btn = document.getElementById('btnSummarize'),
+                bd = document.getElementById('aiBannerBody'),
+                cr = document.getElementById('aiChatRow'),
+                b = document.getElementById('aiBanner');
+            btn.disabled = true;
+            btn.textContent = 'Özetleniyor...';
+            aiBannerOpen = true;
+            b.classList.add('expanded');
+            bd.classList.add('show');
+            bd.innerHTML =
+                '<div class="ai-summary-loading"><div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> AI düşünüyor...</div>';
             const fc = detailContentText || currentDetailNews.description || '';
             try {
-                const res = await fetch(`${GEMINI_URL}?key=${decryptAPIKey(ENCRYPTED_KEY)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: `Aşağıdaki haberi, en önemli 3-5 madde halinde, her madde en fazla 1 cümle olacak şekilde, Türkçe olarak özetle. Her maddenin başına "🔹" koy:\n\nBaşlık: ${currentDetailNews.title}\n\nİçerik: ${fc}` }] }], generationConfig: { temperature: 0.5, maxOutputTokens: 1024 } }) });
+                const res = await fetch(`${GEMINI_URL}?key=${decryptAPIKey(ENCRYPTED_KEY)}`, { method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: 'user',
+                            parts: [{ text: `Aşağıdaki haberi, en önemli 3-5 madde halinde, her madde en fazla 1 cümle olacak şekilde, Türkçe olarak özetle. Her maddenin başına "🔹" koy:\n\nBaşlık: ${currentDetailNews.title}\n\nİçerik: ${fc}` }] }],
+                        generationConfig: { temperature: 0.5, maxOutputTokens: 1024 } }) });
                 const data = await res.json();
                 aiSummaryText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Özet alınamadı.';
-                bd.innerHTML = aiSummaryText.split('\n').filter(l => l.trim()).map(l => `<p>${l.replace(/^\s*[\-\*•]\s*/, '🔹 ')}</p>`).join('');
-                cr.classList.add('show'); document.getElementById('aiChatInput').focus();
-                const si = savedNews.findIndex(s => s.title === currentDetailNews.title && s.link === currentDetailNews.link);
-                if (si !== -1) { savedNews[si].aiSummary = aiSummaryText; savedNews[si].fullContent = detailContentText; localStorage.setItem('haberai_saved', JSON.stringify(savedNews)); }
+                bd.innerHTML = aiSummaryText.split('\n').filter(l => l.trim()).map(l =>
+                    `<p>${l.replace(/^\s*[\-\*•]\s*/, '🔹 ')}</p>`).join('');
+                cr.classList.add('show');
+                document.getElementById('aiChatInput').focus();
+                const si = savedNews.findIndex(s => s.title === currentDetailNews.title && s.link === currentDetailNews
+                    .link);
+                if (si !== -1) { savedNews[si].aiSummary = aiSummaryText;
+                    savedNews[si].fullContent = detailContentText;
+                    localStorage.setItem('haberai_saved', JSON.stringify(savedNews)); }
             } catch (e) { bd.innerHTML = '<p style="color:var(--danger);">Bağlantı hatası, tekrar deneyin.</p>'; }
-            btn.disabled = false; btn.textContent = 'Özetle';
+            btn.disabled = false;
+            btn.textContent = 'Özetle';
         }
 
         async function sendAIChat() {
-            const inp = document.getElementById('aiChatInput'), text = inp.value.trim();
+            const inp = document.getElementById('aiChatInput'),
+                text = inp.value.trim();
             if (!text || !currentDetailNews) return;
             const bd = document.getElementById('aiBannerBody');
-            bd.innerHTML += `<p style="font-weight:600;margin-top:10px;color:var(--accent);">🟢 Sen: ${text}</p>`;
+            bd.innerHTML +=
+                `<p style="font-weight:600;margin-top:10px;color:var(--accent);">🟢 Sen: ${text}</p>`;
             inp.value = '';
             const tid = 'aiTyping-' + Date.now();
-            bd.innerHTML += `<div class="ai-summary-loading" id="${tid}"><div class="spinner" style="width:14px;height:14px;border-width:2px;"></div> Düşünüyor...</div>`;
+            bd.innerHTML +=
+                `<div class="ai-summary-loading" id="${tid}"><div class="spinner" style="width:14px;height:14px;border-width:2px;"></div> Düşünüyor...</div>`;
             bd.scrollTop = bd.scrollHeight;
-            document.getElementById('aiBanner').classList.add('expanded'); aiBannerOpen = true;
+            document.getElementById('aiBanner').classList.add('expanded');
+            aiBannerOpen = true;
             const fc = detailContentText || currentDetailNews.description || '';
             try {
-                const res = await fetch(`${GEMINI_URL}?key=${decryptAPIKey(ENCRYPTED_KEY)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: `Aşağıdaki haber içeriğine dayanarak sorulan soruyu Türkçe olarak cevapla. Kısa ve net ol:\n\nHaber Başlığı: ${currentDetailNews.title}\n\nHaber İçeriği: ${fc}\n\nAI Özeti: ${aiSummaryText}\n\nSoru: ${text}` }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 1024 } }) });
+                const res = await fetch(`${GEMINI_URL}?key=${decryptAPIKey(ENCRYPTED_KEY)}`, { method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: 'user',
+                            parts: [{ text: `Aşağıdaki haber içeriğine dayanarak sorulan soruyu Türkçe olarak cevapla. Kısa ve net ol:\n\nHaber Başlığı: ${currentDetailNews.title}\n\nHaber İçeriği: ${fc}\n\nAI Özeti: ${aiSummaryText}\n\nSoru: ${text}` }] }],
+                        generationConfig: { temperature: 0.7, maxOutputTokens: 1024 } }) });
                 const data = await res.json();
                 const cevap = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Cevap alınamadı.';
                 const el = document.getElementById(tid); if (el) el.remove();
-                bd.innerHTML += `<p style="background:var(--accent-light);padding:10px;border-radius:8px;margin-top:4px;">🤖 ${cevap}</p>`;
+                bd.innerHTML +=
+                    `<p style="background:var(--accent-light);padding:10px;border-radius:8px;margin-top:4px;">🤖 ${cevap}</p>`;
                 bd.scrollTop = bd.scrollHeight;
-            } catch (e) { const el = document.getElementById(tid); if (el) el.remove(); bd.innerHTML += '<p style="color:var(--danger);">Bağlantı hatası!</p>'; }
+            } catch (e) { const el = document.getElementById(tid); if (el) el.remove();
+                bd.innerHTML += '<p style="color:var(--danger);">Bağlantı hatası!</p>'; }
         }
 
         // ==================== SAVED ====================
         function openSavedModal() {
-            showModal('☆ Kaydedilenler', savedNews.length ? savedNews.map((n, i) => `<div class="saved-item" onclick="openDetailFromSaved(${i});closeModal();"><div class="saved-item-info"><div class="saved-item-source">${n.source}</div><div class="saved-item-title">${n.title}</div></div><button class="btn-icon" style="width:30px;height:30px;font-size:0.7rem;" onclick="event.stopPropagation();deleteSaved(${i})">🗑️</button></div>`).join('') : '<div class="empty-state">Kayıtlı haber yok.</div>', [{ text: 'Kapat', onClick: 'closeModal()' }]);
+            pushPage('modal');
+            showModal('☆ Kaydedilenler', savedNews.length ? savedNews.map((n, i) =>
+                `<div class="saved-item" onclick="openDetailFromSaved(${i});closeModal();"><div class="saved-item-info"><div class="saved-item-source">${n.source}</div><div class="saved-item-title">${n.title}</div></div><button class="btn-icon" style="width:30px;height:30px;font-size:0.7rem;" onclick="event.stopPropagation();deleteSaved(${i})">🗑️</button></div>`
+                ).join('') : '<div class="empty-state">Kayıtlı haber yok.</div>', [{ text: 'Kapat', onClick: 'closeModal()' }]);
         }
 
         function openDetailFromSaved(i) {
             const n = savedNews[i]; if (!n) return;
-            currentDetailNews = n; detailStarred = true; aiSummaryText = n.aiSummary || ''; detailContentText = n.fullContent || n.description || '';
-            const dp = document.getElementById('detailPage'); dp.classList.add('show');
+            currentDetailNews = n;
+            detailStarred = true;
+            aiSummaryText = n.aiSummary || '';
+            detailContentText = n.fullContent || n.description || '';
+            pushPage('detail');
+            const dp = document.getElementById('detailPage');
+            dp.classList.add('show');
             document.getElementById('detailScroll').scrollTop = 0;
             document.getElementById('detailSource').textContent = n.source;
             document.getElementById('detailImage').src = n.image || '';
@@ -1072,73 +1221,155 @@
             document.getElementById('detailCategory').textContent = (n.category || '').toUpperCase();
             document.getElementById('detailTitle').textContent = n.title;
             document.getElementById('detailMeta').textContent = n.source + ' · Kaydedildi';
-            document.getElementById('detailText').innerHTML = detailContentText ? detailContentText.split('\n\n').map(p => `<p>${p}</p>`).join('') : '<p>' + (n.description || '') + '</p>';
-            const bd = document.getElementById('aiBannerBody'), cr = document.getElementById('aiChatRow'), b = document.getElementById('aiBanner');
+            document.getElementById('detailText').innerHTML = detailContentText ? detailContentText.split('\n\n').map(p =>
+                `<p>${p}</p>`).join('') : '<p>' + (n.description || '') + '</p>';
+            const bd = document.getElementById('aiBannerBody'),
+                cr = document.getElementById('aiChatRow'),
+                b = document.getElementById('aiBanner');
             if (aiSummaryText) {
-                bd.innerHTML = aiSummaryText.split('\n').filter(l => l.trim()).map(l => `<p>${l.replace(/^\s*[\-\*•]\s*/, '🔹 ')}</p>`).join('');
-                bd.classList.add('show'); cr.classList.add('show'); b.classList.add('expanded'); aiBannerOpen = true;
-            } else { bd.innerHTML = ''; bd.classList.remove('show'); cr.classList.remove('show'); b.classList.remove('expanded'); aiBannerOpen = false; }
-            document.getElementById('btnSummarize').disabled = false; document.getElementById('btnSummarize').textContent = 'Özetle';
-            document.getElementById('aiChatInput').value = ''; updateDetailStarBtn();
+                bd.innerHTML = aiSummaryText.split('\n').filter(l => l.trim()).map(l =>
+                    `<p>${l.replace(/^\s*[\-\*•]\s*/, '🔹 ')}</p>`).join('');
+                bd.classList.add('show');
+                cr.classList.add('show');
+                b.classList.add('expanded');
+                aiBannerOpen = true;
+            } else { bd.innerHTML = '';
+                bd.classList.remove('show');
+                cr.classList.remove('show');
+                b.classList.remove('expanded');
+                aiBannerOpen = false; }
+            document.getElementById('btnSummarize').disabled = false;
+            document.getElementById('btnSummarize').textContent = 'Özetle';
+            document.getElementById('aiChatInput').value = '';
+            updateDetailStarBtn();
         }
 
-        function deleteSaved(i) { savedNews.splice(i, 1); localStorage.setItem('haberai_saved', JSON.stringify(savedNews)); updateSavedBadge(); openSavedModal(); showToast('🗑️ Silindi'); }
+        function deleteSaved(i) { savedNews.splice(i, 1);
+            localStorage.setItem('haberai_saved', JSON.stringify(savedNews));
+            updateSavedBadge();
+            openSavedModal();
+            showToast('🗑️ Silindi'); }
 
         function updateSavedBadge() {
             const badge = document.getElementById('savedBadge');
-            if (savedNews.length) { badge.textContent = savedNews.length; badge.classList.add('show'); }
-            else badge.classList.remove('show');
+            if (savedNews.length) { badge.textContent = savedNews.length;
+                badge.classList.add('show'); } else badge.classList.remove('show');
         }
 
         // ==================== SETTINGS ====================
         function openSettingsModal() {
-            showModal('⚙️ Ayarlar', `<div class="form-group"><label class="form-label">Bir seferde gösterilen haber</label><div style="display:flex;align-items:center;gap:10px;"><button class="btn btn-sm" onclick="adjustCount(-5)" style="flex:none;">−</button><span style="font-weight:600;font-size:0.9rem;" id="countDisplay">${visibleCount}</span><button class="btn btn-sm" onclick="adjustCount(5)" style="flex:none;">+</button></div></div><hr style="border:0;border-top:1px solid var(--border);margin:16px 0;"><button class="btn" style="width:100%;" onclick="openRSSModal()">📡 RSS Kaynaklarını Yönet</button>`, [{ text: 'Tamam', onClick: 'closeModal()', primary: true }]);
+            pushPage('modal');
+            showModal('⚙️ Ayarlar',
+                `<div class="form-group"><label class="form-label">Bir seferde gösterilen haber</label><div style="display:flex;align-items:center;gap:10px;"><button class="btn btn-sm" onclick="adjustCount(-5)" style="flex:none;">−</button><span style="font-weight:600;font-size:0.9rem;" id="countDisplay">${visibleCount}</span><button class="btn btn-sm" onclick="adjustCount(5)" style="flex:none;">+</button></div></div><hr style="border:0;border-top:1px solid var(--border);margin:16px 0;"><button class="btn" style="width:100%;" onclick="openRSSModal()">📡 RSS Kaynaklarını Yönet</button>`,
+                [{ text: 'Tamam', onClick: 'closeModal()', primary: true }]);
         }
 
-        function adjustCount(a) { visibleCount = Math.max(5, Math.min(30, visibleCount + a)); localStorage.setItem('haberai_visible_count', visibleCount); const d = document.getElementById('countDisplay'); if (d) d.textContent = visibleCount; renderNewsList(); }
+        function adjustCount(a) { visibleCount = Math.max(5, Math.min(30, visibleCount + a));
+            localStorage.setItem('haberai_visible_count', visibleCount); const d = document.getElementById('countDisplay'); if (
+                d) d.textContent = visibleCount;
+            renderNewsList(); }
 
         // ==================== RSS ====================
         function openRSSModal() {
-            showModal('📡 RSS Kaynakları', Object.keys(rssData).length ? Object.entries(rssData).map(([id, r]) => `<div class="rss-item"><div class="rss-item-info"><span class="rss-item-name">${r.ad}</span><span class="rss-item-cat">${r.kategori || 'DİĞER'}</span></div><div class="rss-item-actions"><button class="btn btn-sm" style="color:${disabledSources.includes(id) ? 'var(--text-muted)' : 'var(--success)'};" onclick="toggleRSS('${id}')">${disabledSources.includes(id) ? '🔴' : '🟢'}</button><button class="btn btn-sm" onclick="editRSS('${id}')">✏️</button><button class="btn btn-sm btn-danger" onclick="confirmDeleteRSS('${id}')">🗑️</button></div></div>`).join('') : '<div class="empty-state">Henüz RSS kaynağı yok.</div>', [{ text: '+ Ekle', onClick: 'openAddRSS()' }, { text: 'Kapat', onClick: 'closeModal()', primary: true }]);
-            setTimeout(() => { const mb = document.querySelector('#modalContainer .modal-body'); if (mb && rssModalScrollPos) mb.scrollTop = rssModalScrollPos; }, 100);
+            pushPage('modal');
+            showModal('📡 RSS Kaynakları', Object.keys(rssData).length ? Object.entries(rssData).map(([id, r]) =>
+                `<div class="rss-item"><div class="rss-item-info"><span class="rss-item-name">${r.ad}</span><span class="rss-item-cat">${r.kategori || 'DİĞER'}</span></div><div class="rss-item-actions"><button class="btn btn-sm" style="color:${disabledSources.includes(id) ? 'var(--text-muted)' : 'var(--success)'};" onclick="toggleRSS('${id}')">${disabledSources.includes(id) ? '🔴' : '🟢'}</button><button class="btn btn-sm" onclick="editRSS('${id}')">✏️</button><button class="btn btn-sm btn-danger" onclick="confirmDeleteRSS('${id}')">🗑️</button></div></div>`
+                ).join('') : '<div class="empty-state">Henüz RSS kaynağı yok.</div>', [{ text: '+ Ekle',
+                    onClick: 'openAddRSS()' }, { text: 'Kapat', onClick: 'closeModal()', primary: true }]);
+            setTimeout(() => { const mb = document.querySelector('#modalContainer .modal-body'); if (mb && rssModalScrollPos)
+                    mb.scrollTop = rssModalScrollPos; }, 100);
         }
 
-        function openAddRSS() { showModal('Yeni RSS Ekle', `<div class="form-group"><label class="form-label">RSS Adı</label><input class="form-input" id="rssName" placeholder="örn: TRT Haber"></div><div class="form-group"><label class="form-label">RSS URL</label><input class="form-input" id="rssUrl" placeholder="https://..."></div><div class="form-group"><label class="form-label">Logo URL</label><input class="form-input" id="rssLogo" placeholder="https://..."></div><div class="form-group"><label class="form-label">Kategori</label><select class="form-select" id="rssCat">${['TÜRKİYE','DÜNYA','GÜNDEM','TEKNOLOJİ','SPOR','OTOMOBİL','DİĞER'].map(c=>`<option value="${c}">${c}</option>`).join('')}</select></div>`, [{ text: 'İptal', onClick: 'openRSSModal()' }, { text: 'Kaydet', onClick: 'saveRSS()', primary: true }]); }
-        function saveRSS() { const a = document.getElementById('rssName')?.value?.trim(), u = document.getElementById('rssUrl')?.value?.trim(), l = document.getElementById('rssLogo')?.value?.trim() || '', k = document.getElementById('rssCat')?.value || 'DİĞER'; if (!a || !u) { showToast('Ad ve URL gerekli'); return; } db.ref('rss_ayarlari').push({ ad: a, url: u, logo: l, kategori: k }).then(() => { showToast('✅ Eklendi'); openRSSModal(); }); }
-        function editRSS(id) { const r = rssData[id]; if (!r) return; showModal('RSS Düzenle', `<div class="form-group"><label class="form-label">RSS Adı</label><input class="form-input" id="editRssName" value="${r.ad}"></div><div class="form-group"><label class="form-label">RSS URL</label><input class="form-input" id="editRssUrl" value="${r.url}"></div><div class="form-group"><label class="form-label">Logo URL</label><input class="form-input" id="editRssLogo" value="${r.logo || ''}"></div><div class="form-group"><label class="form-label">Kategori</label><select class="form-select" id="editRssCat">${['TÜRKİYE','DÜNYA','GÜNDEM','TEKNOLOJİ','SPOR','OTOMOBİL','DİĞER'].map(c=>`<option value="${c}" ${r.kategori===c?'selected':''}>${c}</option>`).join('')}</select></div>`, [{ text: 'İptal', onClick: 'openRSSModal()' }, { text: 'Güncelle', onClick: `updateRSS('${id}')`, primary: true }]); }
-        function updateRSS(id) { const a = document.getElementById('editRssName')?.value?.trim(), u = document.getElementById('editRssUrl')?.value?.trim(), l = document.getElementById('editRssLogo')?.value?.trim() || '', k = document.getElementById('editRssCat')?.value || 'DİĞER'; if (!a || !u) { showToast('Ad ve URL gerekli'); return; } db.ref('rss_ayarlari/' + id).update({ ad: a, url: u, logo: l, kategori: k }).then(() => { showToast('✅ Güncellendi'); openRSSModal(); }); }
-        function confirmDeleteRSS(id) { showModal('🗑️ Silinsin mi?', '<p style="text-align:center;padding:20px;">Bu RSS kaynağını silmek istediğine emin misin?</p>', [{ text: 'Vazgeç', onClick: 'openRSSModal()' }, { text: 'Sil', onClick: `deleteRSS('${id}')`, danger: true }]); }
-        function deleteRSS(id) { db.ref('rss_ayarlari/' + id).remove().then(() => { disabledSources = disabledSources.filter(s => s !== id); localStorage.setItem('haberai_disabled', JSON.stringify(disabledSources)); showToast('🗑️ Silindi'); openRSSModal(); }); }
+        function openAddRSS() {
+            pushPage('modal');
+            showModal('Yeni RSS Ekle',
+                `<div class="form-group"><label class="form-label">RSS Adı</label><input class="form-input" id="rssName" placeholder="örn: TRT Haber"></div><div class="form-group"><label class="form-label">RSS URL</label><input class="form-input" id="rssUrl" placeholder="https://..."></div><div class="form-group"><label class="form-label">Logo URL</label><input class="form-input" id="rssLogo" placeholder="https://..."></div><div class="form-group"><label class="form-label">Kategori</label><select class="form-select" id="rssCat">${['TÜRKİYE','DÜNYA','GÜNDEM','TEKNOLOJİ','SPOR','OTOMOBİL','DİĞER'].map(c=>`<option value="${c}">${c}</option>`).join('')}</select></div>`,
+                [{ text: 'İptal', onClick: 'openRSSModal()' }, { text: 'Kaydet', onClick: 'saveRSS()',
+                primary: true }]); }
+
+        function saveRSS() { const a = document.getElementById('rssName')?.value?.trim(),
+                u = document.getElementById('rssUrl')?.value?.trim(), l = document.getElementById('rssLogo')?.value?.trim() ||
+                '', k = document.getElementById('rssCat')?.value || 'DİĞER'; if (!a || !u) { showToast(
+                    'Ad ve URL gerekli'); return; }
+            db.ref('rss_ayarlari').push({ ad: a, url: u, logo: l, kategori: k }).then(() => { showToast('✅ Eklendi');
+                openRSSModal(); }); }
+
+        function editRSS(id) { const r = rssData[id]; if (!r) return;
+            pushPage('modal');
+            showModal('RSS Düzenle',
+                `<div class="form-group"><label class="form-label">RSS Adı</label><input class="form-input" id="editRssName" value="${r.ad}"></div><div class="form-group"><label class="form-label">RSS URL</label><input class="form-input" id="editRssUrl" value="${r.url}"></div><div class="form-group"><label class="form-label">Logo URL</label><input class="form-input" id="editRssLogo" value="${r.logo || ''}"></div><div class="form-group"><label class="form-label">Kategori</label><select class="form-select" id="editRssCat">${['TÜRKİYE','DÜNYA','GÜNDEM','TEKNOLOJİ','SPOR','OTOMOBİL','DİĞER'].map(c=>`<option value="${c}" ${r.kategori===c?'selected':''}>${c}</option>`).join('')}</select></div>`,
+                [{ text: 'İptal', onClick: 'openRSSModal()' }, { text: 'Güncelle', onClick: `updateRSS('${id}')`,
+                    primary: true }]); }
+
+        function updateRSS(id) { const a = document.getElementById('editRssName')?.value?.trim(),
+                u = document.getElementById('editRssUrl')?.value?.trim(), l = document.getElementById('editRssLogo')?.value
+                ?.trim() || '', k = document.getElementById('editRssCat')?.value || 'DİĞER'; if (!a || !u) { showToast(
+                    'Ad ve URL gerekli'); return; }
+            db.ref('rss_ayarlari/' + id).update({ ad: a, url: u, logo: l, kategori: k }).then(() => { showToast(
+                '✅ Güncellendi');
+                openRSSModal(); }); }
+
+        function confirmDeleteRSS(id) {
+            pushPage('modal');
+            showModal('🗑️ Silinsin mi?',
+                '<p style="text-align:center;padding:20px;">Bu RSS kaynağını silmek istediğine emin misin?</p>', [{ text: 'Vazgeç',
+                    onClick: 'openRSSModal()' }, { text: 'Sil', onClick: `deleteRSS('${id}')`, danger: true }]); }
+
+        function deleteRSS(id) { db.ref('rss_ayarlari/' + id).remove().then(() => { disabledSources = disabledSources.filter(
+                s => s !== id);
+            localStorage.setItem('haberai_disabled', JSON.stringify(disabledSources));
+            showToast('🗑️ Silindi');
+            openRSSModal(); }); }
+
         function toggleRSS(id) {
             const mb = document.querySelector('#modalContainer .modal-body'); if (mb) rssModalScrollPos = mb.scrollTop;
-            if (disabledSources.includes(id)) disabledSources = disabledSources.filter(s => s !== id); else disabledSources.push(id);
+            if (disabledSources.includes(id)) disabledSources = disabledSources.filter(s => s !== id);
+            else disabledSources.push(id);
             localStorage.setItem('haberai_disabled', JSON.stringify(disabledSources));
             const btn = document.getElementById('toggle-btn-' + id); const isD = disabledSources.includes(id);
-            if (btn) { btn.style.color = isD ? 'var(--text-muted)' : 'var(--success)'; btn.textContent = isD ? '🔴' : '🟢'; }
+            if (btn) { btn.style.color = isD ? 'var(--text-muted)' : 'var(--success)';
+                btn.textContent = isD ? '🔴' : '🟢'; }
             showToast(isD ? '🔴 Pasif' : '🟢 Aktif');
         }
 
         // ==================== MODAL ====================
         function showModal(t, b, btns) {
-            document.getElementById('modalContainer').innerHTML = `<div class="modal-header"><h2>${t}</h2><button class="modal-close" onclick="closeModal()">✕</button></div><div class="modal-body">${b}</div>${btns.length ? `<div class="modal-footer">${btns.map(bn => `<button class="btn${bn.primary?' btn-primary':bn.danger?' btn-danger':''}" onclick="${bn.onClick}">${bn.text}</button>`).join('')}</div>` : ''}`;
-            document.getElementById('modalOverlay').classList.add('show'); document.body.style.overflow = 'hidden';
+            document.getElementById('modalContainer').innerHTML =
+                `<div class="modal-header"><h2>${t}</h2><button class="modal-close" onclick="closeModal()">✕</button></div><div class="modal-body">${b}</div>${btns.length ? `<div class="modal-footer">${btns.map(bn => `<button class="btn${bn.primary?' btn-primary':bn.danger?' btn-danger':''}" onclick="${bn.onClick}">${bn.text}</button>`).join('')}</div>` : ''}`;
+            document.getElementById('modalOverlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
         }
-        function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); document.body.style.overflow = ''; rssModalScrollPos = 0; }
 
-        function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(window._tt); window._tt = setTimeout(() => t.classList.remove('show'), 2000); }
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+            document.body.style.overflow = '';
+            rssModalScrollPos = 0;
+        }
 
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (document.getElementById('detailPage').classList.contains('show')) closeDetail(); else if (document.getElementById('modalOverlay').classList.contains('show')) closeModal(); } });
-        document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
-        document.getElementById('searchInput').addEventListener('input', function() { if (!this.value.trim() && searchMode) clearSearch(); });
+        function showToast(m) { const t = document.getElementById('toast');
+            t.textContent = m;
+            t.classList.add('show');
+            clearTimeout(window._tt);
+            window._tt = setTimeout(() => t.classList.remove('show'), 2000); }
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (document.getElementById('detailPage')
+                    .classList.contains('show')) closeDetail(); else if (document.getElementById('modalOverlay').classList
+                    .contains('show')) closeModal(); } });
+        document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target === this) closeModal
+        (); });
+        document.getElementById('searchInput').addEventListener('input', function() { if (!this.value.trim() && searchMode)
+                clearSearch(); });
 
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('/Gem/sw.js').catch(() => {});
 
         function init() {
-            renderCategoryNav(); updateSavedBadge();
+            renderCategoryNav();
+            updateSavedBadge();
             db.ref('rss_ayarlari').on('value', snap => {
                 rssData = snap.val() || {};
                 if (Object.keys(rssData).length) fetchAllNews();
-                else document.getElementById('newsList').innerHTML = '<div class="empty-state">Henüz RSS kaynağı eklenmedi.<br>Başlığa tıklayarak ekleyebilirsiniz.</div>';
+                else document.getElementById('newsList').innerHTML =
+                    '<div class="empty-state">Henüz RSS kaynağı eklenmedi.<br>Başlığa tıklayarak ekleyebilirsiniz.</div>';
             });
         }
         init();
