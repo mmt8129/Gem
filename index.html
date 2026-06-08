@@ -6,6 +6,10 @@
     <title>Haber Akışı</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ffffff">
     <style>
         :root {
             --bg: #ffffff;
@@ -18,6 +22,7 @@
             --border: #e5e5e5;
             --danger: #dc3545;
             --success: #198754;
+            --star: #f0c040;
         }
 
         * {
@@ -44,7 +49,7 @@
         /* HEADER */
         .header {
             flex-shrink: 0;
-            padding: 16px;
+            padding: 12px 16px 8px;
             border-bottom: 1px solid var(--border);
             background: var(--bg);
             position: sticky;
@@ -55,17 +60,17 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         .header-title {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
             letter-spacing: -0.02em;
             cursor: pointer;
         }
         .header-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
         .btn-icon {
             width: 36px;
@@ -92,16 +97,51 @@
             right: -4px;
             background: var(--danger);
             color: #fff;
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             padding: 2px 5px;
             border-radius: 8px;
             font-weight: 600;
             display: none;
-            min-width: 16px;
+            min-width: 15px;
             text-align: center;
         }
         .badge.show {
             display: block;
+        }
+
+        /* SEARCH BAR */
+        .search-bar {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-family: 'Inter', sans-serif;
+            background: var(--surface);
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        .search-input:focus {
+            border-color: var(--accent);
+        }
+        .btn-search {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            border-radius: 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.15s ease;
+        }
+        .btn-search:active {
+            background: var(--text);
+            color: #fff;
         }
 
         /* CATEGORY NAV */
@@ -111,14 +151,15 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
+            padding: 4px 0;
         }
         .category-nav::-webkit-scrollbar {
             display: none;
         }
         .cat-btn {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 600;
-            padding: 8px 14px;
+            padding: 7px 13px;
             border: 1px solid var(--border);
             background: var(--bg);
             color: var(--text-secondary);
@@ -140,7 +181,7 @@
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding: 8px 16px;
+            padding: 4px 16px 16px;
         }
         .news-item {
             display: flex;
@@ -155,8 +196,8 @@
             opacity: 0.6;
         }
         .news-img {
-            width: 72px;
-            height: 72px;
+            width: 68px;
+            height: 68px;
             border-radius: 10px;
             object-fit: cover;
             background: var(--surface);
@@ -167,15 +208,15 @@
             min-width: 0;
         }
         .news-source {
-            font-size: 0.68rem;
+            font-size: 0.66rem;
             font-weight: 600;
             color: var(--accent);
             letter-spacing: 0.04em;
             text-transform: uppercase;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
         .news-title {
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             font-weight: 600;
             line-height: 1.3;
             letter-spacing: -0.01em;
@@ -185,7 +226,7 @@
             overflow: hidden;
         }
         .news-meta {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             color: var(--text-muted);
             margin-top: 4px;
         }
@@ -239,6 +280,50 @@
             color: #fff;
         }
 
+        /* SEARCH RESULTS */
+        .search-results {
+            padding: 8px 16px;
+        }
+        .search-result-count {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px;
+        }
+        .search-result-item {
+            display: flex;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            align-items: flex-start;
+        }
+        .search-result-item:active {
+            opacity: 0.6;
+        }
+        .search-result-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: var(--surface);
+            flex-shrink: 0;
+        }
+        .search-result-title {
+            font-size: 0.82rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        .search-result-source {
+            font-size: 0.65rem;
+            color: var(--accent);
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            margin-top: 2px;
+        }
+
         /* DETAIL PAGE */
         .detail-page {
             position: fixed;
@@ -247,12 +332,17 @@
             z-index: 100;
             display: none;
             flex-direction: column;
-            overflow-y: auto;
             max-width: 480px;
             margin: 0 auto;
         }
         .detail-page.show {
             display: flex;
+        }
+        .detail-scroll {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 160px;
         }
         .detail-header {
             display: flex;
@@ -260,10 +350,8 @@
             gap: 12px;
             padding: 12px 16px;
             border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
             background: var(--bg);
-            z-index: 10;
+            flex-shrink: 0;
         }
         .btn-back {
             width: 36px;
@@ -287,18 +375,17 @@
         }
         .detail-body {
             padding: 16px;
-            flex: 1;
         }
         .detail-img {
             width: 100%;
-            max-height: 240px;
+            max-height: 220px;
             object-fit: cover;
             border-radius: 12px;
             background: var(--surface);
             margin-bottom: 16px;
         }
         .detail-category {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             font-weight: 700;
             color: var(--accent);
             letter-spacing: 0.08em;
@@ -306,25 +393,25 @@
             margin-bottom: 8px;
         }
         .detail-title {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 700;
             line-height: 1.3;
             letter-spacing: -0.01em;
             margin-bottom: 8px;
         }
         .detail-meta {
-            font-size: 0.75rem;
+            font-size: 0.73rem;
             color: var(--text-muted);
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         .detail-divider {
             height: 2px;
             background: var(--text);
             opacity: 0.1;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         .detail-text {
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             line-height: 1.7;
             color: var(--text-secondary);
         }
@@ -332,22 +419,35 @@
             margin-bottom: 12px;
         }
 
-        /* AI SUMMARY BOX */
-        .ai-summary-box {
-            margin-top: 20px;
-            padding: 16px;
-            background: var(--accent-light);
-            border-radius: 12px;
-            border: 1px solid #d0ddf7;
+        /* AI BANNER (fixed bottom) */
+        .ai-banner {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg);
+            border-top: 2px solid var(--border);
+            z-index: 110;
+            display: flex;
+            flex-direction: column;
+            max-height: 50vh;
+            transition: max-height 0.3s ease;
         }
-        .ai-summary-header {
+        .ai-banner.expanded {
+            max-height: 70vh;
+        }
+        .ai-banner-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 10px;
+            padding: 10px 16px;
+            cursor: pointer;
+            flex-shrink: 0;
         }
-        .ai-summary-label {
-            font-size: 0.72rem;
+        .ai-banner-label {
+            font-size: 0.7rem;
             font-weight: 700;
             letter-spacing: 0.05em;
             text-transform: uppercase;
@@ -373,9 +473,9 @@
             }
         }
         .btn-summarize {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             font-weight: 600;
-            padding: 8px 14px;
+            padding: 7px 12px;
             border: 1px solid var(--accent);
             background: var(--accent);
             color: #fff;
@@ -392,17 +492,69 @@
             opacity: 0.5;
             pointer-events: none;
         }
-        .ai-summary-text {
-            font-size: 0.85rem;
+        .ai-banner-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 16px 8px;
+            font-size: 0.82rem;
             line-height: 1.6;
-            color: var(--text);
+            display: none;
+        }
+        .ai-banner-body.show {
+            display: block;
+        }
+        .ai-banner-body p {
+            margin-bottom: 6px;
         }
         .ai-summary-loading {
             display: flex;
             align-items: center;
             gap: 8px;
             color: var(--text-muted);
-            font-size: 0.8rem;
+            font-size: 0.78rem;
+            padding: 8px 0;
+        }
+        .ai-chat-input-row {
+            display: flex;
+            gap: 6px;
+            padding: 8px 16px 12px;
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+            display: none;
+        }
+        .ai-chat-input-row.show {
+            display: flex;
+        }
+        .ai-chat-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            background: var(--surface);
+        }
+        .ai-chat-input:focus {
+            border-color: var(--accent);
+        }
+        .btn-ai-send {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--text);
+            background: var(--text);
+            color: #fff;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .btn-ai-send:active {
+            background: var(--accent);
+            border-color: var(--accent);
         }
 
         /* MODAL */
@@ -538,7 +690,7 @@
             color: #fff;
         }
         .btn-sm {
-            font-size: 0.68rem;
+            font-size: 0.66rem;
             padding: 6px 12px;
             border-radius: 8px;
             letter-spacing: 0.03em;
@@ -638,6 +790,15 @@
             width: 0;
             height: 0;
         }
+
+        @media (display-mode: standalone) {
+            .header {
+                padding-top: env(safe-area-inset-top, 12px);
+            }
+            .ai-banner {
+                padding-bottom: env(safe-area-inset-bottom, 0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -655,6 +816,10 @@
                     <button class="btn-icon" onclick="refreshNews()" title="Yenile">🔄</button>
                 </div>
             </div>
+            <div class="search-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="Haberlerde ara..." onkeypress="if(event.key==='Enter')doSearch()" autocomplete="off">
+                <button class="btn-search" onclick="doSearch()">🔍 Ara</button>
+            </div>
             <nav class="category-nav" id="categoryNav"></nav>
         </header>
         <div class="news-list" id="newsList">
@@ -668,21 +833,28 @@
             <button class="btn-back" onclick="closeDetail()">←</button>
             <span class="detail-source-badge" id="detailSource"></span>
             <div style="flex:1;"></div>
-            <button class="btn-icon" id="detailStarBtn" onclick="toggleDetailStar()">☆</button>
+            <button class="btn-icon" id="detailStarBtn" onclick="toggleDetailStar()" style="color:var(--text);">☆</button>
         </div>
-        <div class="detail-body">
-            <img class="detail-img" id="detailImage" src="" alt="" onerror="this.style.display='none';">
-            <div class="detail-category" id="detailCategory"></div>
-            <h1 class="detail-title" id="detailTitle"></h1>
-            <div class="detail-meta" id="detailMeta"></div>
-            <div class="detail-divider"></div>
-            <div class="detail-text" id="detailText"></div>
-            <div class="ai-summary-box" id="aiSummaryBox">
-                <div class="ai-summary-header">
-                    <span class="ai-summary-label"><span class="ai-dot"></span> AI Özet</span>
-                    <button class="btn-summarize" id="btnSummarize" onclick="summarizeNews()">Özetle</button>
-                </div>
-                <div id="aiSummaryContent"></div>
+        <div class="detail-scroll" id="detailScroll">
+            <div class="detail-body">
+                <img class="detail-img" id="detailImage" src="" alt="" onerror="this.style.display='none';">
+                <div class="detail-category" id="detailCategory"></div>
+                <h1 class="detail-title" id="detailTitle"></h1>
+                <div class="detail-meta" id="detailMeta"></div>
+                <div class="detail-divider"></div>
+                <div class="detail-text" id="detailText"></div>
+            </div>
+        </div>
+        <!-- AI BANNER -->
+        <div class="ai-banner" id="aiBanner">
+            <div class="ai-banner-header" onclick="toggleAIBanner()">
+                <span class="ai-banner-label"><span class="ai-dot"></span> AI Özet & Sohbet</span>
+                <button class="btn-summarize" id="btnSummarize" onclick="event.stopPropagation();summarizeNews()">Özetle</button>
+            </div>
+            <div class="ai-banner-body" id="aiBannerBody"></div>
+            <div class="ai-chat-input-row" id="aiChatRow">
+                <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Habere dair bir şey sor..." onkeypress="if(event.key==='Enter')sendAIChat()" autocomplete="off">
+                <button class="btn-ai-send" onclick="sendAIChat()">→</button>
             </div>
         </div>
     </div>
@@ -719,12 +891,16 @@
         let news = [];
         let rssData = {};
         let currentCategory = 'all';
-        let visibleCount = 10;
+        let visibleCount = parseInt(localStorage.getItem('haberai_visible_count') || '10');
         let savedNews = JSON.parse(localStorage.getItem('haberai_saved') || '[]');
         let disabledSources = JSON.parse(localStorage.getItem('haberai_disabled') || '[]');
         let currentDetailNews = null;
         let detailStarred = false;
-        let currentModal = null;
+        let searchMode = false;
+        let searchResults = [];
+        let aiBannerOpen = false;
+        let aiSummaryText = '';
+        let detailContentText = '';
 
         const CATEGORIES = ['TÜMÜ', 'TÜRKİYE', 'DÜNYA', 'GÜNDEM', 'TEKNOLOJİ', 'SPOR', 'OTOMOBİL', 'DİĞER'];
 
@@ -740,7 +916,8 @@
 
         function setCategory(cat, el) {
             currentCategory = cat;
-            visibleCount = 10;
+            searchMode = false;
+            document.getElementById('searchInput').value = '';
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
             if (el) el.classList.add('active');
             renderNewsList();
@@ -833,8 +1010,54 @@
             showToast('🔄 Yenilendi');
         }
 
+        // ==================== SEARCH ====================
+        function doSearch() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            if (!query) {
+                searchMode = false;
+                renderNewsList();
+                return;
+            }
+            searchMode = true;
+            searchResults = news.filter(n =>
+                n.title.toLowerCase().includes(query) ||
+                n.source.toLowerCase().includes(query) ||
+                (n.description && n.description.toLowerCase().includes(query))
+            );
+            renderSearchResults(query);
+        }
+
+        function renderSearchResults(query) {
+            const list = document.getElementById('newsList');
+            if (searchResults.length === 0) {
+                list.innerHTML = `<div class="search-result-count">"${query}" için 0 sonuç</div><div class="empty-state">Eşleşen haber bulunamadı.</div>`;
+                return;
+            }
+            let html = `<div class="search-result-count">"${query}" için ${searchResults.length} sonuç</div><div class="search-results">`;
+            html += searchResults.map(n => `
+            <div class="search-result-item" onclick="openDetail('${n.id}')">
+              ${n.thumbnail ? `<img class="search-result-img" src="${n.thumbnail}" alt="" loading="lazy" onerror="this.style.display='none';">` : ''}
+              <div>
+                <div class="search-result-title">${n.title}</div>
+                <div class="search-result-source">${n.source} · ${timeAgo(n.date)}</div>
+              </div>
+            </div>
+          `).join('');
+            html += '</div>';
+            list.innerHTML = html;
+            list.scrollTop = 0;
+        }
+
+        function clearSearch() {
+            searchMode = false;
+            document.getElementById('searchInput').value = '';
+            renderNewsList();
+        }
+
         // ==================== RENDER NEWS ====================
         function renderNewsList() {
+            if (searchMode) return;
+
             let filtered = [...news];
             if (currentCategory !== 'all') filtered = filtered.filter(n => n.category === currentCategory);
             filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -870,6 +1093,7 @@
 
         function loadMore() {
             visibleCount += 10;
+            localStorage.setItem('haberai_visible_count', visibleCount);
             renderNewsList();
         }
 
@@ -884,30 +1108,43 @@
 
         // ==================== DETAIL ====================
         function openDetail(id) {
-            currentDetailNews = news.find(n => n.id === id);
-            if (!currentDetailNews) return;
-            detailStarred = savedNews.some(s => s.title === currentDetailNews.title);
+            const n = news.find(n => n.id === id);
+            if (!n) return;
+            currentDetailNews = n;
+            detailStarred = savedNews.some(s => s.title === n.title);
+            aiSummaryText = '';
+            detailContentText = '';
 
             document.getElementById('mainPage').style.display = 'none';
             const dp = document.getElementById('detailPage');
             dp.classList.add('show');
-            dp.scrollTop = 0;
+            document.getElementById('detailScroll').scrollTop = 0;
 
-            document.getElementById('detailSource').textContent = currentDetailNews.source;
-            document.getElementById('detailImage').src = currentDetailNews.image || '';
-            document.getElementById('detailImage').style.display = currentDetailNews.image ? '' : 'none';
-            document.getElementById('detailCategory').textContent = (currentDetailNews.category || '').toUpperCase();
-            document.getElementById('detailTitle').textContent = currentDetailNews.title;
+            document.getElementById('detailSource').textContent = n.source;
+            document.getElementById('detailImage').src = n.image || '';
+            document.getElementById('detailImage').style.display = n.image ? '' : 'none';
+            document.getElementById('detailCategory').textContent = (n.category || '').toUpperCase();
+            document.getElementById('detailTitle').textContent = n.title;
             document.getElementById('detailMeta').textContent =
-                `${currentDetailNews.source} · ${new Date(currentDetailNews.pubDate).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'})}`;
+                `${n.source} · ${new Date(n.pubDate).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'})}`;
             document.getElementById('detailText').innerHTML =
                 '<p style="color:var(--text-muted);">İçerik yükleniyor...</p>';
-            document.getElementById('aiSummaryContent').innerHTML = '';
+
+            // Reset AI banner
+            document.getElementById('aiBannerBody').innerHTML = '';
+            document.getElementById('aiBannerBody').classList.remove('show');
+            document.getElementById('aiChatRow').classList.remove('show');
+            document.getElementById('aiBanner').classList.remove('expanded');
+            document.getElementById('btnSummarize').disabled = false;
+            document.getElementById('btnSummarize').textContent = 'Özetle';
+            aiBannerOpen = false;
+            document.getElementById('aiChatInput').value = '';
+
             updateDetailStarBtn();
 
             // Fetch full content
-            if (currentDetailNews.link) {
-                fetch(PROXY_URL + encodeURIComponent(currentDetailNews.link))
+            if (n.link) {
+                fetch(PROXY_URL + encodeURIComponent(n.link))
                     .then(r => r.text())
                     .then(html => {
                         const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -916,18 +1153,22 @@
                             .filter(t => t.length > 40)
                             .slice(0, 6);
                         if (paragraphs.length > 0) {
+                            detailContentText = paragraphs.join('\n\n');
                             document.getElementById('detailText').innerHTML =
                                 paragraphs.map(p => `<p>${p}</p>`).join('');
                         } else {
+                            detailContentText = n.description || '';
                             document.getElementById('detailText').innerHTML =
-                                '<p>' + (currentDetailNews.description || 'İçerik bulunamadı.') +
-                                '</p>';
+                                '<p>' + (n.description || 'İçerik bulunamadı.') + '</p>';
                         }
                     })
                     .catch(() => {
+                        detailContentText = n.description || '';
                         document.getElementById('detailText').innerHTML =
-                            '<p>' + (currentDetailNews.description || 'İçerik yüklenemedi.') + '</p>';
+                            '<p>' + (n.description || 'İçerik yüklenemedi.') + '</p>';
                     });
+            } else {
+                detailContentText = n.description || '';
             }
         }
 
@@ -935,6 +1176,12 @@
             document.getElementById('detailPage').classList.remove('show');
             document.getElementById('mainPage').style.display = '';
             currentDetailNews = null;
+            aiSummaryText = '';
+            detailContentText = '';
+            aiBannerOpen = false;
+            document.getElementById('aiBanner').classList.remove('expanded');
+            document.getElementById('aiBannerBody').classList.remove('show');
+            document.getElementById('aiChatRow').classList.remove('show');
         }
 
         function toggleDetailStar() {
@@ -954,19 +1201,47 @@
         function updateDetailStarBtn() {
             const btn = document.getElementById('detailStarBtn');
             btn.textContent = detailStarred ? '★' : '☆';
-            btn.style.color = detailStarred ? '#f0c040' : '';
+            btn.style.color = detailStarred ? 'var(--star)' : 'var(--text)';
         }
 
-        // ==================== AI SUMMARY ====================
+        // ==================== AI BANNER ====================
+        function toggleAIBanner() {
+            aiBannerOpen = !aiBannerOpen;
+            const banner = document.getElementById('aiBanner');
+            const body = document.getElementById('aiBannerBody');
+            const chatRow = document.getElementById('aiChatRow');
+
+            if (aiBannerOpen) {
+                banner.classList.add('expanded');
+                body.classList.add('show');
+                if (aiSummaryText) chatRow.classList.add('show');
+            } else {
+                banner.classList.remove('expanded');
+                body.classList.remove('show');
+                chatRow.classList.remove('show');
+            }
+        }
+
         async function summarizeNews() {
             if (!currentDetailNews) return;
             const btn = document.getElementById('btnSummarize');
-            const content = document.getElementById('aiSummaryContent');
+            const body = document.getElementById('aiBannerBody');
+            const chatRow = document.getElementById('aiChatRow');
+            const banner = document.getElementById('aiBanner');
+
             btn.disabled = true;
             btn.textContent = 'Özetleniyor...';
-            content.innerHTML = '<div class="ai-summary-loading"><div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> AI düşünüyor...</div>';
 
-            const prompt = `Aşağıdaki haberi, en önemli 3-5 madde halinde, her madde en fazla 1 cümle olacak şekilde, Türkçe olarak özetle:\n\nBaşlık: ${currentDetailNews.title}\n\nİçerik: ${currentDetailNews.description || document.getElementById('detailText').textContent}`;
+            // Auto-expand
+            aiBannerOpen = true;
+            banner.classList.add('expanded');
+            body.classList.add('show');
+            body.innerHTML =
+                '<div class="ai-summary-loading"><div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> AI düşünüyor...</div>';
+
+            const fullContent = detailContentText || currentDetailNews.description || '';
+            const prompt =
+                `Aşağıdaki haberi, en önemli 3-5 madde halinde, her madde en fazla 1 cümle olacak şekilde, Türkçe olarak özetle. Her maddenin başına "🔹" koy:\n\nBaşlık: ${currentDetailNews.title}\n\nİçerik: ${fullContent}`;
 
             try {
                 const res = await fetch(`${GEMINI_URL}?key=${decryptAPIKey(ENCRYPTED_KEY)}`, {
@@ -974,7 +1249,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                        generationConfig: { temperature: 0.5, maxOutputTokens: 512 }
+                        generationConfig: { temperature: 0.5, maxOutputTokens: 1024 }
                     })
                 });
                 const data = await res.json();
@@ -982,14 +1257,62 @@
                 if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
                     summary = data.candidates[0].content.parts[0].text;
                 }
-                content.innerHTML = summary.split('\n').filter(l => l.trim()).map(l =>
-                    `<p style="margin-bottom:6px;">${l.replace(/^\s*[\-\*•]\s*/, '🔹 ')}</p>`
+                aiSummaryText = summary;
+                body.innerHTML = summary.split('\n').filter(l => l.trim()).map(l =>
+                    `<p>${l.replace(/^\s*[\-\*•]\s*/, '🔹 ')}</p>`
                 ).join('');
+                chatRow.classList.add('show');
+                document.getElementById('aiChatInput').focus();
             } catch (e) {
-                content.innerHTML = '<p style="color:var(--danger);">Bağlantı hatası, tekrar deneyin.</p>';
+                body.innerHTML = '<p style="color:var(--danger);">Bağlantı hatası, tekrar deneyin.</p>';
             }
             btn.disabled = false;
             btn.textContent = 'Özetle';
+        }
+
+        async function sendAIChat() {
+            const input = document.getElementById('aiChatInput');
+            const text = input.value.trim();
+            if (!text || !currentDetailNews) return;
+
+            const body = document.getElementById('aiBannerBody');
+            body.innerHTML += `<p style="font-weight:600;margin-top:10px;">🟢 Sen: ${text}</p>`;
+            input.value = '';
+            body.innerHTML +=
+                '<div class="ai-summary-loading" id="aiTyping"><div class="spinner" style="width:14px;height:14px;border-width:2px;"></div> Düşünüyor...</div>';
+            body.scrollTop = body.scrollHeight;
+            const banner = document.getElementById('aiBanner');
+            banner.classList.add('expanded');
+            aiBannerOpen = true;
+
+            const fullContent = detailContentText || currentDetailNews.description || '';
+            const prompt =
+                `Aşağıdaki haber içeriğine dayanarak sorulan soruyu Türkçe olarak cevapla. Kısa ve net ol:\n\nHaber Başlığı: ${currentDetailNews.title}\n\nHaber İçeriği: ${fullContent}\n\nAI Özeti: ${aiSummaryText}\n\nSoru: ${text}`;
+
+            try {
+                const res = await fetch(`${GEMINI_URL}?key=${decryptAPIKey(ENCRYPTED_KEY)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                        generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+                    })
+                });
+                const data = await res.json();
+                let cevap = 'Cevap alınamadı.';
+                if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    cevap = data.candidates[0].content.parts[0].text;
+                }
+                const typing = document.getElementById('aiTyping');
+                if (typing) typing.remove();
+                body.innerHTML +=
+                    `<p style="background:var(--accent-light);padding:10px;border-radius:8px;margin-top:4px;">🤖 ${cevap}</p>`;
+                body.scrollTop = body.scrollHeight;
+            } catch (e) {
+                const typing = document.getElementById('aiTyping');
+                if (typing) typing.remove();
+                body.innerHTML += '<p style="color:var(--danger);">Bağlantı hatası!</p>';
+            }
         }
 
         // ==================== SAVED MODAL ====================
@@ -1012,21 +1335,32 @@
         }
 
         function openDetailFromSaved(i) {
-            currentDetailNews = savedNews[i];
-            if (!currentDetailNews) return;
+            const n = savedNews[i];
+            if (!n) return;
+            currentDetailNews = n;
             detailStarred = true;
+            aiSummaryText = '';
+            detailContentText = n.description || '';
+
             document.getElementById('mainPage').style.display = 'none';
             const dp = document.getElementById('detailPage');
             dp.classList.add('show');
-            dp.scrollTop = 0;
-            document.getElementById('detailSource').textContent = currentDetailNews.source;
-            document.getElementById('detailImage').src = currentDetailNews.image || '';
-            document.getElementById('detailImage').style.display = currentDetailNews.image ? '' : 'none';
-            document.getElementById('detailCategory').textContent = (currentDetailNews.category || '').toUpperCase();
-            document.getElementById('detailTitle').textContent = currentDetailNews.title;
-            document.getElementById('detailMeta').textContent = currentDetailNews.source + ' · Kaydedildi';
-            document.getElementById('detailText').innerHTML = '<p>' + (currentDetailNews.description || '') + '</p>';
-            document.getElementById('aiSummaryContent').innerHTML = '';
+            document.getElementById('detailScroll').scrollTop = 0;
+            document.getElementById('detailSource').textContent = n.source;
+            document.getElementById('detailImage').src = n.image || '';
+            document.getElementById('detailImage').style.display = n.image ? '' : 'none';
+            document.getElementById('detailCategory').textContent = (n.category || '').toUpperCase();
+            document.getElementById('detailTitle').textContent = n.title;
+            document.getElementById('detailMeta').textContent = n.source + ' · Kaydedildi';
+            document.getElementById('detailText').innerHTML = '<p>' + (n.description || '') + '</p>';
+            document.getElementById('aiBannerBody').innerHTML = '';
+            document.getElementById('aiBannerBody').classList.remove('show');
+            document.getElementById('aiChatRow').classList.remove('show');
+            document.getElementById('aiBanner').classList.remove('expanded');
+            document.getElementById('btnSummarize').disabled = false;
+            document.getElementById('btnSummarize').textContent = 'Özetle';
+            aiBannerOpen = false;
+            document.getElementById('aiChatInput').value = '';
             updateDetailStarBtn();
         }
 
@@ -1052,7 +1386,7 @@
         function openSettingsModal() {
             const html = `
             <div class="form-group">
-              <label class="form-label">Gösterilecek haber sayısı</label>
+              <label class="form-label">Bir seferde gösterilen haber</label>
               <div style="display:flex;align-items:center;gap:10px;">
                 <button class="btn btn-sm" onclick="adjustCount(-5)" style="flex:none;">−</button>
                 <span style="font-weight:600;font-size:0.9rem;" id="countDisplay">${visibleCount}</span>
@@ -1069,7 +1403,9 @@
 
         function adjustCount(amount) {
             visibleCount = Math.max(5, Math.min(30, visibleCount + amount));
-            document.getElementById('countDisplay').textContent = visibleCount;
+            localStorage.setItem('haberai_visible_count', visibleCount);
+            const display = document.getElementById('countDisplay');
+            if (display) display.textContent = visibleCount;
             renderNewsList();
         }
 
@@ -1154,10 +1490,11 @@
         }
 
         function confirmDeleteRSS(id) {
-            showModal('🗑️ Silinsin mi?', '<p style="text-align:center;padding:20px;">Bu RSS kaynağını silmek istediğine emin misin?</p>', [
-                { text: 'Vazgeç', onClick: 'openRSSModal()' },
-                { text: 'Sil', onClick: `deleteRSS('${id}')`, danger: true }
-            ]);
+            showModal('🗑️ Silinsin mi?',
+                '<p style="text-align:center;padding:20px;">Bu RSS kaynağını silmek istediğine emin misin?</p>', [
+                    { text: 'Vazgeç', onClick: 'openRSSModal()' },
+                    { text: 'Sil', onClick: `deleteRSS('${id}')`, danger: true }
+                ]);
         }
 
         function deleteRSS(id) {
@@ -1176,7 +1513,7 @@
                 disabledSources.push(id);
             }
             localStorage.setItem('haberai_disabled', JSON.stringify(disabledSources));
-            openRSSModal(); // Aynı listede kalır, başa gitmez
+            openRSSModal();
             showToast(disabledSources.includes(id) ? '🔴 Pasif' : '🟢 Aktif');
         }
 
@@ -1195,13 +1532,11 @@
           `;
             document.getElementById('modalOverlay').classList.add('show');
             document.body.style.overflow = 'hidden';
-            currentModal = title;
         }
 
         function closeModal() {
             document.getElementById('modalOverlay').classList.remove('show');
             document.body.style.overflow = '';
-            currentModal = null;
         }
 
         // ==================== TOAST ====================
@@ -1227,6 +1562,39 @@
         document.getElementById('modalOverlay').addEventListener('click', function(e) {
             if (e.target === this) closeModal();
         });
+
+        // Search input clear on empty
+        document.getElementById('searchInput').addEventListener('input', function() {
+            if (!this.value.trim() && searchMode) {
+                clearSearch();
+            }
+        });
+
+        // ==================== PWA MANIFEST ====================
+        const manifest = {
+            name: "Haber Akışı",
+            short_name: "Haber",
+            start_url: ".",
+            display: "standalone",
+            background_color: "#ffffff",
+            theme_color: "#ffffff",
+            icons: [{
+                src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230d6efd'/%3E%3Ctext x='50' y='65' text-anchor='middle' font-size='50' fill='white'%3E📰%3C/text%3E%3C/svg%3E",
+                sizes: "any",
+                type: "image/svg+xml",
+                purpose: "any maskable"
+            }]
+        };
+
+        const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        document.querySelector('link[rel="manifest"]')?.setAttribute('href', manifestURL);
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register("data:application/javascript," + encodeURIComponent(
+                "self.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))))})"
+            )).catch(() => {});
+        }
 
         // ==================== INIT ====================
         function init() {
