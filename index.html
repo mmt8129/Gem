@@ -6,7 +6,7 @@
     <title>Haber Akışı</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/Gem/manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ffffff">
@@ -1639,50 +1639,9 @@
             }
         });
 
-        // ==================== PWA ====================
-        // Manifest dinamik oluştur
-        const manifestData = {
-            name: "Haber Akışı",
-            short_name: "Haber",
-            start_url: location.href,
-            display: "standalone",
-            background_color: "#ffffff",
-            theme_color: "#ffffff",
-            description: "RSS Haber Okuyucu",
-            icons: [{
-                src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%230d6efd'/%3E%3Ctext x='256' y='340' text-anchor='middle' font-size='280' fill='white' font-family='sans-serif'%3E📰%3C/text%3E%3C/svg%3E",
-                sizes: "512x512",
-                type: "image/svg+xml",
-                purpose: "any maskable"
-            }]
-        };
-
-        const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-        const manifestURL = URL.createObjectURL(manifestBlob);
-        const manifestLink = document.querySelector('link[rel="manifest"]');
-        if (manifestLink) {
-            manifestLink.href = manifestURL;
-        }
-
-        // Service Worker
+                // ==================== PWA ====================
         if ('serviceWorker' in navigator) {
-            const swCode = `
-            const CACHE = 'haber-v1';
-            self.addEventListener('install', e => self.skipWaiting());
-            self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-            self.addEventListener('fetch', e => {
-              e.respondWith(
-                fetch(e.request).then(res => {
-                  const clone = res.clone();
-                  caches.open(CACHE).then(c => c.put(e.request, clone));
-                  return res;
-                }).catch(() => caches.match(e.request))
-              );
-            });
-          `;
-            const swBlob = new Blob([swCode], { type: 'application/javascript' });
-            const swURL = URL.createObjectURL(swBlob);
-            navigator.serviceWorker.register(swURL).catch(() => {});
+            navigator.serviceWorker.register('/Gem/sw.js').catch(() => {});
         }
 
         // ==================== INIT ====================
