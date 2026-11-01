@@ -890,7 +890,7 @@ function openDetailSheet() {
     // SADECE İÇERİĞİ SIFIRLA, HEADER'A DOKUNMA
     chatBody.innerHTML = '<div class="msg ai">Bu haber hakkında ne öğrenmek istersin?<div class="chip-row"><button class="chip" onclick="askDetailAI(\'Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.\')">✨ Özetle</button></div></div>';
 
-    setTimeout(() => document.getElementById('detailChatInput').focus(), 400);
+    // setTimeout(() => document.getElementById('detailChatInput').focus(), 400);
     pushModal('detailSheet');
 }
 
