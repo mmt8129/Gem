@@ -792,8 +792,8 @@ function showDetailPage() {
     document.getElementById('detailDate').textContent = n.pubDate ? new Date(n.pubDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 
     // YENİ EKLENEN KISIM: Hangi haberin sohbeti olduğunu hafızaya al
-    localStorage.setItem('haberai_last_detail_news_id', n.id);
-
+    localStorage.setItem('haberai_last_detail_news_id', n.id || n.title);
+    
     document.getElementById('detailBody').innerHTML = '<p style="text-align:center; color:#888;">İçerik yükleniyor...</p>';
 
     if (n.link && n.link !== '#') {
@@ -891,18 +891,33 @@ function openDetailSheet() {
 
     const chatBody = document.getElementById('detailChatBody');
     const lastNewsId = localStorage.getItem('haberai_last_detail_news_id');
-    const savedChat = localStorage.getItem('haberai_detail_chat_' + lastNewsId);
+    
+    // Hafızadan JSON olarak çek
+    const savedChatStr = localStorage.getItem('haberai_detail_chat_' + lastNewsId);
+    let savedChat = [];
 
-    if (savedChat) {
+    if (savedChatStr) {
+        try {
+            savedChat = JSON.parse(savedChatStr);
+        } catch (e) {
+            console.log("Hafıza okuma hatası:", e);
+        }
+    }
+
+    if (savedChat.length > 0) {
         // Eğer bu habere ait kayıtlı sohbet varsa onu yükle
-        chatBody.innerHTML = savedChat;
+        chatBody.innerHTML = '';
+        savedChat.forEach(msg => {
+            const roleClass = msg.sender === 'user' ? 'user' : 'ai';
+            const text = msg.sender === 'user' ? msg.text : metniTemizle(msg.text);
+            chatBody.innerHTML += `<div class="msg ${roleClass}">${text}</div>`;
+        });
         chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: 'smooth' });
     } else {
         // Yoksa ilk mesajı göster
         chatBody.innerHTML = '<div class="msg ai">Bu haber hakkında ne öğrenmek istersin?<div class="chip-row"><button class="chip" onclick="askDetailAI(\'Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.\')">✨ Özetle</button></div></div>';
     }
 
-    // setTimeout(() => document.getElementById('detailChatInput').focus(), 400); // Klavye açılmasın diye sildik
     pushModal('detailSheet');
 }
 
@@ -919,15 +934,22 @@ async function sendDetailMessage() {
     if (!text || !currentDetailNews) return;
     
     const body = document.getElementById('detailChatBody');
+    const lastNewsId = localStorage.getItem('haberai_last_detail_news_id');
+    
+    // Mevcut sohbeti JSON olarak al, yoksa boş dizi oluştur
+    let savedChatStr = localStorage.getItem('haberai_detail_chat_' + lastNewsId);
+    let savedChat = [];
+    if (savedChatStr) {
+        try { savedChat = JSON.parse(savedChatStr); } catch(e){}
+    }
+
+    // Kullanıcı mesajını ekrana bas ve hafızaya ekle
     body.innerHTML += `<div class="msg user">${text}</div>`;
+    savedChat.push({ sender: 'user', text: text });
+    localStorage.setItem('haberai_detail_chat_' + lastNewsId, JSON.stringify(savedChat));
     inp.value = '';
 
-    // Sohbeti hafızaya kaydet
-    const lastNewsId = localStorage.getItem('haberai_last_detail_news_id');
-    localStorage.setItem('haberai_detail_chat_' + lastNewsId, body.innerHTML);
-
     let contextText = "";
-
     if (text === "Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.") {
         const detailContent = document.getElementById('detailBody').innerText;
         contextText = `Lütfen aşağıdaki haberi kısa ve açıklayıcı şekilde maddeler halinde özetle:\n\n${detailContent}`;
@@ -942,14 +964,15 @@ async function sendDetailMessage() {
     try {
         const cevap = await callGemini(contextText);
         const temizCevap = metniTemizle(cevap);
+        
+        // AI cevabını hafızaya ekle
+        savedChat.push({ sender: 'ai', text: cevap });
+        localStorage.setItem('haberai_detail_chat_' + lastNewsId, JSON.stringify(savedChat));
+
         const typing = document.getElementById(typingId);
         if (typing) typing.remove();
         body.innerHTML += `<div class="msg ai">${temizCevap}</div>`;
         body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
-
-        // AI cevabını da hafızaya kaydet
-        localStorage.setItem('haberai_detail_chat_' + lastNewsId, body.innerHTML);
-
     } catch (e) {
         console.log('Detay AI gönderim hatası:', e);
         const typing = document.getElementById(typingId);
