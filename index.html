@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Haber Akışı</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="stylesheet" href="style.css">
+	<style>
+    /* A+ ve A- Butonlarını Zorla Görünür Yap */
+    #detailSheet .sheet-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+    #detailSheet .sheet-header-right {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        z-index: 99999 !important;
+    }
+    .font-size-btn {
+        background: #e5e7eb !important;
+        color: #111 !important;
+        border: 1px solid #ccc !important;
+        border-radius: 8px !important;
+        padding: 6px 12px !important;
+        font-size: 0.9rem !important;
+        font-weight: 800 !important;
+        cursor: pointer !important;
+    }
+    [data-theme="dark"] .font-size-btn {
+        background: #333 !important;
+        color: #fff !important;
+        border: 1px solid #555 !important;
+    }
+</style>
+</head>
+<body>
+
+    <div id="mainPage">
+        <header class="sticky-header">
+            <div class="masthead">
+                <div class="top-row">
+                    <span class="date" id="mastheadDate" onclick="openCalendarModal()"></span>
+                    <span class="weather" id="mastheadWeather" onclick="openWeatherModal()">
+                        <span id="weatherIcon">☀️</span> <span id="weatherTemp">--°</span>
+                    </span>
+                </div>
+                <div class="title-row">
+                    <div class="title" onclick="openSettingsModal()">Haber<span>.</span></div>
+                    <div class="header-actions">
+                        <button onclick="openSavedModal()">☆ <span id="savedBadge" style="display:none;">0</span></button>
+                        <button onclick="softRefresh()">🔄</button>
+                    </div>
+                </div>
+            </div>
+               <nav class="category-nav" id="categoryNav">
+                <button class="nav-item active" data-cat="all" onclick="setCategory(this, 'all')">Tümü</button>
+                <button class="nav-item" data-cat="TÜRKİYE" onclick="setCategory(this, 'TÜRKİYE')">Türkiye</button>
+                <button class="nav-item" data-cat="DÜNYA" onclick="setCategory(this, 'DÜNYA')">Dünya</button>
+                <button class="nav-item" data-cat="GÜNDEM" onclick="setCategory(this, 'GÜNDEM')">Gündem</button>
+                <button class="nav-item" data-cat="TEKNOLOJİ" onclick="setCategory(this, 'TEKNOLOJİ')">Teknoloji</button>
+                <button class="nav-item" data-cat="SPOR" onclick="setCategory(this, 'SPOR')">Spor</button>
+                <button class="nav-item" data-cat="OTOMOBİL" onclick="setCategory(this, 'OTOMOBİL')">Otomobil</button>
+                <button class="nav-item" data-cat="DİĞER" onclick="setCategory(this, 'DİĞER')">Diğer</button>
+            </nav>
+        </header>
+
+        <main class="scroll-area" id="scrollArea">
+            <div id="carouselMount"></div>
+            <div id="newsListMount"></div>
+        </main>
+
+        <footer class="input-bar">
+            <div class="input-wrapper">
+                <input type="text" id="mainInput" placeholder="Haber ara veya AI ile sohbet et..." onkeypress="if(event.key==='Enter')handleInput()" autocomplete="off">
+                <button class="btn-send" onclick="handleInput()">→</button>
+            </div>
+        </footer>
+    </div>
+
+    <div id="detailPage" style="display:none; background:var(--bg); flex-direction:column; position:fixed; inset:0; z-index:550; overflow-y:auto;">
+        <div class="detail-top-bar">
+            <button class="btn-back" onclick="closeDetail()">←</button>
+            <span class="source-badge" id="detailSource"></span>
+            <div class="detail-actions">
+                <button onclick="toggleDetailStar()" id="detailStarBtn">☆</button>
+                <button onclick="toggleDetailDropdown()">⋮</button>
+                <div class="dropdown-menu" id="detailDropdown">
+                    <button onclick="shareDetailNews()"><span>📤</span> Paylaş</button>
+                    <button onclick="openDetailLink()"><span>🔗</span> Linke Git</button>
+                </div>
+            </div>
+        </div>
+        <div class="detail-content">
+            <img class="detail-image" id="detailImage" src="" alt="" onerror="this.style.display='none';">
+            <div class="article-category" id="detailCategory"></div>
+            <h1 class="article-title" id="detailTitle"></h1>
+            <div class="article-meta">
+                <span id="detailDate"></span> · <span id="detailSource2"></span>
+            </div>
+            <div class="article-body" id="detailBody"></div>
+        </div>
+                <!-- Detay sayfası alt buton grubu -->
+        <div class="detail-bottom-bar">
+            <button class="font-btn" onclick="changeDetailFontSize(-1)">A-</button>
+            <button class="fab" id="detailFab" onclick="openDetailSheet()">✨ AI Özetle</button>
+            <button class="font-btn" onclick="changeDetailFontSize(1)">A+</button>
+        </div>
+    </div>
+
+            <div class="bottom-sheet" id="detailSheet">
+        <div class="sheet-header">
+            <h3>✨ AI Özetliyor</h3>
+            <div class="sheet-header-right">
+                
+                <button class="close-sheet-btn" onclick="closeDetailSheet()">✕</button>
+            </div>
+        </div>
+        <div class="sheet-body" id="detailChatBody" style="font-size: 16px;">
+            <div class="msg ai">
+                Bu haber hakkında ne öğrenmek istersin?
+                <div class="chip-row"><button class="chip" onclick="askDetailAI('Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.')">✨ Özetle</button></div>
+            </div>
+        </div>
+        <div class="sheet-input">
+            <input type="text" id="detailChatInput" placeholder="Habere dair bir şey sor..." onkeypress="if(event.key==='Enter')sendDetailMessage()">
+            <button onclick="sendDetailMessage()">→</button>
+        </div>
+    </div>
+    
+    <div id="aiModalOverlay" class="modal-overlay">
+        <div class="modal-container ai-modal">
+            <div class="modal-header">
+                <h2>AI Asistan</h2>
+                <div><button onclick="confirmClearChat()">Temizle</button><button onclick="closeAIModal()">✕</button></div>
+            </div>
+            <div class="modal-body chat-body" id="aiChatBody"></div>
+            <div class="modal-footer-input">
+                <input type="text" id="aiInput" placeholder="Bir şey sor..." onkeypress="if(event.key==='Enter')sendAIMessage()">
+                <button onclick="sendAIMessage()">→</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="searchModalOverlay" class="modal-overlay"><div class="modal-container" id="searchModalContainer"></div></div>
+    <div id="settingsModalOverlay" class="modal-overlay"><div class="modal-container" id="settingsModalContainer"></div></div>
+    <div id="rssModalOverlay" class="modal-overlay"><div class="modal-container" id="rssModalContainer"></div></div>
+    <div id="savedModalOverlay" class="modal-overlay"><div class="modal-container" id="savedModalContainer"></div></div>
+    <div id="weatherModalOverlay" class="modal-overlay"><div class="modal-container" id="weatherModalContainer"></div></div>
+    <div id="calendarModalOverlay" class="modal-overlay"><div class="modal-container" id="calendarModalContainer"></div></div>
+    <div id="confirmModalOverlay" class="modal-overlay"><div class="modal-container" id="confirmModalContainer" style="height:auto;"></div></div>
+
+    <div id="toast"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
