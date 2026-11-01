@@ -4,7 +4,7 @@
   "description": "Yapay zeka destekli haber ve sohbet uygulaması",
   "start_url": "/Gem/",
   "display": "standalone",
-  "background_color": "#000000",
+  "background_color": "#ffffff",
   "theme_color": "#e11d48",
   "orientation": "portrait",
   "scope": "/Gem/",
