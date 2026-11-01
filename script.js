@@ -887,10 +887,11 @@ function openDetailSheet() {
     document.body.style.overflow = 'hidden';
 
     const chatBody = document.getElementById('detailChatBody');
-    // SADECE İÇERİĞİ SIFIRLA, HEADER'A DOKUNMA
     chatBody.innerHTML = '<div class="msg ai">Bu haber hakkında ne öğrenmek istersin?<div class="chip-row"><button class="chip" onclick="askDetailAI(\'Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.\')">✨ Özetle</button></div></div>';
 
-    // setTimeout(() => document.getElementById('detailChatInput').focus(), 400);
+    // Bu satır klavyeyi açıyordu, sildik:
+    // setTimeout(() => document.getElementById('detailChatInput').focus(), 400); 
+
     pushModal('detailSheet');
 }
 
