@@ -791,6 +791,9 @@ function showDetailPage() {
     document.getElementById('detailTitle').textContent = n.title;
     document.getElementById('detailDate').textContent = n.pubDate ? new Date(n.pubDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 
+    // YENİ EKLENEN KISIM: Hangi haberin sohbeti olduğunu hafızaya al
+    localStorage.setItem('haberai_last_detail_news_id', n.id);
+
     document.getElementById('detailBody').innerHTML = '<p style="text-align:center; color:#888;">İçerik yükleniyor...</p>';
 
     if (n.link && n.link !== '#') {
@@ -887,11 +890,19 @@ function openDetailSheet() {
     document.body.style.overflow = 'hidden';
 
     const chatBody = document.getElementById('detailChatBody');
-    chatBody.innerHTML = '<div class="msg ai">Bu haber hakkında ne öğrenmek istersin?<div class="chip-row"><button class="chip" onclick="askDetailAI(\'Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.\')">✨ Özetle</button></div></div>';
+    const lastNewsId = localStorage.getItem('haberai_last_detail_news_id');
+    const savedChat = localStorage.getItem('haberai_detail_chat_' + lastNewsId);
 
-    // Bu satır klavyeyi açıyordu, sildik:
-    // setTimeout(() => document.getElementById('detailChatInput').focus(), 400); 
+    if (savedChat) {
+        // Eğer bu habere ait kayıtlı sohbet varsa onu yükle
+        chatBody.innerHTML = savedChat;
+        chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: 'smooth' });
+    } else {
+        // Yoksa ilk mesajı göster
+        chatBody.innerHTML = '<div class="msg ai">Bu haber hakkında ne öğrenmek istersin?<div class="chip-row"><button class="chip" onclick="askDetailAI(\'Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.\')">✨ Özetle</button></div></div>';
+    }
 
+    // setTimeout(() => document.getElementById('detailChatInput').focus(), 400); // Klavye açılmasın diye sildik
     pushModal('detailSheet');
 }
 
@@ -911,17 +922,16 @@ async function sendDetailMessage() {
     body.innerHTML += `<div class="msg user">${text}</div>`;
     inp.value = '';
 
+    // Sohbeti hafızaya kaydet
+    const lastNewsId = localStorage.getItem('haberai_last_detail_news_id');
+    localStorage.setItem('haberai_detail_chat_' + lastNewsId, body.innerHTML);
+
     let contextText = "";
 
-    // EĞER "Özetle" BUTONUNA BASILDIYSA
     if (text === "Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.") {
-        // Direkt sayfadaki metni al, linke gitme
         const detailContent = document.getElementById('detailBody').innerText;
         contextText = `Lütfen aşağıdaki haberi kısa ve açıklayıcı şekilde maddeler halinde özetle:\n\n${detailContent}`;
-    } 
-    // EĞER KULLANICI KENDİ SORUSUNU YAZDIYSA
-    else {
-        // Sorunun içine linki ekle ki Worker gidip okusun
+    } else {
         contextText = `${text}\n\nHaber Linki: ${currentDetailNews.link || ''}`;
     }
 
@@ -936,6 +946,10 @@ async function sendDetailMessage() {
         if (typing) typing.remove();
         body.innerHTML += `<div class="msg ai">${temizCevap}</div>`;
         body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
+
+        // AI cevabını da hafızaya kaydet
+        localStorage.setItem('haberai_detail_chat_' + lastNewsId, body.innerHTML);
+
     } catch (e) {
         console.log('Detay AI gönderim hatası:', e);
         const typing = document.getElementById(typingId);
