@@ -906,23 +906,38 @@ async function sendDetailMessage() {
     const inp = document.getElementById('detailChatInput');
     const text = inp.value.trim();
     if (!text || !currentDetailNews) return;
+    
     const body = document.getElementById('detailChatBody');
     body.innerHTML += `<div class="msg user">${text}</div>`;
     inp.value = '';
+
+    let contextText = "";
+
+    // EĞER "Özetle" BUTONUNA BASILDIYSA
+    if (text === "Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.") {
+        // Direkt sayfadaki metni al, linke gitme
+        const detailContent = document.getElementById('detailBody').innerText;
+        contextText = `Lütfen aşağıdaki haberi kısa ve açıklayıcı şekilde maddeler halinde özetle:\n\n${detailContent}`;
+    } 
+    // EĞER KULLANICI KENDİ SORUSUNU YAZDIYSA
+    else {
+        // Sorunun içine linki ekle ki Worker gidip okusun
+        contextText = `${text}\n\nHaber Linki: ${currentDetailNews.link || ''}`;
+    }
+
     const typingId = 'dtyping-' + Date.now();
     body.innerHTML += `<div class="msg ai" id="${typingId}"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
     body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
 
-    const contextPrompt = `Haber Başlığı: ${currentDetailNews.title}\nHaber Linki: ${currentDetailNews.link || ''}\nHaber Açıklaması: ${(currentDetailNews.description || '').replace(/<[^>]*>/g, '').substring(0, 800)}\n\nKullanıcı Sorusu: ${text}`;
-
     try {
-        const cevap = await callGemini(contextPrompt);
+        const cevap = await callGemini(contextText);
         const temizCevap = metniTemizle(cevap);
         const typing = document.getElementById(typingId);
         if (typing) typing.remove();
         body.innerHTML += `<div class="msg ai">${temizCevap}</div>`;
         body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
     } catch (e) {
+        console.log('Detay AI gönderim hatası:', e);
         const typing = document.getElementById(typingId);
         if (typing) typing.remove();
         body.innerHTML += '<div class="msg ai">Bağlantı hatası! 😕</div>';
