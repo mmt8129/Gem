@@ -54,9 +54,11 @@
                 <div class="title-row">
                     <div class="title" onclick="openSettingsModal()">Haber<span>.</span></div>
                     <div class="header-actions">
-                        <button onclick="openSavedModal()">☆ <span id="savedBadge" style="display:none;">0</span></button>
-                        <button onclick="softRefresh()">🔄</button>
-                    </div>
+                    <!-- YENİ EKLENEN AI BUTONU -->
+                    <button onclick="openAIModal()" title="AI Asistan" style="color: var(--text); font-size: 1.2rem;">🤖</button>
+                    <button onclick="openSavedModal()">☆ <span id="savedBadge" style="display:none;">0</span></button>
+                    <button onclick="softRefresh()">🔄</button>
+                </div>
                 </div>
             </div>
                <nav class="category-nav" id="categoryNav">
