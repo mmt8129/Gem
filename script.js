@@ -454,9 +454,25 @@ function handleInput() {
 function openAIModal(initialText) {
     document.getElementById('aiModalOverlay').classList.add('active');
     document.body.style.overflow = 'hidden';
+    const body = document.getElementById('aiChatBody');
     
-    // Direkt render et
-    renderAIChat(); 
+    body.innerHTML = '<div class="msg ai">Sohbet geçmişi yükleniyor...</div>';
+    
+    db.ref('ai_sohbet_gecmisi').once('value', snap => {
+        body.innerHTML = '';
+        const data = snap.val();
+        if (data) {
+            const messages = Object.values(data).sort((a, b) => a.timestamp - b.timestamp);
+            messages.forEach(msg => {
+                const roleClass = msg.sender === 'user' ? 'user' : 'ai';
+                const text = msg.sender === 'user' ? msg.text : metniTemizle(msg.text);
+                body.innerHTML += `<div class="msg ${roleClass}">${text}</div>`;
+            });
+        } else {
+            body.innerHTML = '<div class="msg ai">Merhaba, sana nasıl yardımcı olabilirim?</div>';
+        }
+        body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
+    });
 
     if (initialText) { 
         setTimeout(() => { document.getElementById('aiInput').value = initialText; sendAIMessage(); }, 300); 
@@ -513,15 +529,12 @@ async function sendAIMessage() {
     const text = inp.value.trim();
     if (!text) return;
     
-    // Yeni soru sorulduğunda eski sekmeleri sıfırla (history'den sadece son cevabı tut)
-    currentQuery = text;
-
     const body = document.getElementById('aiChatBody');
     body.innerHTML += `<div class="msg user">${text}</div>`;
     inp.value = '';
-    
-    aiChatHistory.push({ role: "user", parts: [{ text: text }] });
-    localStorage.setItem('haberai_chat_history', JSON.stringify(aiChatHistory));
+
+    // Kullanıcı mesajını Firebase'e kaydet
+    db.ref('ai_sohbet_gecmisi').push({ sender: 'user', text: text, timestamp: Date.now() });
 
     const typingId = 'typing-' + Date.now();
     body.innerHTML += `<div class="msg ai" id="${typingId}"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
@@ -531,14 +544,13 @@ async function sendAIMessage() {
         const cevap = await callGemini(text);
         const temizCevap = metniTemizle(cevap);
         
-        aiChatHistory.push({ role: "model", parts: [{ text: cevap }] });
-        localStorage.setItem('haberai_chat_history', JSON.stringify(aiChatHistory));
-
         const typing = document.getElementById(typingId);
         if (typing) typing.remove();
-        
-        // Cevap geldiğinde sekmeleri ve sonucu içeren mesajı bas (renderAIChat'ı tekrar çağırarak)
-        renderAIChat();
+        body.innerHTML += `<div class="msg ai">${temizCevap}</div>`;
+        body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
+
+        // AI cevabını Firebase'e kaydet
+        db.ref('ai_sohbet_gecmisi').push({ sender: 'ai', text: temizCevap, timestamp: Date.now() });
         
     } catch (e) {
         console.log('AI gönderim hatası:', e);
@@ -660,7 +672,7 @@ function confirmClearChat() {
     const container = document.getElementById('confirmModalContainer');
     container.innerHTML = `
         <div class="modal-header"><h2>Sohbeti Temizle</h2><button onclick="closeConfirmModal()">✕</button></div>
-        <div class="modal-body" style="text-align:center;"><p>Ekrandaki sohbeti temizlemek istiyor musun?</p></div>
+        <div class="modal-body" style="text-align:center;"><p>Ekrandaki ve veritabanındaki sohbeti temizlemek istiyor musun?</p></div>
         <div class="modal-footer"><button class="btn-full" onclick="closeConfirmModal()">VAZGEÇ</button><button class="btn-full danger" onclick="clearChatAndClose()">EVET, SİL</button></div>`;
     document.getElementById('confirmModalOverlay').classList.add('active');
     pushModal('confirm');
@@ -672,9 +684,7 @@ function closeConfirmModal(useStack = true) {
 }
 
 function clearChatAndClose() {
-    // Firebase'den sohbet geçmişini tamamen sil
-    db.ref('ai_sohbet_gecmisi').remove();
-    
+    db.ref('ai_sohbet_gecmisi').remove(); // Firebase'den sil
     document.getElementById('aiChatBody').innerHTML = '<div class="msg ai">Merhaba, sana nasıl yardımcı olabilirim?</div>';
     closeConfirmModal();
     showToast('🗑️ Sohbet temizlendi');
