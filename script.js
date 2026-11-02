@@ -86,9 +86,7 @@ async function callGemini(text) {
     const res = await fetch(GEMINI_PROXY_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            contents: [{ parts: [{ text }] }]
-        })
+        body: JSON.stringify({ contents: [{ parts: [{ text }] }] })
     });
     if (!res.ok) throw new Error('Gemini ' + res.status);
     const data = await res.json();
@@ -276,11 +274,136 @@ function renderAll() {
     listMount.innerHTML = listHTML;
     document.getElementById('scrollArea').scrollTop = 0;
 }
+
 function loadMore() { visibleCount += newsLimit; renderAll(); document.getElementById('scrollArea').scrollTo({ top: document.getElementById('scrollArea').scrollHeight, behavior: 'smooth' }); }
 function setCategory(el, cat) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); currentCategory = cat; visibleCount = newsLimit; renderAll(); }
 function softRefresh() { visibleCount = newsLimit; localStorage.removeItem('haberai_news_cache'); fetchAllNews(true); showToast('🔄 Haberler yenilendi'); }
 
-// ==================== AI SOHBET ====================
+// ==================== DETAY SAYFASI ====================
+function openDetailPage(id) {
+    currentDetailNews = news.find(n => n.id == id);
+    if (!currentDetailNews) return;
+    showDetailPage();
+}
+function openDetailPageFromSaved(i) {
+    currentDetailNews = savedNews[i];
+    showDetailPage();
+}
+function showDetailPage() {
+    const n = currentDetailNews;
+    if (!n) return;
+    document.getElementById('mainPage').style.display = 'none';
+    const dp = document.getElementById('detailPage');
+    dp.style.display = 'flex';
+    dp.scrollTop = 0;
+    document.getElementById('detailSource').textContent = n.source;
+    document.getElementById('detailSource2').textContent = n.source;
+    document.getElementById('detailImage').src = n.thumbnail || n.image || '';
+    document.getElementById('detailImage').style.display = 'block';
+    document.getElementById('detailCategory').textContent = (n.category || '').toUpperCase();
+    document.getElementById('detailTitle').textContent = n.title;
+    document.getElementById('detailDate').textContent = n.pubDate ? new Date(n.pubDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+
+    document.getElementById('detailBody').innerHTML = '<p style="text-align:center; color:#888;">İçerik yükleniyor...</p>';
+
+    if (n.link && n.link !== '#') {
+        const proxyUrl = "https://wild-sky-08d7.06mmt8129.workers.dev/?url=";
+        fetch(proxyUrl + encodeURIComponent(n.link))
+            .then(res => res.text())
+            .then(html => {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const paragraphs = Array.from(doc.querySelectorAll('p'))
+                    .map(p => p.textContent.trim())
+                    .filter(t => t.length > 40)
+                    .slice(0, 5)
+                    .join('<br><br>');
+                if (paragraphs) {
+                    const contentHTML = paragraphs.split('<br><br>').map(p => `<p>${p}</p>`).join('');
+                    const endMarker = `<div style="display:flex;align-items:center;gap:10px;margin-top:30px;padding:20px 0;"><div style="flex:1;height:1px;background:#333;"></div><span style="font-size:0.7rem; color:#666; letter-spacing:0.1em;">BİTTİ</span><div style="flex:1;height:1px;background:#333;"></div></div>`;
+                    document.getElementById('detailBody').innerHTML = contentHTML + endMarker;
+                }
+            })
+            .catch(e => { console.log('İçerik çekme hatası:', e); });
+    }
+    detailStarred = savedNews.some(s => s.title === n.title);
+    updateDetailStarBtn();
+    document.getElementById('detailFab').style.display = 'flex';
+    pushModal('detail');
+}
+function closeDetail(useStack = true) {
+    document.getElementById('detailPage').style.display = 'none';
+    document.getElementById('mainPage').style.display = '';
+    document.body.style.overflow = '';
+    currentDetailNews = null;
+    if (useStack) popModal();
+}
+function toggleDetailStar() {
+    if (!currentDetailNews) return;
+    if (detailStarred) { savedNews = savedNews.filter(s => s.title !== currentDetailNews.title); }
+    else { savedNews.push({ ...currentDetailNews, savedAt: new Date().toISOString() }); }
+    detailStarred = !detailStarred;
+    localStorage.setItem('haberai_saved', JSON.stringify(savedNews));
+    updateSavedBadge();
+    updateDetailStarBtn();
+    showToast(detailStarred ? '★ Kaydedildi' : '☆ Kayıt kaldırıldı');
+}
+function updateDetailStarBtn() {
+    const btn = document.getElementById('detailStarBtn');
+    btn.textContent = detailStarred ? '★' : '☆';
+    if (detailStarred) btn.classList.add('saved'); else btn.classList.remove('saved');
+}
+function toggleDetailDropdown() { dropdownOpen = !dropdownOpen; document.getElementById('detailDropdown').classList.toggle('show', dropdownOpen); }
+function shareDetailNews() { dropdownOpen = false; document.getElementById('detailDropdown').classList.remove('show'); if (navigator.share && currentDetailNews) navigator.share({ title: currentDetailNews.title, text: currentDetailNews.title, url: currentDetailNews.link || '#' }).catch(() => {}); }
+function openDetailLink() { dropdownOpen = false; document.getElementById('detailDropdown').classList.remove('show'); if (currentDetailNews && currentDetailNews.link && currentDetailNews.link !== '#') window.open(currentDetailNews.link, '_blank'); }
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('detailDropdown');
+    const btn = document.getElementById('detailMenuBtn');
+    if (dropdownOpen && menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) { dropdownOpen = false; menu.classList.remove('show'); }
+});
+
+// ==================== DETAY AI SHEET ====================
+function openDetailSheet() {
+    document.getElementById('detailSheet').classList.add('active');
+    document.getElementById('detailFab').style.display = 'none';
+    document.body.style.overflow = 'hidden';
+    const chatBody = document.getElementById('detailChatBody');
+    chatBody.innerHTML = '<div class="msg ai">Bu haber hakkında ne öğrenmek istersin?<div class="chip-row"><button class="chip" onclick="askDetailAI(\'Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.\')">✨ Özetle</button></div></div>';
+    pushModal('detailSheet');
+}
+function closeDetailSheet(useStack = true) {
+    document.getElementById('detailSheet').classList.remove('active');
+    document.getElementById('detailFab').style.display = 'flex';
+    document.body.style.overflow = '';
+    if (useStack) popModal();
+}
+async function sendDetailMessage() {
+    const inp = document.getElementById('detailChatInput');
+    const text = inp.value.trim();
+    if (!text || !currentDetailNews) return;
+    const body = document.getElementById('detailChatBody');
+    body.innerHTML += `<div class="msg user">${text}</div>`;
+    inp.value = '';
+    const typingId = 'dtyping-' + Date.now();
+    body.innerHTML += `<div class="msg ai" id="${typingId}"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+    body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
+    const contextPrompt = `Haber Başlığı: ${currentDetailNews.title}\nHaber Linki: ${currentDetailNews.link || ''}\nHaber Açıklaması: ${(currentDetailNews.description || '').replace(/<[^>]*>/g, '').substring(0, 800)}\n\nKullanıcı Sorusu: ${text}`;
+    try {
+        const cevap = await callGemini(contextPrompt);
+        const temizCevap = metniTemizle(cevap);
+        const typing = document.getElementById(typingId);
+        if (typing) typing.remove();
+        body.innerHTML += `<div class="msg ai">${temizCevap}</div>`;
+        body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
+    } catch (e) {
+        const typing = document.getElementById(typingId);
+        if (typing) typing.remove();
+        body.innerHTML += '<div class="msg ai">Bağlantı hatası! 😕</div>';
+        body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
+    }
+}
+function askDetailAI(prompt) { document.getElementById('detailChatInput').value = prompt; sendDetailMessage(); }
+
+// ==================== AI SOHBET (FIREBASE KAYITLI) ====================
 function openAIModal(initialText) {
     document.getElementById('aiModalOverlay').classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -393,10 +516,7 @@ function confirmClearChat() {
     document.getElementById('confirmModalOverlay').classList.add('active');
     pushModal('confirm');
 }
-function closeConfirmModal(useStack = true) {
-    document.getElementById('confirmModalOverlay').classList.remove('active');
-    if (useStack) popModal();
-}
+function closeConfirmModal(useStack = true) { document.getElementById('confirmModalOverlay').classList.remove('active'); if (useStack) popModal(); }
 function clearChatAndClose() {
     db.ref('ai_sohbet_gecmisi').remove();
     document.getElementById('aiChatBody').innerHTML = '<div class="msg ai">Merhaba, sana nasıl yardımcı olabilirim?</div>';
@@ -404,7 +524,7 @@ function clearChatAndClose() {
     showToast('🗑️ Sohbet temizlendi');
 }
 
-// ==================== DİĞER FONKSİYONLAR ====================
+// ==================== ARAMA / AYARLAR / RSS ====================
 function handleInput() {
     const inp = document.getElementById('mainInput');
     const val = inp.value.trim();
@@ -422,26 +542,181 @@ function openSearchModal(query) {
     document.body.style.overflow = 'hidden';
     pushModal('search', { query });
 }
-function closeSearchModal(useStack = true) {
-    document.getElementById('searchModalOverlay').classList.remove('active');
-    document.body.style.overflow = '';
-    if (useStack) popModal();
+function closeSearchModal(useStack = true) { document.getElementById('searchModalOverlay').classList.remove('active'); document.body.style.overflow = ''; if (useStack) popModal(); }
+
+function openSettingsModal() {
+    const container = document.getElementById('settingsModalContainer');
+    container.innerHTML = `<div class="modal-header"><h2>⚙️ Ayarlar</h2><button onclick="closeSettingsModal()">✕</button></div><div class="modal-body"><div style="margin-bottom:20px;"><label style="font-weight:600;font-size:0.9rem;display:block;margin-bottom:10px;">Haber Sayısı</label><div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);padding:10px;border-radius:12px;"><button onclick="adjustNewsLimit(-5)" style="width:40px;height:40px;border-radius:10px;border:none;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,0.1);">-</button><span id="newsLimitDisplay" style="font-weight:bold;font-size:1.2rem;">${newsLimit}</span><button onclick="adjustNewsLimit(5)" style="width:40px;height:40px;border-radius:10px;border:none;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,0.1);">+</button></div></div><button class="btn-full" onclick="openRSSModal()">📡 Kaynakları Yönet</button></div><div class="modal-footer"><button class="btn-full primary" onclick="closeSettingsModal()">Kapat</button></div>`;
+    document.getElementById('settingsModalOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    pushModal('settings');
+}
+function closeSettingsModal(useStack = true) { document.getElementById('settingsModalOverlay').classList.remove('active'); document.body.style.overflow = ''; if (useStack) popModal(); visibleCount = newsLimit; renderAll(); }
+function adjustNewsLimit(amount) { let newLimit = newsLimit + amount; if (newLimit >= 5 && newLimit <= 20) { newsLimit = newLimit; localStorage.setItem('haberai_news_limit', newsLimit); document.getElementById('newsLimitDisplay').textContent = newsLimit; } }
+
+function openRSSModal() {
+    const container = document.getElementById('rssModalContainer');
+    container.innerHTML = `<div class="modal-header"><div style="display:flex;align-items:center;gap:10px;"><button onclick="backToSettingsFromRSS()" style="background:var(--bg);">←</button><h2>Kaynaklar</h2></div><button onclick="openAddRSS()" style="background:var(--primary);color:#fff;width:auto;padding:0 15px;font-size:0.8rem;">Ekle</button></div><div class="modal-body" id="rssListBody">Yükleniyor...</div><div class="modal-footer"><button class="btn-full" onclick="backToSettingsFromRSS()">Geri Dön</button></div>`;
+    document.getElementById('rssModalOverlay').classList.add('active');
+    if (modalStack[modalStack.length - 1]?.type !== 'rss') pushModal('rss');
+    db.ref('rss_ayarlari').once('value', snap => {
+        const body = document.getElementById('rssListBody');
+        if (!body) return;
+        const data = snap.val();
+        if (!data) { body.innerHTML = '<p style="text-align:center;">Kaynak yok.</p>'; return; }
+        body.innerHTML = Object.keys(data).map(key => {
+            const r = data[key];
+            const isDisabled = disabledSources.includes(key);
+            return `<div class="rss-item"><div class="rss-item-info"><strong>${r.ad}</strong><span>${r.kategori}</span></div><div class="rss-item-actions"><button onclick="toggleRSS('${key}')" id="rss-toggle-${key}" style="color:${isDisabled ? '#ccc' : '#22c55e'}">${isDisabled ? '🔴' : '🟢'}</button><button onclick="editRSS('${key}')">✏️</button><button onclick="confirmDeleteRSS('${key}')">🗑️</button></div></div>`;
+        }).join('');
+    });
+}
+function closeRSSModal(useStack = true) { document.getElementById('rssModalOverlay').classList.remove('active'); if (useStack) popModal(); }
+function backToSettingsFromRSS() { if (modalStack[modalStack.length - 1]?.type === 'rss') popModal(); closeRSSModal(false); openSettingsModal(); }
+function openAddRSS() {
+    const container = document.getElementById('rssModalContainer');
+    container.innerHTML = `<div class="modal-header"><div style="display:flex;align-items:center;gap:10px;"><button onclick="openRSSModal()">←</button><h2>Ekle</h2></div></div><div class="modal-body"><label style="font-size:0.8rem;font-weight:600;">Adı</label><input class="form-input" id="rssName"><label style="font-size:0.8rem;font-weight:600;">URL</label><input class="form-input" id="rssUrl"><label style="font-size:0.8rem;font-weight:600;">Kategori</label><select class="form-select" id="rssCat">${['GÜNDEM','SPOR','EKONOMİ','TEKNOLOJİ','DÜNYA'].map(c => `<option value="${c}">${c}</option>`).join('')}</select></div><div class="modal-footer"><button class="btn-full primary" onclick="saveRSS()">Kaydet</button></div>`;
+    pushModal('rss');
+}
+function saveRSS() {
+    const ad = document.getElementById('rssName')?.value;
+    const url = document.getElementById('rssUrl')?.value;
+    const kat = document.getElementById('rssCat')?.value;
+    if (!ad || !url) { showToast('Boş bırakma!'); return; }
+    db.ref('rss_ayarlari').push({ ad, url, kategori: kat }).then(() => { showToast('✅ Eklendi'); openRSSModal(); });
+}
+function editRSS(key) {
+    db.ref('rss_ayarlari/' + key).once('value', snap => {
+        const r = snap.val(); if (!r) return;
+        const container = document.getElementById('rssModalContainer');
+        container.innerHTML = `<div class="modal-header"><div style="display:flex;align-items:center;gap:10px;"><button onclick="openRSSModal()">←</button><h2>Düzenle</h2></div></div><div class="modal-body"><label style="font-size:0.8rem;font-weight:600;">Adı</label><input class="form-input" id="editRssName" value="${r.ad}"><label style="font-size:0.8rem;font-weight:600;">URL</label><input class="form-input" id="editRssUrl" value="${r.url}"><label style="font-size:0.8rem;font-weight:600;">Kategori</label><select class="form-select" id="editRssCat">${['GÜNDEM','SPOR','EKONOMİ','TEKNOLOJİ','DÜNYA'].map(c => `<option value="${c}" ${r.kategori===c?'selected':''}>${c}</option>`).join('')}</select></div><div class="modal-footer"><button class="btn-full primary" onclick="updateRSS('${key}')">Güncelle</button></div>`;
+        pushModal('rss');
+    });
+}
+function updateRSS(key) {
+    const ad = document.getElementById('editRssName')?.value;
+    const url = document.getElementById('editRssUrl')?.value;
+    const kat = document.getElementById('editRssCat')?.value;
+    if (!ad || !url) { showToast('Boş bırakma!'); return; }
+    db.ref('rss_ayarlari/' + key).update({ ad, url, kategori: kat }).then(() => { showToast('✅ Güncellendi'); openRSSModal(); });
+}
+function confirmDeleteRSS(key) {
+    const container = document.getElementById('rssModalContainer');
+    container.innerHTML = `<div class="modal-header"><h2 style="color:var(--primary);">Sil?</h2><button onclick="openRSSModal()">✕</button></div><div class="modal-body" style="text-align:center;"><p>Bu kaynağı silmek istiyor musun?</p></div><div class="modal-footer"><button class="btn-full danger" onclick="executeDeleteRSS('${key}')">Evet, Sil</button></div>`;
+    pushModal('rss');
+}
+function executeDeleteRSS(key) { db.ref('rss_ayarlari/' + key).remove().then(() => { showToast('🗑️ Silindi'); openRSSModal(); }); }
+function toggleRSS(key) {
+    if (disabledSources.includes(key)) { disabledSources = disabledSources.filter(id => id !== key); }
+    else { disabledSources.push(key); }
+    localStorage.setItem('haberai_disabled_sources', JSON.stringify(disabledSources));
+    const btn = document.getElementById('rss-toggle-' + key);
+    if (btn) { const isDisabled = disabledSources.includes(key); btn.style.color = isDisabled ? '#ccc' : '#22c55e'; btn.textContent = isDisabled ? '🔴' : '🟢'; }
+    showToast(disabledSources.includes(key) ? '🔴 Pasif' : '🟢 Aktif');
 }
 
-function showToast(msg) {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.style.opacity = '1';
-    clearTimeout(window._toastTimer);
-    window._toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 2000);
-}
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === '/') {
-        const a = document.activeElement;
-        if (a !== document.getElementById('mainInput') && a !== document.getElementById('aiInput')) { e.preventDefault(); document.getElementById('mainInput').focus(); }
+// ==================== KAYDEDİLENLER ====================
+function openSavedModal() {
+    const container = document.getElementById('savedModalContainer');
+    let html = '<div class="modal-header"><h2>Kaydedilenler</h2><button onclick="closeSavedModal()">✕</button></div><div class="modal-body">';
+    if (savedNews.length === 0) { html += '<div class="empty-state">Kayıt yok.</div>'; }
+    else {
+        savedNews.forEach((n, i) => {
+            html += `<div class="story-list-item" onclick="openDetailPageFromSaved(${i})" style="border-bottom:1px solid var(--border); border-radius:0; padding:10px 0; box-shadow:none;"><div class="list-item-content"><div class="list-item-kicker">${n.source}</div><div class="list-item-headline" style="font-size:0.9rem;">${n.title}</div></div></div>`;
+        });
     }
-    if (e.key === 'Escape') { closeTopModal(); }
-});
+    html += '</div><div class="modal-footer"><button class="btn-full" onclick="closeSavedModal()">Kapat</button></div>';
+    container.innerHTML = html;
+    document.getElementById('savedModalOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    pushModal('saved');
+}
+function closeSavedModal(useStack = true) { document.getElementById('savedModalOverlay').classList.remove('active'); document.body.style.overflow = ''; if (useStack) popModal(); }
+function deleteSaved(i) { savedNews.splice(i, 1); localStorage.setItem('haberai_saved', JSON.stringify(savedNews)); updateSavedBadge(); openSavedModal(); showToast('🗑️ Silindi'); }
 
+// ==================== HAVA DURUMU ====================
+function getWeatherIcon(code) {
+    if (code === 0 || code === 1) return '☀️'; if (code === 2 || code === 3) return '⛅'; if (code === 45 || code === 48) return '🌫️'; if (code >= 51 && code <= 55) return '🌦️'; if (code >= 61 && code <= 65) return '🌧️'; if (code >= 71 && code <= 75) return '❄️'; if (code >= 80 && code <= 82) return '⛈️'; if (code >= 95) return '🌩️'; return '🌈';
+}
+function getWeatherText(code) {
+    const map = { 0: 'Açık', 1: 'Az Bulutlu', 2: 'Parçalı Bulutlu', 3: 'Kapalı', 45: 'Sisli', 48: 'Buzlu Sis', 51: 'Hafif Çise', 53: 'Çiseleme', 55: 'Yoğun Çise', 61: 'Hafif Yağmur', 63: 'Yağmur', 65: 'Yoğun Yağmur', 71: 'Hafif Kar', 73: 'Kar', 75: 'Yoğun Kar', 80: 'Hafif Sağanak', 81: 'Sağanak', 82: 'Yoğun Sağanak', 95: 'Gök Gürültülü', 96: 'Dolu', 99: 'Yoğun Dolu' };
+    return map[code] || 'Bilinmiyor';
+}
+async function fetchWeather(city = 'Ankara') {
+    try {
+        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=tr`);
+        const geoData = await geoRes.json();
+        if (!geoData.results || geoData.results.length === 0) { showToast('Şehir bulunamadı!'); return; }
+        const lat = geoData.results[0].latitude; const lon = geoData.results[0].longitude; const sehirAdi = geoData.results[0].name;
+        const havaRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=7`);
+        const data = await havaRes.json();
+        weatherDailyData = data.daily.time.map((date, i) => ({ date: date, max: data.daily.temperature_2m_max[i], min: data.daily.temperature_2m_min[i], code: data.daily.weathercode[i], icon: getWeatherIcon(data.daily.weathercode[i]), text: getWeatherText(data.daily.weathercode[i]) }));
+        weatherCurrentData = { temp: Math.round(data.current_weather.temperature), code: data.current_weather.weathercode, icon: getWeatherIcon(data.current_weather.weathercode), text: getWeatherText(data.current_weather.weathercode), city: sehirAdi };
+        document.getElementById('weatherIcon').textContent = weatherCurrentData.icon; document.getElementById('weatherTemp').textContent = weatherCurrentData.temp + '°';
+        localStorage.setItem('haberai_weather', JSON.stringify({ daily: weatherDailyData, current: weatherCurrentData, time: Date.now() }));
+        if (document.getElementById('weatherModalOverlay').classList.contains('active')) renderWeatherModal(sehirAdi);
+    } catch (e) { console.log('Hava durumu hatası:', e); }
+}
+function loadWeatherFromCache() {
+    const cached = localStorage.getItem('haberai_weather'); if (!cached) return false;
+    try { const data = JSON.parse(cached); weatherDailyData = data.daily || []; weatherCurrentData = data.current || null; if (weatherCurrentData) { document.getElementById('weatherIcon').textContent = weatherCurrentData.icon; document.getElementById('weatherTemp').textContent = weatherCurrentData.temp + '°'; } return true; } catch (e) { return false; }
+}
+function renderWeatherModal(cityName) {
+    const container = document.getElementById('weatherModalContainer'); const current = weatherCurrentData || {};
+    container.innerHTML = `<div class="modal-header"><h2>Hava Durumu</h2><button onclick="closeWeatherModal()">✕</button></div><div class="modal-body"><div class="weather-search-box"><input type="text" id="weatherSearchInput" placeholder="Şehir ara..." value="${cityName || 'Ankara'}"><button onclick="searchWeather()">Ara</button></div><div class="weather-current"><div class="wc-icon">${current.icon || '☀️'}</div><div class="wc-temp">${current.temp != null ? current.temp + '°' : '--°'}</div><div class="wc-text">${current.text || ''} · ${current.city || cityName || ''}</div></div><div style="font-weight:600;margin-bottom:10px;">7 Günlük Tahmin</div><div class="weather-forecast-grid" id="weatherForecastGrid"></div></div>`;
+    const grid = document.getElementById('weatherForecastGrid');
+    weatherDailyData.forEach(day => { const date = new Date(day.date + 'T00:00:00'); const dayName = date.toLocaleDateString('tr-TR', { weekday: 'short' }); const card = document.createElement('div'); card.className = 'weather-day-card'; card.innerHTML = `<div class="day-name">${dayName}</div><div class="day-icon">${day.icon}</div><div class="max">${Math.round(day.max)}°</div><div class="min">${Math.round(day.min)}°</div>`; grid.appendChild(card); });
+    const inp = document.getElementById('weatherSearchInput'); if (inp) inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') searchWeather(); });
+}
+function openWeatherModal() { document.getElementById('weatherModalOverlay').classList.add('active'); document.body.style.overflow = 'hidden'; pushModal('weather'); if (weatherDailyData.length > 0 && weatherCurrentData) renderWeatherModal(weatherCurrentData.city || 'Ankara'); else { renderWeatherModal('Ankara'); fetchWeather('Ankara'); } }
+function closeWeatherModal(useStack = true) { document.getElementById('weatherModalOverlay').classList.remove('active'); document.body.style.overflow = ''; if (useStack) popModal(); }
+function searchWeather() { const city = document.getElementById('weatherSearchInput')?.value.trim(); if (!city) return; fetchWeather(city); }
+
+// ==================== TAKVİM ====================
+function openCalendarModal() {
+    tempSelectedDate = selectedDateFilter; calendarViewDate = new Date();
+    if (tempSelectedDate) { const d = new Date(tempSelectedDate + 'T00:00:00'); calendarViewDate = new Date(d.getFullYear(), d.getMonth(), 1); }
+    renderCalendarModal(); document.getElementById('calendarModalOverlay').classList.add('active'); document.body.style.overflow = 'hidden'; pushModal('calendar');
+}
+function closeCalendarModal(useStack = true) { document.getElementById('calendarModalOverlay').classList.remove('active'); document.body.style.overflow = ''; if (useStack) popModal(); }
+function renderCalendarModal() {
+    const year = calendarViewDate.getFullYear(); const month = calendarViewDate.getMonth(); const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate(); const daysInPrevMonth = new Date(year, month, 0).getDate(); const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+    const todayKey = dateKey(new Date()); const container = document.getElementById('calendarModalContainer');
+    container.innerHTML = `<div class="modal-header"><h2>Takvim</h2><button onclick="closeCalendarModal()">✕</button></div><div class="modal-body"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;"><button onclick="changeCalendarMonth(-1)" style="border:none;background:var(--bg);width:30px;height:30px;border-radius:50%;">◀</button><span style="font-weight:700;">${monthNames[month]} ${year}</span><button onclick="changeCalendarMonth(1)" style="border:none;background:var(--bg);width:30px;height:30px;border-radius:50%;">▶</button></div><div class="calendar-grid" id="calendarGrid"></div></div><div class="modal-footer"><button class="btn-full" onclick="closeCalendarModal()">İptal</button><button class="btn-full primary" onclick="applyCalendarFilter()">Tamam</button></div>`;
+    const grid = document.getElementById('calendarGrid'); ['P', 'S', 'Ç', 'P', 'C', 'C', 'P'].forEach(label => { const div = document.createElement('div'); div.className = 'day-label'; div.textContent = label; grid.appendChild(div); });
+    let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+    for (let i = startOffset - 1; i >= 0; i--) { const div = document.createElement('div'); div.className = 'day-cell other-month'; div.textContent = daysInPrevMonth - i; grid.appendChild(div); }
+    for (let i = 1; i <= daysInMonth; i++) { const div = document.createElement('div'); div.className = 'day-cell'; const cellKey = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(i).padStart(2, '0'); if (cellKey === todayKey) div.classList.add('today'); if (cellKey === tempSelectedDate) div.classList.add('selected'); div.textContent = i; div.onclick = () => selectCalendarDay(cellKey); grid.appendChild(div); }
+    const totalCells = startOffset + daysInMonth; const remaining = (7 - (totalCells % 7)) % 7;
+    for (let i = 1; i <= remaining; i++) { const div = document.createElement('div'); div.className = 'day-cell other-month'; div.textContent = i; grid.appendChild(div); }
+}
+function changeCalendarMonth(delta) { calendarViewDate.setMonth(calendarViewDate.getMonth() + delta); renderCalendarModal(); }
+function selectCalendarDay(cellKey) { tempSelectedDate = cellKey; renderCalendarModal(); }
+function applyCalendarFilter() {
+    if (tempSelectedDate === dateKey(new Date())) selectedDateFilter = null;
+    else if (tempSelectedDate) selectedDateFilter = tempSelectedDate;
+    else selectedDateFilter = null;
+    updateDate(); visibleCount = newsLimit; renderAll(); closeCalendarModal();
+}
+
+// ==================== TARİH GÜNCELLEME VE BAŞLANGIÇ ====================
+function updateDate() {
+    const el = document.getElementById('mastheadDate');
+    if (selectedDateFilter) {
+        const d = new Date(selectedDateFilter + 'T00:00:00');
+        el.textContent = '📅 ' + d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
+        el.classList.add('filtered');
+    } else {
+        el.textContent = new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' });
+        el.classList.remove('filtered');
+    }
+}
+
+function showToast(msg) { const toast = document.getElementById('toast'); toast.textContent = msg; toast.style.opacity = '1'; clearTimeout(window._toastTimer); window._toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 2000); }
+document.addEventListener('keydown', (e) => { if (e.key === '/') { const a = document.activeElement; if (a !== document.getElementById('mainInput') && a !== document.getElementById('aiInput') && a !== document.getElementById('detailChatInput')) { e.preventDefault(); document.getElementById('mainInput').focus(); } } if (e.key === 'Escape') { closeTopModal(); } });
+
+// ==================== BAŞLAT ====================
 updateSavedBadge();
+updateDate();
+loadWeatherFromCache();
+fetchWeather('Ankara');
