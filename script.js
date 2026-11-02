@@ -458,20 +458,23 @@ function openAIModal(initialText) {
     
     body.innerHTML = '<div class="msg ai">Sohbet geçmişi yükleniyor...</div>';
     
+    // Firebase'den geçmişi çek
     db.ref('ai_sohbet_gecmisi').once('value', snap => {
-        body.innerHTML = '';
         const data = snap.val();
         if (data) {
             const messages = Object.values(data).sort((a, b) => a.timestamp - b.timestamp);
-            messages.forEach(msg => {
-                const roleClass = msg.sender === 'user' ? 'user' : 'ai';
-                const text = msg.sender === 'user' ? msg.text : metniTemizle(msg.text);
-                body.innerHTML += `<div class="msg ${roleClass}">${text}</div>`;
-            });
+            
+            // Firebase verisini, bizim render fonksiyonunun anladığı formata çevir
+            aiChatHistory = messages.map(msg => ({
+                role: msg.sender === 'user' ? 'user' : 'model',
+                parts: [{ text: msg.text }]
+            }));
         } else {
-            body.innerHTML = '<div class="msg ai">Merhaba, sana nasıl yardımcı olabilirim?</div>';
+            aiChatHistory = [];
         }
-        body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
+        
+        // Sekmeleri ve mesajları bas
+        renderAIChat(); 
     });
 
     if (initialText) { 
@@ -499,7 +502,7 @@ function renderAIChat() {
         const roleClass = msg.role === 'user' ? 'user' : 'ai';
         const text = msg.role === 'user' ? msg.parts[0].text : metniTemizle(msg.parts[0].text);
         
-        // Eğer bu bir AI mesajıysa ve son mesajsa, altına sekmeleri ve sonuç alanlarını ekle
+        // Son mesaj AI'dan geldiyse, altına sekmeleri ekle
         if (msg.role === 'model' && index === aiChatHistory.length - 1) {
             body.innerHTML += `
                 <div class="msg ai" style="max-width: 100%; width: 100%;">
@@ -510,7 +513,6 @@ function renderAIChat() {
                         <button class="ai-tab" id="tab-image" onclick="switchTab('image')">görsel</button>
                     </div>
                     
-                    <!-- Sekme İçerik Alanları -->
                     <div id="inlineTabContent">
                         <div class="search-body" id="inlineSearchBody" style="display: none;"></div>
                         <div class="image-body" id="inlineImageBody" style="display: none;"></div>
@@ -533,7 +535,8 @@ async function sendAIMessage() {
     body.innerHTML += `<div class="msg user">${text}</div>`;
     inp.value = '';
 
-    // Kullanıcı mesajını Firebase'e kaydet
+    // Kullanıcı mesajını geçmişe ve Firebase'e ekle
+    aiChatHistory.push({ role: "user", parts: [{ text: text }] });
     db.ref('ai_sohbet_gecmisi').push({ sender: 'user', text: text, timestamp: Date.now() });
 
     const typingId = 'typing-' + Date.now();
@@ -544,13 +547,15 @@ async function sendAIMessage() {
         const cevap = await callGemini(text);
         const temizCevap = metniTemizle(cevap);
         
+        // AI cevabını geçmişe ve Firebase'e ekle
+        aiChatHistory.push({ role: "model", parts: [{ text: cevap }] });
+        db.ref('ai_sohbet_gecmisi').push({ sender: 'ai', text: temizCevap, timestamp: Date.now() });
+
         const typing = document.getElementById(typingId);
         if (typing) typing.remove();
-        body.innerHTML += `<div class="msg ai">${temizCevap}</div>`;
-        body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
-
-        // AI cevabını Firebase'e kaydet
-        db.ref('ai_sohbet_gecmisi').push({ sender: 'ai', text: temizCevap, timestamp: Date.now() });
+        
+        // Cevap geldiğinde renderAIChat'i çağırarak sekmeleri ekrana bas
+        renderAIChat(); 
         
     } catch (e) {
         console.log('AI gönderim hatası:', e);
