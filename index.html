@@ -136,17 +136,16 @@
         </div>
     </div>
     
-            <div id="aiModalOverlay" class="modal-overlay">
-        <div class="modal-container ai-modal">
+                <div id="aiModalOverlay" class="modal-overlay">
+        <div class="modal-container ai-modal" style="width: 100%; max-width: 480px; height: 100vh; border-radius: 0; overflow: hidden;">
             <div class="modal-header">
                 <h2>AI Asistan</h2>
                 <div><button onclick="confirmClearChat()">Temizle</button><button onclick="closeAIModal()">✕</button></div>
             </div>
+            <!-- Sohbetin aktığı alan -->
+            <div class="modal-body chat-body" id="aiChatBody" style="flex: 1; overflow-y: auto; overflow-x: hidden; padding: 15px; width: 100%; box-sizing: border-box;"></div>
             
-            <!-- Sadece sohbet alanı kaldı -->
-            <div class="modal-body chat-body" id="aiChatBody"></div>
-
-            <div class="modal-footer-input">
+            <div class="modal-footer-input" style="flex-shrink: 0;">
                 <input type="text" id="aiInput" placeholder="Bir şey sor..." onkeypress="if(event.key==='Enter')sendAIMessage()">
                 <button onclick="sendAIMessage()">→</button>
             </div>
