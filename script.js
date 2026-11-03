@@ -448,22 +448,25 @@ function closeAIModal(useStack = true) {
     document.body.style.overflow = '';
     if (useStack) popModal();
 }
+
 function renderAIChat() {
     const body = document.getElementById('aiChatBody');
     body.innerHTML = '<div class="msg ai">Merhaba, sana nasıl yardımcı olabilirim?</div>';
+    
     aiChatHistory.forEach((msg, index) => {
         const roleClass = msg.role === 'user' ? 'user' : 'ai';
         const text = msg.role === 'user' ? msg.parts[0].text : metniTemizle(msg.parts[0].text);
+        
         if (msg.role === 'model' && index === aiChatHistory.length - 1) {
             body.innerHTML += `
-                <div class="msg ai" style="max-width: 100%; width: 100%;">
+                <div class="msg ai" style="max-width: 100%; width: 100%; box-sizing: border-box; word-wrap: break-word; overflow-wrap: anywhere;">
                     ${text}
-                    <div class="ai-tabs" id="inlineTabs">
+                    <div class="ai-tabs" id="inlineTabs" style="flex-wrap: wrap; width: 100%; box-sizing: border-box;">
                         <button class="ai-tab active" id="tab-ai" onclick="switchTab('ai')">ai</button>
                         <button class="ai-tab" id="tab-search" onclick="switchTab('search')">arama</button>
                         <button class="ai-tab" id="tab-image" onclick="switchTab('image')">görsel</button>
                     </div>
-                    <div id="inlineTabContent">
+                    <div id="inlineTabContent" style="width: 100%; box-sizing: border-box;">
                         <div class="search-body" id="inlineSearchBody" style="display: none;"></div>
                         <div class="image-body" id="inlineImageBody" style="display: none;"></div>
                     </div>
@@ -474,6 +477,7 @@ function renderAIChat() {
     });
     body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
 }
+
 async function sendAIMessage() {
     const inp = document.getElementById('aiInput');
     const text = inp.value.trim();
