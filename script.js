@@ -562,11 +562,40 @@ function closeSearchModal(useStack = true) { document.getElementById('searchModa
 
 function openSettingsModal() {
     const container = document.getElementById('settingsModalContainer');
-    container.innerHTML = `<div class="modal-header"><h2>⚙️ Ayarlar</h2><button onclick="closeSettingsModal()">✕</button></div><div class="modal-body"><div style="margin-bottom:20px;"><label style="font-weight:600;font-size:0.9rem;display:block;margin-bottom:10px;">Haber Sayısı</label><div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);padding:10px;border-radius:12px;"><button onclick="adjustNewsLimit(-5)" style="width:40px;height:40px;border-radius:10px;border:none;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,0.1);">-</button><span id="newsLimitDisplay" style="font-weight:bold;font-size:1.2rem;">${newsLimit}</span><button onclick="adjustNewsLimit(5)" style="width:40px;height:40px;border-radius:10px;border:none;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,0.1);">+</button></div></div><button class="btn-full" onclick="openRSSModal()">📡 Kaynakları Yönet</button></div><div class="modal-footer"><button class="btn-full primary" onclick="closeSettingsModal()">Kapat</button></div>`;
+    const currentTheme = localStorage.getItem('haberai_theme') || 'light';
+    
+    container.innerHTML = `
+        <div class="modal-header"><h2>⚙️ Ayarlar</h2><button onclick="closeSettingsModal()">✕</button></div>
+        <div class="modal-body">
+            <!-- TEMA SEÇİMİ -->
+            <div style="margin-bottom:20px;">
+                <label style="font-weight:600;font-size:0.9rem;display:block;margin-bottom:10px;">Tema Seçimi</label>
+                <div style="display:flex; gap:10px;">
+                    <button class="theme-btn ${currentTheme === 'light' ? 'active' : ''}" id="themeLight" onclick="setTheme('light')" style="flex:1; padding:12px; border-radius:12px; border:2px solid var(--border); background:var(--bg); color:var(--text); font-weight:600; cursor:pointer;">☀️ Aydınlık</button>
+                    <button class="theme-btn ${currentTheme === 'dark' ? 'active' : ''}" id="themeDark" onclick="setTheme('dark')" style="flex:1; padding:12px; border-radius:12px; border:2px solid var(--border); background:var(--bg); color:var(--text); font-weight:600; cursor:pointer;">🌙 Karanlık</button>
+                </div>
+            </div>
+            
+            <!-- HABER SAYISI -->
+            <div style="margin-bottom:20px;">
+                <label style="font-weight:600;font-size:0.9rem;display:block;margin-bottom:10px;">Haber Sayısı</label>
+                <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);padding:10px;border-radius:12px;">
+                    <button onclick="adjustNewsLimit(-5)" style="width:40px;height:40px;border-radius:10px;border:none;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,0.1);color:var(--text);">-</button>
+                    <span id="newsLimitDisplay" style="font-weight:bold;font-size:1.2rem;">${newsLimit}</span>
+                    <button onclick="adjustNewsLimit(5)" style="width:40px;height:40px;border-radius:10px;border:none;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,0.1);color:var(--text);">+</button>
+                </div>
+            </div>
+            
+            <button class="btn-full" onclick="openRSSModal()" style="width:100%;padding:14px;border-radius:12px;border:none;background:var(--text);color:var(--bg);font-weight:600;cursor:pointer;margin-bottom:10px;">📡 Kaynakları Yönet</button>
+        </div>
+        <div class="modal-footer"><button class="btn-full primary" onclick="closeSettingsModal()" style="width:100%;padding:14px;border-radius:12px;border:none;background:var(--primary);color:#fff;font-weight:600;cursor:pointer;">Kapat</button></div>`;
+        
     document.getElementById('settingsModalOverlay').classList.add('active');
     document.body.style.overflow = 'hidden';
     pushModal('settings');
 }
+
+
 function closeSettingsModal(useStack = true) { document.getElementById('settingsModalOverlay').classList.remove('active'); document.body.style.overflow = ''; if (useStack) popModal(); visibleCount = newsLimit; renderAll(); }
 function adjustNewsLimit(amount) { let newLimit = newsLimit + amount; if (newLimit >= 5 && newLimit <= 20) { newsLimit = newLimit; localStorage.setItem('haberai_news_limit', newsLimit); document.getElementById('newsLimitDisplay').textContent = newsLimit; } }
 
@@ -715,6 +744,29 @@ function applyCalendarFilter() {
     updateDate(); visibleCount = newsLimit; renderAll(); closeCalendarModal();
 }
 
+function setTheme(theme) {
+    localStorage.setItem('haberai_theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+    
+    // Butonların görünümünü güncelle
+    const lightBtn = document.getElementById('themeLight');
+    const darkBtn = document.getElementById('themeDark');
+    if (lightBtn && darkBtn) {
+        if (theme === 'light') { 
+            lightBtn.style.borderColor = 'var(--primary)'; lightBtn.style.color = 'var(--primary)'; 
+            darkBtn.style.borderColor = 'var(--border)'; darkBtn.style.color = 'var(--text)';
+        } else { 
+            darkBtn.style.borderColor = 'var(--primary)'; darkBtn.style.color = 'var(--primary)'; 
+            lightBtn.style.borderColor = 'var(--border)'; lightBtn.style.color = 'var(--text)';
+        }
+    }
+}
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('haberai_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+}
+
 // ==================== TARİH GÜNCELLEME VE BAŞLANGIÇ ====================
 function updateDate() {
     const el = document.getElementById('mastheadDate');
@@ -736,3 +788,5 @@ updateSavedBadge();
 updateDate();
 loadWeatherFromCache();
 fetchWeather('Ankara');
+// ... en alttaki diğer başlatma kodlarının yanına ...
+initTheme();
