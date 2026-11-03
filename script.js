@@ -440,7 +440,7 @@ function openAIModal(initialText) {
     });
 
     if (initialText) setTimeout(() => { document.getElementById('aiInput').value = initialText; sendAIMessage(); }, 300);
-    else setTimeout(() => document.getElementById('aiInput').focus(), 400);
+    // else setTimeout(() => document.getElementById('aiInput').focus(), 400);
     pushModal('ai');
 }
 function closeAIModal(useStack = true) {
