@@ -61,6 +61,25 @@ function updateSavedBadge() {
     }
 }
 
+// Haber detay sayfası A+ ve A- butonları için yazı boyutu ayarı
+let currentDetailSize = 16;
+
+function changeDetailFontSize(amount) {
+    currentDetailSize += amount;
+    
+    // Sınırları belirle (Çok küçük veya çok büyük olmasın)
+    if (currentDetailSize < 12) currentDetailSize = 12;
+    if (currentDetailSize > 26) currentDetailSize = 26;
+    
+    // Haber içeriğini ve başlığını seç
+    const bodyText = document.querySelector('.article-body');
+    const titleText = document.querySelector('.article-title');
+    
+    if (bodyText) bodyText.style.fontSize = currentDetailSize + 'px';
+    // Başlık gövdeden biraz daha büyük kalsın
+    if (titleText) titleText.style.fontSize = (currentDetailSize + 6) + 'px';
+}
+
 function dateKey(d) {
     const dt = new Date(d);
     if (isNaN(dt.getTime())) return null;
