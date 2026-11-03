@@ -292,3 +292,25 @@ body {
     object-fit: cover;
     border-radius: 10px;
 }
+
+/* AI Sohbet Mesajlarının Taşmasını Engelle */
+.msg, .msg.ai, .msg.user {
+    word-wrap: break-word !important;       /* Uzun kelimeleri alt satıra geçir */
+    overflow-wrap: break-word !important;   /* Modern tarayıcılar için */
+    white-space: normal !important;         /* Normal metin akışı sağla */
+    max-width: 100% !important;             /* Genişliği kutudan taşırma */
+}
+
+/* AI'nın oluşturduğu tablolar veya kod blokları için */
+.msg table, .msg pre {
+    width: 100% !important;
+    display: block;
+    overflow-x: auto;                       /* Sadece tablo kendi içinde kaysın */
+    white-space: pre-wrap;
+}
+
+/* Sohbet alanı (kapsayıcı) */
+#aiChatBody {
+    overflow-x: hidden !important;          /* Yatay kaydırmayı tamamen kapat */
+    padding-right: 5px;
+}
