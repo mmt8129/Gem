@@ -482,11 +482,27 @@ async function sendAIMessage() {
     }
 }
 async function generateSearchQuery(question) {
-    try {
-        const prompt = `Aşağıdaki kullanıcı sorusunu, Google aramasında en iyi sonucu verecek kısa ve net bir arama kelimesine/cümlesine dönüştür. Sadece arama kelimesini yaz, başka hiçbir şey yazma. Tırnak işareti kullanma.\n\nSoru: ${question}`;
-        const cevap = await callGemini(prompt);
-        return metniTemizle(cevap).replace(/<[^>]*>?/gm, '').trim() || question;
-    } catch (e) { return question; }
+    // 1. Tüm noktalama işaretlerini kaldır (soru işareti, virgül, nokta vs.)
+    let cleaned = question.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+
+    // 2. Türkçeye özgü gereksiz soru eklerini ve kelimelerini kaldır
+    const stopWords = [
+        "nelerdir", "nedir", "kimdir", "nerededir", "nasıldır", "hakkında", "bilgi", "ver", "anlat", 
+        "öğrenmek", "istiyorum", "kim", "ne", "nerede", "nasıl", "neden", "niçin", "ve", "ile", "mi", "mı", "mu", "mü", "hangisi", "neresi", "nereye", "nereden", "kaçı", "hangi", "kaç", "ne kadar", "kaçıncı", "kaçar", "niye", "ne diye", "ne zaman", "kimin", "neyin", "hangileri", "kimler", "neler"
+    ];
+
+    // Metni kelimelere ayır ve gereksizleri filtrele
+    let words = cleaned.split(/\s+/);
+    words = words.filter(word => {
+        // Kelimeyi küçük harfe çevirip listemizde var mı diye bak
+        return !stopWords.includes(word.toLowerCase()) && word.length > 1;
+    });
+
+    // 3. Temizlenmiş kelimeleri tekrar birleştir
+    let finalQuery = words.join(" ").trim();
+
+    // 4. Eğer temizlik sonrası hiç kelime kalmadıysa (örn: sadece "nedir" yazıldıysa), orijinal soruyu kullan
+    return finalQuery || question;
 }
 async function switchTab(type) {
     document.getElementById('tab-ai').classList.remove('active');
