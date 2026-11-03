@@ -292,3 +292,27 @@ body {
     object-fit: cover;
     border-radius: 10px;
 }
+
+/* AI Sohbet Kutularını Zorla Sığdır */
+.ai-modal .msg.ai {
+    max-width: 100% !important;
+    width: 100% !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    box-sizing: border-box !important;
+}
+
+/* Sekmelerin kutudan taşmasını engelle */
+.ai-tabs {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Modalın yatay kaydırmasını kesin olarak engelle */
+.ai-modal .modal-body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
