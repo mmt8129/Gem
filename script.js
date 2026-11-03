@@ -97,35 +97,43 @@ function metniTemizle(hamMetin) {
     temiz = temiz.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
     temiz = temiz.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '');
     
-    // 1. AI'ın cevap içine gömdüğü (1) (2) gibi referansları tıklanabilir yap
-    // (Bunu yaparken AI'ın verdiği linkleri bulup bir diziye atıyoruz)
-    // NOT: AI normalde [1](https://link) yazar. Bunu yakalayalım.
+    // 1. "Kaynak: exa.ai" veya "Kaynak: https://..." gibi kısımları yakala
+    temiz = temiz.replace(/(Kaynak|Kaynaklar|Source):?\s*([a-zA-Z0-9-]+\.[a-zA-Z]{2,}|https?:\/\/[^\s]+)/gi, (match, prefix, url) => {
+        // Eğer link http ile başlamıyorsa başına https:// ekle
+        let finalUrl = url;
+        if (!url.startsWith('http')) {
+            finalUrl = 'https://' + url;
+        }
+        // Küçük ve italik (eğik) yazı stili ile tıklanabilir yap
+        return `<span style="font-size: 0.75rem; font-style: italic; opacity: 0.8;">${prefix}: <a href="${finalUrl}" target="_blank" style="color: #3b82f6; text-decoration: underline;">${url}</a></span>`;
+    });
+
+    // 2. Diğer Markdown linklerini tıklanabilir yap
     temiz = temiz.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, (match, text, url) => {
-        // Linki custom tab'da açmak için target="_blank" ekliyoruz
         return `<a href="${url}" target="_blank" style="color: #3b82f6; text-decoration: underline;">${text}</a>`;
     });
 
-    // 2. Ham (çıplak) linkleri de tıklanabilir yap
+    // 3. Çıplak linkleri tıklanabilir yap (Eğer 1. adımda yakalanmayan varsa)
     temiz = temiz.replace(/(^|\s)(https?:\/\/[^\s]+)/g, (match, space, url) => {
         return `${space}<a href="${url}" target="_blank" style="color: #3b82f6; text-decoration: underline;">${url}</a>`;
     });
 
-    // 3. Çift yıldızları (**) Kırmızı Kalın Yazıya Çevir
+    // 4. Çift yıldızları (**) Kırmızı Kalın Yazıya Çevir
     temiz = temiz.replace(/\*\*(.*?)\*\*/g, '<b style="color:var(--primary);">$1</b>');
     temiz = temiz.replace(/^#{1,6}\s+(.*)$/gm, '<b style="color:var(--primary);">$1</b>');
     
-    // 4. Markdown Tablo Çizgilerini Temizle
+    // 5. Markdown Tablo Çizgilerini Temizle
     temiz = temiz.replace(/\|/g, ' '); 
     temiz = temiz.replace(/^[\s-:|]+$/gm, ''); 
     
-    // 5. Kalan tek yıldızları (*) ve alt tireleri (_) temizle
+    // 6. Kalan tek yıldızları (*) ve alt tireleri (_) temizle
     temiz = temiz.replace(/\*/g, ''); 
     temiz = temiz.replace(/(?<!\w)_(.*?)_(?!\w)/g, '$1'); 
 
-    // 6. Liste işaretlerini düzelt
+    // 7. Liste işaretlerini düzelt
     temiz = temiz.replace(/^\s*[\-\*]\s+/gm, '• ');
     
-    // 7. Satır atlamalarını HTML'e çevir
+    // 8. Satır atlamalarını HTML'e çevir
     temiz = temiz.replace(/\n/g, '<br>');
     
     return temiz;
