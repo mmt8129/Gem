@@ -332,7 +332,20 @@ function renderAll() {
     document.getElementById('scrollArea').scrollTop = 0;
 }
 
-function loadMore() { visibleCount += newsLimit; renderAll(); document.getElementById('scrollArea').scrollTo({ top: document.getElementById('scrollArea').scrollHeight, behavior: 'smooth' }); }
+function loadMore() {
+    const scrollArea = document.getElementById('scrollArea');
+    const previousHeight = scrollArea.scrollHeight; // Önceki yüksekliği kaydet
+    
+    visibleCount += newsLimit;
+    renderAll();
+    
+    // Yeni yükseklik ile eski yükseklik arasındaki farkı bul ve oraya kaydır
+    const newHeight = scrollArea.scrollHeight;
+    const scrollDifference = newHeight - previousHeight;
+    
+    // Kullanıcıyı eski yerinde tut
+    scrollArea.scrollTo({ top: scrollDifference, behavior: 'smooth' });
+}
 function setCategory(el, cat) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); currentCategory = cat; visibleCount = newsLimit; renderAll(); }
 function softRefresh() { visibleCount = newsLimit; localStorage.removeItem('haberai_news_cache'); fetchAllNews(true); showToast('🔄 Haberler yenilendi'); }
 
