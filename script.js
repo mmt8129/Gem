@@ -63,20 +63,13 @@ function updateSavedBadge() {
 
 // Haber detay sayfası A+ ve A- butonları için yazı boyutu ayarı
 let currentDetailSize = 16;
-
 function changeDetailFontSize(amount) {
     currentDetailSize += amount;
-    
-    // Sınırları belirle (Çok küçük veya çok büyük olmasın)
     if (currentDetailSize < 12) currentDetailSize = 12;
     if (currentDetailSize > 26) currentDetailSize = 26;
-    
-    // Haber içeriğini ve başlığını seç
     const bodyText = document.querySelector('.article-body');
     const titleText = document.querySelector('.article-title');
-    
     if (bodyText) bodyText.style.fontSize = currentDetailSize + 'px';
-    // Başlık gövdeden biraz daha büyük kalsın
     if (titleText) titleText.style.fontSize = (currentDetailSize + 6) + 'px';
 }
 
@@ -91,51 +84,31 @@ function dateKey(d) {
 
 function metniTemizle(hamMetin) {
     let temiz = String(hamMetin || '');
-    
-    // Gizli etiketleri temizle
     temiz = temiz.replace(/【[^】]*】/g, '').replace(/\[\d+†[^\]]*\]/g, '').replace(/\[\d+\]/g, '');
     temiz = temiz.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
     temiz = temiz.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '');
     
-    // 1. "Kaynak: exa.ai" veya "Kaynak: https://..." gibi kısımları yakala
+    // Linkleri tıklanabilir yap
     temiz = temiz.replace(/(Kaynak|Kaynaklar|Source):?\s*([a-zA-Z0-9-]+\.[a-zA-Z]{2,}|https?:\/\/[^\s]+)/gi, (match, prefix, url) => {
-        // Eğer link http ile başlamıyorsa başına https:// ekle
-        let finalUrl = url;
-        if (!url.startsWith('http')) {
-            finalUrl = 'https://' + url;
-        }
-        // Küçük ve italik (eğik) yazı stili ile tıklanabilir yap
+        let finalUrl = url.startsWith('http') ? url : 'https://' + url;
         return `<span style="font-size: 0.75rem; font-style: italic; opacity: 0.8;">${prefix}: <a href="${finalUrl}" target="_blank" style="color: #3b82f6; text-decoration: underline;">${url}</a></span>`;
     });
-
-    // 2. Diğer Markdown linklerini tıklanabilir yap
     temiz = temiz.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, (match, text, url) => {
         return `<a href="${url}" target="_blank" style="color: #3b82f6; text-decoration: underline;">${text}</a>`;
     });
-
-    // 3. Çıplak linkleri tıklanabilir yap (Eğer 1. adımda yakalanmayan varsa)
     temiz = temiz.replace(/(^|\s)(https?:\/\/[^\s]+)/g, (match, space, url) => {
         return `${space}<a href="${url}" target="_blank" style="color: #3b82f6; text-decoration: underline;">${url}</a>`;
     });
 
-    // 4. Çift yıldızları (**) Kırmızı Kalın Yazıya Çevir
+    // Kalın, tablo ve listeleri düzelt
     temiz = temiz.replace(/\*\*(.*?)\*\*/g, '<b style="color:var(--primary);">$1</b>');
     temiz = temiz.replace(/^#{1,6}\s+(.*)$/gm, '<b style="color:var(--primary);">$1</b>');
-    
-    // 5. Markdown Tablo Çizgilerini Temizle
     temiz = temiz.replace(/\|/g, ' '); 
     temiz = temiz.replace(/^[\s-:|]+$/gm, ''); 
-    
-    // 6. Kalan tek yıldızları (*) ve alt tireleri (_) temizle
     temiz = temiz.replace(/\*/g, ''); 
     temiz = temiz.replace(/(?<!\w)_(.*?)_(?!\w)/g, '$1'); 
-
-    // 7. Liste işaretlerini düzelt
     temiz = temiz.replace(/^\s*[\-\*]\s+/gm, '• ');
-    
-    // 8. Satır atlamalarını HTML'e çevir
     temiz = temiz.replace(/\n/g, '<br>');
-    
     return temiz;
 }
 
@@ -326,27 +299,33 @@ function renderAll() {
         });
     }
     if (filtered.length > visibleCount) {
-        listHTML += `<div class="load-more-area"><button class="btn-load-more" onclick="loadMore()">Daha Fazla Göster (${filtered.length - visibleCount})</button></div>`;
+        listHTML += `<div class="load-more-area" id="loadMoreArea"><button class="btn-load-more" onclick="loadMore()">Daha Fazla Göster (${filtered.length - visibleCount})</button></div>`;
     }
     listMount.innerHTML = listHTML;
-    document.getElementById('scrollArea').scrollTop = 0;
+    
+    // Sayfa yenilenirken en üste kaydırma yapmıyoruz.
+    // document.getElementById('scrollArea').scrollTop = 0; // BU SATIR KALDIRILDI
 }
 
 function loadMore() {
     const scrollArea = document.getElementById('scrollArea');
-    const previousHeight = scrollArea.scrollHeight; // Önceki yüksekliği kaydet
+    const btn = document.querySelector('.btn-load-more');
     
+    // Butonun sayfadaki konumunu al
+    const buttonRect = btn.getBoundingClientRect();
+    const buttonTop = buttonRect.top + scrollArea.scrollTop;
+
+    // Yeni haberleri yükle
     visibleCount += newsLimit;
     renderAll();
-    
-    // Yeni yükseklik ile eski yükseklik arasındaki farkı bul ve oraya kaydır
-    const newHeight = scrollArea.scrollHeight;
-    const scrollDifference = newHeight - previousHeight;
-    
-    // Kullanıcıyı eski yerinde tut
-    scrollArea.scrollTo({ top: scrollDifference, behavior: 'smooth' });
+
+    // Render işleminden sonra tekrar butonun olduğu yere kaydır (böylece zıplama olmaz)
+    setTimeout(() => {
+        scrollArea.scrollTo({ top: buttonTop - 20, behavior: 'smooth' });
+    }, 50);
 }
-function setCategory(el, cat) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); currentCategory = cat; visibleCount = newsLimit; renderAll(); }
+
+function setCategory(el, cat) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); currentCategory = cat; visibleCount = newsLimit; renderAll(); document.getElementById('scrollArea').scrollTop = 0; }
 function softRefresh() { visibleCount = newsLimit; localStorage.removeItem('haberai_news_cache'); fetchAllNews(true); showToast('🔄 Haberler yenilendi'); }
 
 // ==================== DETAY SAYFASI ====================
@@ -373,6 +352,9 @@ function showDetailPage() {
     document.getElementById('detailCategory').textContent = (n.category || '').toUpperCase();
     document.getElementById('detailTitle').textContent = n.title;
     document.getElementById('detailDate').textContent = n.pubDate ? new Date(n.pubDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+
+    // HAFIZA İÇİN ID KAYDI
+    localStorage.setItem('haberai_last_detail_news_id', n.id || n.title);
 
     document.getElementById('detailBody').innerHTML = '<p style="text-align:center; color:#888;">İçerik yükleniyor...</p>';
 
@@ -431,35 +413,73 @@ document.addEventListener('click', function(e) {
     if (dropdownOpen && menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) { dropdownOpen = false; menu.classList.remove('show'); }
 });
 
-// ==================== DETAY AI SHEET ====================
+// ==================== DETAY AI SHEET (HAFIZALI) ====================
 function openDetailSheet() {
     document.getElementById('detailSheet').classList.add('active');
     document.getElementById('detailFab').style.display = 'none';
     document.body.style.overflow = 'hidden';
     const chatBody = document.getElementById('detailChatBody');
-    chatBody.innerHTML = '<div class="msg ai">Bu haber hakkında ne öğrenmek istersin?<div class="chip-row"><button class="chip" onclick="askDetailAI(\'Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.\')">✨ Özetle</button></div></div>';
+    
+    // Hafızadan bu habere ait sohbeti çek
+    const lastNewsId = localStorage.getItem('haberai_last_detail_news_id');
+    const savedChatStr = localStorage.getItem('haberai_detail_chat_' + lastNewsId);
+    
+    if (savedChatStr) {
+        try {
+            const savedChat = JSON.parse(savedChatStr);
+            chatBody.innerHTML = '';
+            savedChat.forEach(msg => {
+                const roleClass = msg.sender === 'user' ? 'user' : 'ai';
+                const text = msg.sender === 'user' ? msg.text : metniTemizle(msg.text);
+                chatBody.innerHTML += `<div class="msg ${roleClass}">${text}</div>`;
+            });
+        } catch(e) { console.error("Hafıza okuma hatası", e); }
+    } else {
+        chatBody.innerHTML = '<div class="msg ai">Bu haber hakkında ne öğrenmek istersin?<div class="chip-row"><button class="chip" onclick="askDetailAI(\'Bu haberi kısa ve açıklayıcı şekilde maddeler halinde özetle.\')">✨ Özetle</button></div></div>';
+    }
+    
     pushModal('detailSheet');
 }
+
 function closeDetailSheet(useStack = true) {
     document.getElementById('detailSheet').classList.remove('active');
     document.getElementById('detailFab').style.display = 'flex';
     document.body.style.overflow = '';
     if (useStack) popModal();
 }
+
 async function sendDetailMessage() {
     const inp = document.getElementById('detailChatInput');
     const text = inp.value.trim();
     if (!text || !currentDetailNews) return;
     const body = document.getElementById('detailChatBody');
+    
+    // Hafıza ID'sini al
+    const lastNewsId = localStorage.getItem('haberai_last_detail_news_id');
+    let savedChatStr = localStorage.getItem('haberai_detail_chat_' + lastNewsId);
+    let savedChat = [];
+    if (savedChatStr) { try { savedChat = JSON.parse(savedChatStr); } catch(e){} }
+
+    // Kullanıcı mesajını ekle ve kaydet
     body.innerHTML += `<div class="msg user">${text}</div>`;
+    savedChat.push({ sender: 'user', text: text });
+    localStorage.setItem('haberai_detail_chat_' + lastNewsId, JSON.stringify(savedChat));
     inp.value = '';
+    
     const typingId = 'dtyping-' + Date.now();
     body.innerHTML += `<div class="msg ai" id="${typingId}"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
     body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
+    
     const contextPrompt = `Haber Başlığı: ${currentDetailNews.title}\nHaber Linki: ${currentDetailNews.link || ''}\nHaber Açıklaması: ${(currentDetailNews.description || '').replace(/<[^>]*>/g, '').substring(0, 800)}\n\nKullanıcı Sorusu: ${text}`;
+    
     try {
         const cevap = await callGemini(contextPrompt);
         const temizCevap = metniTemizle(cevap);
+        
+        // AI cevabını kaydet
+        savedChat.push({ sender: 'ai', text: cevap });
+        localStorage.setItem('haberai_detail_chat_' + lastNewsId, JSON.stringify(savedChat));
+        
         const typing = document.getElementById(typingId);
         if (typing) typing.remove();
         body.innerHTML += `<div class="msg ai">${temizCevap}</div>`;
@@ -491,7 +511,6 @@ function openAIModal(initialText) {
     });
 
     if (initialText) setTimeout(() => { document.getElementById('aiInput').value = initialText; sendAIMessage(); }, 300);
-    // else setTimeout(() => document.getElementById('aiInput').focus(), 400);
     pushModal('ai');
 }
 function closeAIModal(useStack = true) {
@@ -556,26 +575,11 @@ async function sendAIMessage() {
     }
 }
 async function generateSearchQuery(question) {
-    // 1. Tüm noktalama işaretlerini kaldır (soru işareti, virgül, nokta vs.)
     let cleaned = question.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
-
-    // 2. Türkçeye özgü gereksiz soru eklerini ve kelimelerini kaldır
-    const stopWords = [
-        "nelerdir", "nedir", "kimdir", "nerededir", "nasıldır", "hakkında", "bilgi", "ver", "anlat", 
-        "öğrenmek", "istiyorum", "kim", "ne", "nerede", "nasıl", "neden", "niçin", "ve", "ile", "mi", "mı", "mu", "mü", "hangisi", "neresi", "nereye", "nereden", "kaçı", "hangi", "kaç", "ne kadar", "kaçıncı", "kaçar", "niye", "ne diye", "ne zaman", "kimin", "neyin", "hangileri", "kimler", "neler"
-    ];
-
-    // Metni kelimelere ayır ve gereksizleri filtrele
+    const stopWords = ["nelerdir", "nedir", "kimdir", "nerededir", "nasıldır", "hakkında", "bilgi", "ver", "anlat", "öğrenmek", "istiyorum", "kim", "ne", "nerede", "nasıl", "neden", "niçin", "ve", "ile", "mi", "mı", "mu", "mü", "hangisi", "neresi", "nereye", "nereden", "kaçı", "hangi", "kaç", "ne kadar", "kaçıncı", "kaçar", "niye", "ne diye", "ne zaman", "kimin", "neyin", "hangileri", "kimler", "neler"];
     let words = cleaned.split(/\s+/);
-    words = words.filter(word => {
-        // Kelimeyi küçük harfe çevirip listemizde var mı diye bak
-        return !stopWords.includes(word.toLowerCase()) && word.length > 1;
-    });
-
-    // 3. Temizlenmiş kelimeleri tekrar birleştir
+    words = words.filter(word => !stopWords.includes(word.toLowerCase()) && word.length > 1);
     let finalQuery = words.join(" ").trim();
-
-    // 4. Eğer temizlik sonrası hiç kelime kalmadıysa (örn: sadece "nedir" yazıldıysa), orijinal soruyu kullan
     return finalQuery || question;
 }
 async function switchTab(type) {
@@ -668,7 +672,6 @@ function openSettingsModal() {
     document.body.style.overflow = 'hidden';
     pushModal('settings');
 }
-
 
 function closeSettingsModal(useStack = true) { document.getElementById('settingsModalOverlay').classList.remove('active'); document.body.style.overflow = ''; if (useStack) popModal(); visibleCount = newsLimit; renderAll(); }
 function adjustNewsLimit(amount) { let newLimit = newsLimit + amount; if (newLimit >= 5 && newLimit <= 20) { newsLimit = newLimit; localStorage.setItem('haberai_news_limit', newsLimit); document.getElementById('newsLimitDisplay').textContent = newsLimit; } }
@@ -862,5 +865,4 @@ updateSavedBadge();
 updateDate();
 loadWeatherFromCache();
 fetchWeather('Ankara');
-// ... en alttaki diğer başlatma kodlarının yanına ...
 initTheme();
